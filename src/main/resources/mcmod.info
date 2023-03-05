@@ -1,0 +1,19 @@
+{
+  "modListVersion": 2,
+  "modList": [{
+    "modid": "journeymap",
+    "name": "JourneyMap",
+    "description": "JourneyMap ${jmedition} Edition: Real-time map in-game or in a web browser as you explore.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "http://journeymap.info",
+    "updateUrl": "",
+    "authorList": ["techbrew", "mysticdrew"],
+    "logoFile": "assets/journeymap/web/img/ico/journeymap144.png",
+    "screenshots": [],
+    "dependants":[],
+    "dependencies": ["Forge@[${forgeversion},)"],
+    "requiredMods": ["Forge@[${forgeversion},)"],
+    "useDependencyInformation": true
+  }]
+}

@@ -1,0 +1,25 @@
+/* JourneyMap 5.1.1 Splash/About Dialog - nl_NL */
+{
+  "lines": [
+    {
+      "label": "Nieuw 'Vault' thema. Klik hier om het uit te proberen!",
+      "action": "fullscreen.Fullscreen#setTheme#Vault"
+    },
+    {
+      "label": "Verbeterd geheugen- en processorgebruik",
+      "action": ""
+    },
+    {
+      "label": "Betere klimaat- en waterkleuren",
+      "action": ""
+    },
+    {
+      "label": "JourneyMapServer is nu inbegrepen in het jar-bestand",
+      "action": ""
+    },
+    {
+      "label": " Gelijktijdige release voor Minecraft 1.7.10 en 1.8",
+      "action": ""
+    }
+  ]
+}

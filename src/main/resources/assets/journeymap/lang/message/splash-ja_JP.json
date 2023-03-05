@@ -1,0 +1,26 @@
+/* JourneyMap 5.1.1 Splash/About Dialog - ja_JP */
+/* Only translate label values. Do not translate action values. */
+{
+  "lines": [
+    {
+      "label": "Vault風の、新しい「ボールト」のテーマです。使用するには、ここをクリックしてください！",
+      "action": "fullscreen.Fullscreen#setTheme#Vault"
+    },
+    {
+      "label": "メモリとCPUの使用率が減りました",
+      "action": ""
+    },
+    {
+      "label": "より正確なバイオームの色と水の色",
+      "action": ""
+    },
+    {
+      "label": "JourneyMap Serverを同梱しました。",
+      "action": ""
+    },
+    {
+      "label": "Minecraft 1.7.10とMinecraft 1.8のJourneyMapが同時公開されした!",
+      "action": ""
+    }
+  ]
+}

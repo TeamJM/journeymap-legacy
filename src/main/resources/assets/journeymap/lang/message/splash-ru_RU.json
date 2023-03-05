@@ -1,0 +1,26 @@
+/* JourneyMap 5.1.1 Splash/About Dialog - ru_RU  */
+/* Only translate label values. Do not translate action values. */
+{
+  "lines": [
+    {
+      "label": "Новая тема интерфейса 'Vault'. Нажмите здесь, чтобы попробовать!",
+      "action": "fullscreen.Fullscreen#setTheme#Vault"
+    },
+    {
+      "label": "Улучшенное использование процессора и оперативной памяти",
+      "action": ""
+    },
+    {
+      "label": "Более точные цвета биомов и воды",
+      "action": ""
+    },
+    {
+      "label": "jar-файл JourneyMap теперь содержит и серверную часть",
+      "action": ""
+    },
+    {
+      "label": "Релиз для Minecraft 1.7.10 и 1.8",
+      "action": ""
+    }
+  ]
+}

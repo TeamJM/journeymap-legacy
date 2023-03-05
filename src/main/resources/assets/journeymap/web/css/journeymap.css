@@ -1,0 +1,285 @@
+html,body{height:100%;margin:0;padding:0}
+/*!
+ JourneyMap Mod <journeymap.info> for Minecraft
+ Copyright (c) 2011-2018  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved. */
+ 
+#map-canvas {
+    height: 100%;
+    width: 100%;
+    background-color: #111 !important;
+}
+
+#jm-logo{
+    padding: 2px 10px 0px 15px;
+}
+
+#jm-button {
+	height: 40px;
+    margin-top: 2px;
+}
+
+#jm-button div {	
+
+	font-size: 14px !important;
+}
+
+#jm-menu img {
+	margin-right:10px;
+}
+
+.ui-menu-item {
+    padding-left: 5px;	
+}
+
+.ui-menu-item a img {
+	vertical-align: middle;
+}
+
+li label {
+	display: inline;
+	height: 30px;
+	line-height: 30px;
+	padding: 5px 20px;
+	clear: both;
+	white-space: nowrap;
+	font-weight: normal;
+	cursor: pointer;
+}
+
+li label input {
+    vertical-align: text-bottom;
+}
+
+label span {
+	margin: 5px 0px 5px 5px;
+}
+
+.nav {
+	padding: 10px 10px 0px 0px;
+}
+
+.nav-button button {
+    height: 38px;
+	margin: 0px;
+}
+
+
+#jm-rt-menus {
+	display: inline;
+	position: relative;
+}
+
+#jm-rt-menus div {
+    display: inline;
+}
+
+#jm-menu {
+	padding: 5px;
+}
+
+#jm-menu li {
+    padding: 5px;
+}
+
+#jm-actions-menu {
+	padding: 5px;
+}
+
+#jm-actions-menu li {
+    padding: 5px;
+}
+
+#worldInfo {
+    padding:6px;
+    display:inline-block;
+    font-weight: bold;
+}
+
+#worldInfo .infoTitle  {
+    font-style:italic;
+    font-weight:normal;
+    text-align:right;
+    padding-left:4px;
+    padding-right:4px;
+
+}
+
+.playerMarker {
+	height:32px;
+	width:32px;
+	border: none;
+}
+
+.entityMarker, .mpMarker {
+	height:64px;
+	width:64px;
+	border: none;
+}
+
+.entityName {
+	font:bold 11px Arial;
+	text-align:center;
+	white-space: nowrap;
+	color:#ffffff;
+	padding:2px;
+	background-color:#000000;
+	visibility:hidden;
+	position:absolute;
+	margin-top:-2em;
+}
+
+.mpName {
+    font:bold 11px Arial;
+    text-align:center;
+    white-space: nowrap;
+    color:#ffffff;
+    padding:3px;
+
+    position:absolute;
+    margin-top:-12px;
+    
+    background-color:rgba(34,34,34,0.7);
+    display:inline-block;
+    
+    border-width:1px;
+    border-style:solid;
+    border-color:#c5c5c5;
+    
+    -webkit-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    border-radius: 6px;
+}
+
+.waypoint {
+    font-size: 10px;
+    font-weight: bold;
+    text-align:center;
+    white-space: nowrap;
+    
+    height: 15px;
+    padding:5px;
+    color: #fff;
+    background-color:rgba(34,34,34,0.9);    
+    
+    border-width:1px;
+    border-style:solid;
+    border-color:#c5c5c5;
+    
+    -webkit-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    border-radius: 6px;
+}
+
+.waypoint.death {
+	background-color:rgba(255,0,0,0.7);
+}
+
+.playerImages, .entityImages, .mpImages {
+    position:relative;	
+}
+
+.entityIcon {
+    position:absolute;
+    width: 16px;
+    height: 16px;
+    top: 24px;
+    left: 24px;
+}
+
+.entityIcon.entity_3D {
+	position:absolute;
+	width: 32px;
+	height: 32px;
+	top: 6px;
+	left: 16px;
+}
+
+.entityLocator, .mpLocator {
+	position:absolute;
+	width: 64px;
+    height: 64px;
+}
+
+.playerLocator {
+	position:absolute;
+	width: 32px;
+    height: 32px;
+}
+
+.mpIcon {
+    position:absolute;
+    top: 20px;
+    left: 20px;
+    width: 24px;
+    height: 24px;
+}
+
+.playerInfo {
+  
+    font-size: 10px;
+    font-weight: bold;
+    
+    margin-bottom:32px;
+    padding:5px;
+    color: #fff;
+    background-color:rgba(34,34,34,0.7);
+    display:inline-block;
+    
+    border-width:1px;
+    border-style:solid;
+    border-color:#c5c5c5;
+    
+    -webkit-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    border-radius: 6px;
+
+}
+
+.message {
+    font-size: 14px !important;
+    text-align: center;
+    cursor: pointer;
+}
+
+.dialog {
+	text-align: center;
+}
+
+.ui-widget {
+	font-size: 14px !important;
+}
+
+.ui-dialog .ui-dialog-buttonpane { 
+    text-align: center;
+    padding:5px !important;
+}
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { 
+    float: none;
+}
+
+.ui-button-text img {
+    width: 24px;
+    height: 24px;
+}
+
+/* Fix Google Maps canvas */
+.google-map-canvas,
+.google-map-canvas * { 
+	.box-sizing(content-box); 
+}
+
+/* Optional responsive image setFrom */
+img { max-width: none; }
+
+/* Debug page */
+.entry{width:300px;display:inline-block;}
+.rgb{display:inline-block;height:32px;width:32px}

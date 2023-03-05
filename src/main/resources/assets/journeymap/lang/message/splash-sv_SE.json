@@ -1,0 +1,26 @@
+/* JourneyMap 5.1.1 Splash/About Dialog - sv_SE */
+/* Only translate label values. Do not translate action values. */
+{
+  "lines": [
+    {
+      "label": "Nya 'Vault'-temat. Klicka här för att testa det!",
+      "action": "fullscreen.Fullscreen#setTheme#Vault"
+    },
+    {
+      "label": "Förbättrad minnes- och processoranvändning",
+      "action": ""
+    },
+    {
+      "label": "Mer exakta biom- och vattenfäger",
+      "action": ""
+    },
+    {
+      "label": "JourneyMapServer är nu inkluderad i samma jar-fil",
+      "action": ""
+    },
+    {
+      "label": "Samtidiga släpp för Minecraft 1.7.10 och 1.8",
+      "action": ""
+    }
+  ]
+}

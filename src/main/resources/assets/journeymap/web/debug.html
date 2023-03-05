@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>JourneyMap Debug</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="description" content="">
+    <meta name="author" content="Techbrew Interactive, LLC (techbrew.net)">
+    <link href="http://feeds.feedburner.com/JourneyMap" id="rssfeed" rel="alternate" type="application/rss+xml"/>
+    <link href="http://code.jquery.com/ui/1.10.4/themes/flick/jquery-ui.css" rel="stylesheet" type="text/css"/>
+    <link href="css/journeymap.css?v=@JMVERSION@" rel="stylesheet" type="text/css"/>
+    <link rel="shortcut icon" href="favicon.ico">
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script>
+        $(function()
+        {
+            var logTimeout;
+            var logActive = false;
+            var autoLog = true;
+
+            var loadLog = function()
+            {
+                clearTimeout(logTimeout);
+                if(logActive)
+                {
+                    $.ajax({
+                        url: "/log",
+                        dataType : 'html',
+                        success: function(data, textStatus) {
+                            $("#log").html(data);
+                            $("#log").scrollTop($("#log")[0].scrollHeight);
+                        }
+                    })
+                }
+                if(autoLog)
+                {
+                    logTimeout = setTimeout(loadLog, 3000);
+                }
+            };
+            
+            $('#reloadbtn').button({ icons: {primary: 'ui-icon-refresh'}});
+            $('#savelogbtn').button({ icons: {primary: 'ui-icon-disk'}});
+            $('#accordion').accordion( { active:false, heightStyle: 'content' } );
+            $('#tabs').tabs( { heightStyle: 'content', activate: function( event, ui ) {
+                logActive = (ui.newTab.id == $('#tabs-3').id);
+                if(logActive)
+                {
+                    loadLog();
+                }
+                else
+                {
+                    clearTimeout(logTimeout);
+                }
+            } } );
+
+            $('#logbtn').prop('checked', true)
+                    .button( { icons: {primary: 'ui-icon-refresh'}})
+                    .click(function( event )
+            {
+                this.blur();
+                autoLog = this.prop('checked');
+                if(autoLog)
+                {
+                    loadLog();
+                }
+            });
+        });
+
+
+    </script>
+    <style>
+        body {height: auto; }
+        span{vertical-align:middle; margin:2px; }
+    </style>
+</head>
+<body>
+
+<div class="ui-widget ui-widget-header ui-corner-all" style="text-align: center">
+    <h2>JourneyMap @JMVERSION@ for @MCVERSION@</h2>
+</div>
+
+<div id="tabs">
+    <ul>
+        <li><a href="#tabs-1">Data</a></li>
+        <li><a href="#tabs-2">Colors</a></li>
+        <li><a href="#tabs-3">Log</a></li>
+    </ul>
+
+    <div id="tabs-1">
+
+        <a id="reloadbtn" href="/debug">Refresh</a><br/>
+
+        <output/>
+
+    </div>
+    <!-- /tabs-1 -->
+
+    <div id="tabs-2" style="">
+        <iframe style="width:100%;height:600px;" src="/colorpalette.html"></iframe>
+    </div>
+
+    <div id="tabs-3">
+        <div class="ui-buttonset">
+            <input type="checkbox" id="logbtn" checked><label for="logbtn">Auto Refresh</label>
+            <a id="savelogbtn" href="/log" download>Save Copy</a><br/>
+        </div>
+        <textarea readonly id="log" style="width: 100%; height:600px; padding:5px; line-height:1.3"></textarea>
+    </div>
+    <!-- /tabs-3 -->
+
+</div>
+<!-- /tabs -->
+
+</body>
+</html>
