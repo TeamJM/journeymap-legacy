@@ -14,7 +14,7 @@ Source code and build resources for [JourneyMap][2] ([http://journeymap.info][2]
 Check out a branch of the JourneyMap GIT repo to a directory called journeymap.  For example:
 
 ```sh
-    git clone git@github.com:TeamJM/journeymap-private.git   
+    git clone git@github.com:TeamJM/journeymap-legacy.git   
     cd journeymap
     git fetch && git checkout (branchname)
 ```
