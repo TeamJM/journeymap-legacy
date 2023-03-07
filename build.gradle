@@ -6,19 +6,26 @@ buildscript {
             url = "https://maven.minecraftforge.net/"
         }
         maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        maven {
             name = "sonatype"
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
         }
     }
     dependencies {
-        classpath ('com.anatawa12.forge:ForgeGradle:1.2-1.0.+') {
+        classpath('com.anatawa12.forge:ForgeGradle:1.2-1.0.+') {
             changing = true
         }
+        classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
+//        classpath group: 'com.modrinth.minotaur', name: 'Minotaur', version: '2.+' //TODO
     }
 }
 
 apply plugin: 'forge'
 apply plugin: 'java'
+apply plugin: 'com.matthewprenger.cursegradle'
+//apply plugin: "com.modrinth.minotaur" //TODO
 
 // Fixes bug in IDEA 14 that wasn't putting resources into build/classes
 sourceSets {
@@ -57,29 +64,41 @@ minecraft {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: '*.*');
+    compile fileTree(dir: 'libs', include: '*.*')
 }
 
 processResources {
-        // this will ensure that this task is redone when the versions change.
-        inputs.property "version", project.version
-        inputs.property "mcversion", project.minecraft.version
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
 
-        from(sourceSets.main.resources.srcDirs) {
-            include 'license.txt'
-            expand 'version': project.version, 'mcversion': project.minecraft.version, 'date' : getDate()
-        }
-        // copy everything else, thats not the mcmod.info
-        from(sourceSets.main.resources.srcDirs) {
-            exclude 'mcmod.info'
-            exclude 'license.txt'
-        }
+    from(sourceSets.main.resources.srcDirs) {
+        include 'license.txt'
+        expand 'version': project.version, 'mcversion': project.minecraft.version, 'date': getDate()
+    }
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+        exclude 'license.txt'
+    }
+}
+
+task processDocs(type: Copy) {
+    // update docs
+    from(file("/doc/")) {
+        include '*.html'
+        expand 'version': project.version,
+                'date': getDate(),
+                'mcversion': config.minecraft_version,
+                'forgeversion': config.forge_version
+    }
+    into 'build/doc'
 }
 
 task copyJs(type: Copy) {
     from 'tmp'
     into 'build/resources/main/assets/journeymap/web/css'
-    include 'journeymap.css' 
+    include 'journeymap.css'
 }
 
 task copyCss(type: Copy, dependsOn: copyJs) {
@@ -91,27 +110,27 @@ task copyCss(type: Copy, dependsOn: copyJs) {
 task filter() {
     def subdir = new File("tmp")
 
-    if( !subdir.exists() ) {
+    if (!subdir.exists()) {
         subdir.mkdirs()
     }
 }
 
-task minifyJs(type: JavaExec, dependsOn: filter) { 
-    ant.java(jar:"libs/yuicompressor-2.4.7.jar",fork:true) 
-    {
-        arg(value: "${srcWebDir}js/journeymap.js")
-        arg(value: "-o")
-        arg(value: "tmp/journeymap.js")
-    }
+task minifyJs(type: JavaExec, dependsOn: filter) {
+    ant.java(jar: "libs/yuicompressor-2.4.7.jar", fork: true)
+            {
+                arg(value: "${srcWebDir}js/journeymap.js")
+                arg(value: "-o")
+                arg(value: "tmp/journeymap.js")
+            }
 }
 
 task minifyCss(type: JavaExec, dependsOn: filter) {
-    ant.java(jar:"libs/yuicompressor-2.4.7.jar",fork:true) 
-    {
-        arg(value: "${srcWebDir}css/journeymap.css")
-        arg(value: "-o")
-        arg(value: "tmp/journeymap.css")
-    }
+    ant.java(jar: "libs/yuicompressor-2.4.7.jar", fork: true)
+            {
+                arg(value: "${srcWebDir}css/journeymap.css")
+                arg(value: "-o")
+                arg(value: "tmp/journeymap.css")
+            }
 }
 
 task deleteNoRadar(type: Delete) {
@@ -122,7 +141,7 @@ task deleteUnlimited(type: Delete) {
     delete '${implSrc}Unlimited.java'
 }
 
-task unlimitedJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar']) {
+task unlimitedJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar', 'processDocs']) {
     version = "${version}-${config.unlimited}".toLowerCase()
 
     from(sourceSets.main.output) {
@@ -130,11 +149,11 @@ task unlimitedJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar']) {
     }
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-        expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion' : config.forge_version, jmedition : config.unlimited
+        expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion': config.forge_version, jmedition: config.unlimited
     }
 }
 
-task fairPlayJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar', 'deleteUnlimited']) {
+task fairPlayJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar', 'deleteUnlimited', 'processDocs']) {
     version = "${version}-${config.fairPlay}".toLowerCase()
     from(sourceSets.main.output) {
         exclude("journeymap/client/feature/impl/Unlimited.class")
@@ -142,15 +161,15 @@ task fairPlayJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar', 'deleteUnlim
     }
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-        expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion' : config.forge_version, jmedition : config.fairPlay
+        expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion': config.forge_version, jmedition: config.fairPlay
     }
 }
 
-reobf { 
-    reobf (unlimitedJar) { spec ->
+reobf {
+    reobf(unlimitedJar) { spec ->
         spec.classpath = sourceSets.main.compileClasspath;
     }
-    reobf (fairPlayJar) { spec ->
+    reobf(fairPlayJar) { spec ->
         spec.classpath = sourceSets.main.compileClasspath;
     }
 }
@@ -167,3 +186,46 @@ def getDate() {
 }
 
 build.dependsOn makePretty
+
+// Automated upload to CurseForge for the win!
+if (!project.hasProperty("curseForgeApiKey")) {
+    ext.curseForgeApiKey = "notset"
+}
+
+
+curseforge {
+    project {
+        id = '32274'
+        apiKey = "${curseForgeApiKey}"
+        changelogType = 'html'
+        releaseType = config.curse_release_type
+        relations {
+            tool 'journeymap-tools'
+        }
+
+        mainArtifact(unlimitedJar) {
+            displayName = "${archivesBaseName}-${version}"
+            changelog = file('/build/doc/changelog.html')
+        }
+
+        addArtifact(fairPlayJar) {
+            changelog = file('/build/doc/changelog.html')
+        }
+    }
+}
+
+
+//TODO: see if we can get modrinth working
+//tasks.modrinth.dependsOn(tasks.build)
+//
+//modrinth {
+//    token = "${modrinthApiKey}"
+//    projectId = "lfHFW1mp"
+//    versionNumber = "${version}"
+//    versionName = "${archivesBaseName}-${version}"
+//    versionType = "release"
+//    uploadFile = shadowJar
+//    gameVersions = ["${project.minecraft_version}"]
+//    loaders = ["forge"]
+//    changelog = file('/build/doc/changelog.html').exists() ? file('/build/doc/changelog.html').text : null
+//}
