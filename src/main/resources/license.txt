@@ -1,6 +1,6 @@
 JourneyMap ${version} for Minecraft ${mcversion} (${date})
 http://journeymap.info/
-Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  LGPL v3.
+Copyright (c) 2011-2017  Techbrew LLC <techbrew.net>.  LGPL v2.1.
 
 JourneyMap may only be distributed in a Modpack if the qualifications and conditions have
 been met according to: http://journeymap.info/help/modpacks/
