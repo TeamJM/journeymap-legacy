@@ -1,11 +1,23 @@
 # [JourneyMap for Minecraft][1]
 
 Source code and build resources for [JourneyMap][2] ([http://journeymap.info][2])
-
+ 
 ## Requirements
 
-* Java 1.7 or 1.8 JDK
+* Java 1.8 JDK
 * IntelliJ IDEA
+
+## Contributing
+
+We're huge fans of the open source community, and we're happy to accept pull requests for patches and improvements. That said, we would prefer that you join the discord server and have a chat with us about it first. This allows us to cooperate with you and ensure that your PR makes sense, and isn't stepping on anyone else's toes.
+
+If you would like to contribute, please fork this repository and submit a pull request.
+
+When submitting a pull request, please follow these guidelines:
+
+- Make sure to describe your changes in the pull request description.
+- Make sure to run your code locally to ensure that your changes are functioning correctly and have not broken anything. See the section below for instructions on how to do this.
+
 
 ## Environment Setup
 
@@ -29,10 +41,7 @@ Check out a branch of the JourneyMap GIT repo to a directory called journeymap. 
 
 * Open journeymap.ipr in IDEA
 * Import Project from Gradle when prompted
-* Edit the Minecraft Client run configuration, add your credentials to `Program Arguments`: 
 
-```
-    --username name@email.address --password foo
 ```
 
 ### 3. Build the jars
@@ -40,6 +49,7 @@ Check out a branch of the JourneyMap GIT repo to a directory called journeymap. 
 * Update `project.properties` version info
 * Build using Gradle (build.gradle) > build
 * The end result will be in `build/libs/journeymap*.jar`
+
 
 [1]: https://github.com/TeamJM/journeymap-legacy
 [2]: http://journeymap.info
