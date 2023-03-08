@@ -42,14 +42,11 @@ Check out a branch of the JourneyMap GIT repo to a directory called journeymap. 
 * Open journeymap.ipr in IDEA
 * Import Project from Gradle when prompted
 
-```
-
 ### 3. Build the jars
 
 * Update `project.properties` version info
 * Build using Gradle (build.gradle) > build
 * The end result will be in `build/libs/journeymap*.jar`
-
 
 [1]: https://github.com/TeamJM/journeymap-legacy
 [2]: http://journeymap.info
