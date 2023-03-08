@@ -27,11 +27,6 @@ apply plugin: 'java'
 apply plugin: 'com.matthewprenger.cursegradle'
 //apply plugin: "com.modrinth.minotaur" //TODO
 
-// Fixes bug in IDEA 14 that wasn't putting resources into build/classes
-sourceSets {
-    main { output.resourcesDir = output.classesDir }
-}
-
 ext {
     configFile = file "project.properties"
     srcWebDir = "src/main/resources/assets/journeymap/web/"
