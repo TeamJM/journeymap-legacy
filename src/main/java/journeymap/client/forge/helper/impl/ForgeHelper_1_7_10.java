@@ -60,6 +60,8 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     private IRenderHelper renderHelper = new RenderHelper_1_7_10();
     private IBlockAccess blockAccess = new JmBlockAccess();
 
+    private static Minecraft mc = Minecraft.getMinecraft();
+
     @Override
     public IRenderHelper getRenderHelper()
     {
@@ -375,23 +377,15 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     @Override
     public BiomeGenBase getBiome(ChunkMD chunkMD, int x, int y, int z)
     {
-        if (chunkMD != null && chunkMD.hasChunk())
+        try
         {
-            try
-            {
-                Chunk chunk = chunkMD.getChunk();
-                BiomeGenBase biome = chunk.getBiomeGenForWorldCoords(x & 15, z & 15, ForgeHelper.INSTANCE.getWorld().getWorldChunkManager());
-                if (biome != null)
-                {
-                    return biome;
-                }
-            }
-            catch (Throwable throwable)
-            {
-                Journeymap.getLogger().error("Error in getBiome(): " + throwable);
-            }
+            return mc.theWorld.getBiomeGenForCoords(x,z);
         }
-        return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(x, z);
+        catch (Throwable throwable)
+        {
+            Journeymap.getLogger().error("Error in getBiome(): " + throwable);
+            return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(x, z);
+        }
     }
 
     @Override
@@ -519,27 +513,12 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         @Override
         public BiomeGenBase getBiomeGenForCoords(int x, int z)
         {
-            Chunk chunk = getChunk(x, z);
-            if (chunk != null)
-            {
-                try
-                {
-                    BiomeGenBase biome = chunk.getBiomeGenForWorldCoords(x & 15, z & 15, chunk.worldObj.provider.worldChunkMgr);
-                    if (biome == null)
-                    {
-                        return null;
-                    }
-                    return biome;
-                }
-                catch (Throwable throwable)
-                {
-                    Journeymap.getLogger().error("Error in getBiomeGenForCoords(): " + throwable);
-                    return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(x, z);
-                }
+            try {
+                return mc.theWorld.getBiomeGenForCoords(x,z);
             }
-            else
-            {
-                return ForgeHelper.INSTANCE.getWorld().provider.getBiomeGenForCoords(x, z);
+            catch (Throwable throwable) {
+                Journeymap.getLogger().error("Error in getBiomeGenForCoords(): " + throwable);
+                return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(x, z);
             }
         }
 
