@@ -513,10 +513,12 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         @Override
         public BiomeGenBase getBiomeGenForCoords(int x, int z)
         {
-            try {
+            try
+            {
                 return mc.theWorld.getBiomeGenForCoords(x,z);
             }
-            catch (Throwable throwable) {
+            catch (Throwable throwable)
+            {
                 Journeymap.getLogger().error("Error in getBiomeGenForCoords(): " + throwable);
                 return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(x, z);
             }
