@@ -33,7 +33,6 @@ public class RenderSpec
     private static volatile RenderSpec lastSurfaceRenderSpec;
     private static volatile RenderSpec lastUndergroundRenderSpec;
     private static Minecraft minecraft = Minecraft.getMinecraft();
-    private final EntityPlayer player;
     private final Boolean underground;
     private final int primaryRenderDistance;
     private final int maxSecondaryRenderDistance;
@@ -47,9 +46,8 @@ public class RenderSpec
     private int lastTaskChunks;
     private double lastTaskAvgChunkTime;
 
-    private RenderSpec(Minecraft minecraft, boolean underground)
+    private RenderSpec(boolean underground)
     {
-        this.player = minecraft.thePlayer;
         final CoreProperties props = JourneymapClient.getCoreProperties();
         final int gameRenderDistance = Math.max(1, minecraft.gameSettings.renderDistanceChunks - 1);
         final int mapRenderDistanceMin = underground ? props.renderDistanceCaveMin.get() : props.renderDistanceSurfaceMin.get();
@@ -141,7 +139,7 @@ public class RenderSpec
                 || lastSurfaceRenderSpec.lastPlayerCoord.chunkXPos != minecraft.thePlayer.chunkCoordX
                 || lastSurfaceRenderSpec.lastPlayerCoord.chunkZPos != minecraft.thePlayer.chunkCoordZ)
         {
-            RenderSpec newSpec = new RenderSpec(minecraft, false);
+            RenderSpec newSpec = new RenderSpec(false);
             newSpec.copyLastStatsFrom(lastSurfaceRenderSpec);
             lastSurfaceRenderSpec = newSpec;
         }
@@ -154,7 +152,7 @@ public class RenderSpec
                 || lastUndergroundRenderSpec.lastPlayerCoord.chunkXPos != minecraft.thePlayer.chunkCoordX
                 || lastUndergroundRenderSpec.lastPlayerCoord.chunkZPos != minecraft.thePlayer.chunkCoordZ)
         {
-            RenderSpec newSpec = new RenderSpec(minecraft, true);
+            RenderSpec newSpec = new RenderSpec(true);
             newSpec.copyLastStatsFrom(lastUndergroundRenderSpec);
             lastUndergroundRenderSpec = newSpec;
         }
@@ -178,12 +176,13 @@ public class RenderSpec
         DataCache dataCache = DataCache.instance();
 
         // Reset coords if player moved
+        EntityPlayer player = minecraft.thePlayer;
         if (lastPlayerCoord == null || lastPlayerCoord.chunkXPos != player.chunkCoordX || lastPlayerCoord.chunkZPos != player.chunkCoordZ)
         {
             primaryRenderCoords = null;
             lastSecondaryRenderDistance = primaryRenderDistance;
         }
-        lastPlayerCoord = new ChunkCoordIntPair(minecraft.thePlayer.chunkCoordX, minecraft.thePlayer.chunkCoordZ);
+        lastPlayerCoord = new ChunkCoordIntPair(player.chunkCoordX, player.chunkCoordZ);
 
         // Add min distance coords around player
         if (primaryRenderCoords == null || primaryRenderCoords.isEmpty())
