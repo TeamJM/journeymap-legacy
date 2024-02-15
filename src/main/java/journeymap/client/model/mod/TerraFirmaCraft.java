@@ -18,6 +18,7 @@ public class TerraFirmaCraft
 {
     private static final String MODID = "terrafirmacraft";
     private static final String MODID2 = "tfc2";
+    private static final String MODID3 = "terrafirmacraftplus";
     private static final int WATER_COLOR = 0x0b1940;
 
     public static class TfcBlockHandler implements ModBlockDelegate.IModBlockHandler
@@ -27,7 +28,7 @@ public class TerraFirmaCraft
         @Override
         public boolean initialize(BlockMD blockMD)
         {
-            if (blockMD.getUid().modId.equals(MODID) || blockMD.getUid().modId.equals(MODID2))
+            if (blockMD.getUid().modId.equals(MODID) || blockMD.getUid().modId.equals(MODID2) || blockMD.getUid().modId.equals(MODID3))
             {
                 String name = blockMD.getUid().name.toLowerCase();
                 if (name.equals("looserock") || name.equals("loose_rock") || name.contains("rubble") || name.contains("vegetation"))
@@ -61,7 +62,7 @@ public class TerraFirmaCraft
                 }
             }
 
-            return false;
+            return true;
         }
 
         @Override
