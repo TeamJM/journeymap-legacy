@@ -30,6 +30,10 @@ public class ChunkRenderController
     private final SurfaceRenderer overWorldSurfaceRenderer;
     private final IChunkRenderer overWorldCaveRenderer;
 
+    private static final ChunkPainter undergroundG2D = new ChunkPainter();
+    private static final ChunkPainter dayG2D = new ChunkPainter();
+    private static final ChunkPainter nightG2D = new ChunkPainter();
+
     public ChunkRenderController()
     {
         netherRenderer = new NetherRenderer();
@@ -47,9 +51,6 @@ public class ChunkRenderController
             return false;
         }
 
-        ChunkPainter undergroundG2D = null;
-        ChunkPainter dayG2D = null;
-        ChunkPainter nightG2D = null;
         boolean renderOkay = false;
 
         try
@@ -60,7 +61,7 @@ public class ChunkRenderController
                 BufferedImage image = regionImageSet.getChunkImage(chunkMd, mapType);
                 if (image != null)
                 {
-                    undergroundG2D = new ChunkPainter(RegionImageHandler.initRenderingHints(image.createGraphics()));
+                    undergroundG2D.setG2D(RegionImageHandler.initRenderingHints(image.createGraphics()));
                     switch (rCoord.dimension)
                     {
                         case -1:
@@ -92,12 +93,12 @@ public class ChunkRenderController
 
                 if (imageDay != null)
                 {
-                    dayG2D = new ChunkPainter(RegionImageHandler.initRenderingHints(imageDay.createGraphics()));
+                    dayG2D.setG2D(RegionImageHandler.initRenderingHints(imageDay.createGraphics()));
                 }
 
                 if (imageNight != null)
                 {
-                    nightG2D = new ChunkPainter(RegionImageHandler.initRenderingHints(imageNight.createGraphics()));
+                    nightG2D.setG2D(RegionImageHandler.initRenderingHints(imageNight.createGraphics()));
                 }
 
                 renderOkay = dayG2D != null && overWorldSurfaceRenderer.render(dayG2D, nightG2D, chunkMd);
@@ -125,15 +126,15 @@ public class ChunkRenderController
         }
         finally
         {
-            if (dayG2D != null)
+            if (dayG2D.getG2D() != null)
             {
                 dayG2D.finishPainting();
             }
-            if (nightG2D != null)
+            if (nightG2D.getG2D() != null)
             {
                 nightG2D.finishPainting();
             }
-            if (undergroundG2D != null)
+            if (undergroundG2D.getG2D() != null)
             {
                 undergroundG2D.finishPainting();
             }

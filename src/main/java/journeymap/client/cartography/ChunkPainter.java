@@ -25,10 +25,24 @@ public class ChunkPainter
     Integer[][] colors = new Integer[16][16];
     Graphics2D g2D;
 
+    @Deprecated
     public ChunkPainter(Graphics2D g2D)
     {
         this.g2D = g2D;
         g2D.setComposite(ALPHA_OPAQUE);
+    }
+
+    public ChunkPainter(){
+
+    }
+
+    public void setG2D(Graphics2D g2D) {
+        this.g2D = g2D;
+        g2D.setComposite(ALPHA_OPAQUE);
+    }
+
+    public Graphics2D getG2D(){
+        return this.g2D;
     }
 
     /**
