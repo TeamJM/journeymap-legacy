@@ -498,16 +498,15 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     {
         final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
         final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
-        final ChunkCoordIntPair targetCoord = new ChunkCoordIntPair(blockX >> 4, blockZ >> 4);
-        ChunkMD targetChunkMd = null;
+        ChunkMD targetChunkMd;
 
-        if (targetCoord.equals(chunkMd.getCoord()))
+        if (blockX >> 4 == chunkMd.getCoord().chunkXPos && blockZ >> 4 == chunkMd.getCoord().chunkXPos)
         {
             targetChunkMd = chunkMd;
         }
         else
         {
-            targetChunkMd = dataCache.getChunkMD(targetCoord);
+            targetChunkMd = dataCache.getChunkMD(new ChunkCoordIntPair(blockX >> 4, blockZ >> 4));
         }
 
         if (targetChunkMd != null)
