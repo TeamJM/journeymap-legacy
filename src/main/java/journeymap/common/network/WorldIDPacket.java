@@ -16,11 +16,6 @@ import journeymap.common.Journeymap;
 import journeymap.server.oldservercode.config.ConfigHandler;
 import net.minecraft.entity.player.EntityPlayerMP;
 // 1.8
-//import net.minecraftforge.fml.common.network.ByteBufUtils;
-//import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-//import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-//import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-//import net.minecraftforge.fml.relauncher.Side;
 
 /**
  * Created by Mysticdrew on 10/8/2014.

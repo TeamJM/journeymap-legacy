@@ -475,6 +475,8 @@ public class TextureCache
             conn.setInstanceFollowRedirects(true);
             conn.setDoInput(true);
             conn.setDoOutput(false);
+            conn.setConnectTimeout(3000);
+            conn.setReadTimeout(1000);
             conn.connect();
             if (conn.getResponseCode() / 100 == 2) // can't get input stream before response code available
             {
