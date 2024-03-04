@@ -22,7 +22,7 @@ public class ChunkPainter
     public static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
     protected static volatile AtomicLong badBlockCount = new AtomicLong(0);
 
-    Integer[][] colors = new Integer[16][16];
+    int[][] colors = new int[16][16];
     Graphics2D g2D;
 
     public ChunkPainter(Graphics2D g2D)
@@ -36,8 +36,8 @@ public class ChunkPainter
      */
     public void paintDimOverlay(int x, int z, float alpha)
     {
-        Integer color = colors[x][z];
-        if (color != null)
+        int color = colors[x][z];
+        if (color != -1)
         {
             paintBlock(x, z, RGB.adjustBrightness(color, alpha));
         }
@@ -86,7 +86,7 @@ public class ChunkPainter
      */
     public void finishPainting()
     {
-        Integer color;
+        int color;
         int lastColor = -1;
 
         try
@@ -96,7 +96,7 @@ public class ChunkPainter
                 for (int x = 0; x < 16; x++)
                 {
                     color = colors[x][z];
-                    if (color == null)
+                    if (color == -1)
                     {
                         continue;
                     }
@@ -117,6 +117,14 @@ public class ChunkPainter
             g2D.dispose();
             g2D = null;
             colors = null;
+        }
+    }
+
+    public void initColorsArray(){
+        for (int x=0; x < 16;x++) {
+            for (int z=0;z<16;z++){
+                colors[x][z]=-1;
+            }
         }
     }
 }

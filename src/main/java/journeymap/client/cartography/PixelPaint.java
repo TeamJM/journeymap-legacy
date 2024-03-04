@@ -22,7 +22,7 @@ class PixelPaint implements Paint, PaintContext
 {
     final ColorModel colorModel = ColorModel.getRGBdefault();
     IntegerComponentRaster intRaster;
-    Integer rgbColor;
+    int rgbColor;
 
     /**
      * Sets the rgb color to use.
