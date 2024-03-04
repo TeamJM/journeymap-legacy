@@ -76,6 +76,9 @@ processResources {
         exclude 'mcmod.info'
         exclude 'license.txt'
     }
+
+    //adds the AT file(s)
+    rename '(.+_at.cfg)', 'META-INF/$1'
 }
 
 task processDocs(type: Copy) {
@@ -146,6 +149,9 @@ task unlimitedJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar', 'processDoc
         include 'mcmod.info'
         expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion': config.forge_version, jmedition: config.unlimited
     }
+    manifest {
+        attributes 'FMLAT': 'journeymap_at.cfg'
+    }
 }
 
 task fairPlayJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar', 'deleteUnlimited', 'processDocs']) {
@@ -157,6 +163,9 @@ task fairPlayJar(type: Jar, dependsOn: ['copyCss', 'deleteNoRadar', 'deleteUnlim
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
         expand 'version': project.version, 'mcversion': project.minecraft.version, 'forgeversion': config.forge_version, jmedition: config.fairPlay
+    }
+    manifest {
+        attributes 'FMLAT': 'journeymap_at.cfg'
     }
 }
 

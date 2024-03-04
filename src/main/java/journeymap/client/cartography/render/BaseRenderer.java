@@ -9,6 +9,7 @@ package journeymap.client.cartography.render;
 import com.google.common.cache.*;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.IChunkRenderer;
+import journeymap.client.cartography.MutableChunkCoordIntPair;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Stratum;
 import journeymap.client.data.DataCache;
@@ -35,6 +36,7 @@ import java.util.HashMap;
 public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<ChunkCoordIntPair, ChunkMD>
 {
     public static final String PROP_WATER_HEIGHT = "waterHeight";
+    private static final MutableChunkCoordIntPair coordinates = new MutableChunkCoordIntPair(0, 0);
     protected static final AlphaComposite ALPHA_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
     protected static final int COLOR_BLACK = Color.black.getRGB();
     protected static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
@@ -289,16 +291,15 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     {
         final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
         final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
-        final ChunkCoordIntPair targetCoord = new ChunkCoordIntPair(blockX >> 4, blockZ >> 4);
-        ChunkMD targetChunkMd = null;
+        ChunkMD targetChunkMd;
 
-        if (targetCoord.equals(chunkMd.getCoord()))
+        if (blockX >> 4 == chunkMd.getCoord().chunkXPos && blockZ >> 4 == chunkMd.getCoord().chunkZPos)
         {
             targetChunkMd = chunkMd;
         }
         else
         {
-            targetChunkMd = dataCache.getChunkMD(targetCoord);
+            targetChunkMd = dataCache.getChunkMD(coordinates.setChunkXPos(blockX >> 4).setChunkZPos(blockZ >> 4));
         }
 
         if (targetChunkMd != null)
@@ -498,16 +499,15 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     {
         final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
         final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
-        final ChunkCoordIntPair targetCoord = new ChunkCoordIntPair(blockX >> 4, blockZ >> 4);
-        ChunkMD targetChunkMd = null;
+        ChunkMD targetChunkMd;
 
-        if (targetCoord.equals(chunkMd.getCoord()))
+        if (blockX >> 4 == chunkMd.getCoord().chunkXPos && blockZ >> 4 == chunkMd.getCoord().chunkXPos)
         {
             targetChunkMd = chunkMd;
         }
         else
         {
-            targetChunkMd = dataCache.getChunkMD(targetCoord);
+            targetChunkMd = dataCache.getChunkMD(coordinates.setChunkXPos(blockX >> 4).setChunkZPos(blockZ >> 4));
         }
 
         if (targetChunkMd != null)
