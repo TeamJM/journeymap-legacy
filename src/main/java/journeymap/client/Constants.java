@@ -165,6 +165,10 @@ public class Constants
     {
         try
         {
+            if (keyBinding.getKeyCode() == 0)
+            {
+                return false;
+            }
             return keyBinding.isPressed() || Keyboard.isKeyDown(getKeyCode(keyBinding));
         }
         catch (Throwable t)
