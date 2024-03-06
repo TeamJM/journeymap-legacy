@@ -152,6 +152,7 @@ tasks.processResources {
 // -dev jar
 tasks.jar {
   dependsOn(processDocs)
+  archiveClassifier = "deobf-mcp${snapshot}"
   archiveVersion = "${version}-${unlimited}".lowercase()
   exclude("journeymap/client/feature/impl/NoRadar.class")
   filesMatching("mcmod.info") {
