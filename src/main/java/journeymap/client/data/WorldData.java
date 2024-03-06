@@ -75,13 +75,13 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
         try
         {
-            return ForgeHelper.INSTANCE.getRealmsServerName();
+            return ForgeHelper.INSTANCE.getRealmsServerName().replace(':', '_');
         }
         catch (Throwable t)
         {
             Journeymap.getLogger().error("Couldn't get service name: " + LogFormatter.toString(t));
             // Fallback
-            return getLegacyServerName();
+            return getLegacyServerName().replace(':', '_');
         }
     }
 
