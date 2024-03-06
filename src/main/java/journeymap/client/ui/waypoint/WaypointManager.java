@@ -18,6 +18,7 @@ import journeymap.client.ui.option.CategorySlot;
 import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -501,9 +502,7 @@ public class WaypointManager extends JmUI
 
     protected void updateSort(SortButton sortButton)
     {
-        // 1.8.8
-        // for (GuiButton button : buttonList)
-        for (Button button : (List<Button>) buttonList)
+        for (GuiButton button : buttonList)
         {
             if (button instanceof SortButton)
             {
