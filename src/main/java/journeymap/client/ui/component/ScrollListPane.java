@@ -44,10 +44,10 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
     public void setDimensions(int width, int height, int top, int bottom)
     {
         // 1.7
-        // super.func_148122_a(width, height, top, bottom);
+        super.func_148122_a(width, height, top, bottom);
 
         // 1.8
-        super.setDimensions(width, height, top, bottom);
+        // super.setDimensions(width, height, top, bottom);
         scrollbarX = this.width - (hpad);
         listWidth = this.width - (hpad * 4);
     }
@@ -135,10 +135,10 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
     protected void drawSlot(int slotIndex, int x, int y, int slotHeight, Tessellator tessellator, int mouseX, int mouseY)
     {
         // 1.7
-        //boolean selected = this.func_148124_c(mouseX, mouseY) == slotIndex;
+        boolean selected = this.func_148124_c(mouseX, mouseY) == slotIndex;
 
         // 1.8
-        boolean selected = this.getSlotIndexFromScreenCoords(mouseX, mouseY) == slotIndex;
+        //boolean selected = this.getSlotIndexFromScreenCoords(mouseX, mouseY) == slotIndex;
         SlotMetadata tooltipMetadata = this.getSlot(slotIndex).drawSlot(slotIndex, x, y, this.getListWidth(), slotHeight, mouseX, mouseY, selected);
         if (tooltipMetadata != null && !Arrays.equals(tooltipMetadata.getTooltip(), lastTooltip))
         {
@@ -159,18 +159,18 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
     public boolean mousePressed(int mouseX, int mouseY, int mouseEvent)
     {
         // 1.7
-        // boolean overSlot = this.func_148141_e(mouseY);
+        boolean overSlot = this.func_148141_e(mouseY);
 
         // 1.8
-        boolean overSlot = this.isMouseYWithinSlotBounds(mouseY);
+        // boolean overSlot = this.isMouseYWithinSlotBounds(mouseY);
 
         if (overSlot)
         {
             // 1.7
-            // int slotIndex = this.func_148124_c(mouseX, mouseY);
+            int slotIndex = this.func_148124_c(mouseX, mouseY);
 
             // 1.8
-            int slotIndex = this.getSlotIndexFromScreenCoords(mouseX, mouseY);
+            // int slotIndex = this.getSlotIndexFromScreenCoords(mouseX, mouseY);
 
             if (slotIndex >= 0)
             {
@@ -182,10 +182,10 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
                 if (this.getSlot(slotIndex).mousePressed(slotIndex, mouseX, mouseY, mouseEvent, relativeX, relativeY))
                 {
                     // 1.7
-                    //this.func_148143_b(false);
+                    this.func_148143_b(false);
 
                     // 1.8
-                    this.setEnabled(false);
+                    //this.setEnabled(false);
                     lastClickedIndex = slotIndex;
                     lastPressed = this.getSlot(slotIndex).getLastPressed();
                     updateSlots();
@@ -198,7 +198,7 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
     }
 
 
-    public boolean mouseReleased(int x, int y, int mouseEvent)
+    public boolean mouseMovedOrUp(int x, int y, int mouseEvent)
     {
         for (int slotIndex = 0; slotIndex < this.getSize(); ++slotIndex)
         {
@@ -210,10 +210,10 @@ public class ScrollListPane<T extends ScrollListPane.ISlot> extends GuiSlot
         }
 
         // 1.7
-        //this.func_148143_b(true);
+        this.func_148143_b(true);
 
         // 1.8
-        this.setEnabled(true);
+        //this.setEnabled(true);
 
         lastPressed = null;
         return false;

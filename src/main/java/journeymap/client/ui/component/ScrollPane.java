@@ -60,10 +60,10 @@ public class ScrollPane extends GuiSlot
     public void setDimensions(int width, int height, int marginTop, int marginBottom, int x, int y)
     {
         // 1.7
-        // super.func_148122_a(width, height, marginTop, height - marginBottom);
+        super.func_148122_a(width, height, marginTop, height - marginBottom);
 
         // 1.8
-        super.setDimensions(width, height, marginTop, height - marginBottom);
+        //super.setDimensions(width, height, marginTop, height - marginBottom);
         paneWidth = width;
         paneHeight = height;
         origin.setLocation(x, y);

@@ -107,7 +107,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     @Override
     public FontRenderer getFontRenderer()
     {
-        return getClient().fontRendererObj;
+        return getClient().fontRenderer;
     }
 
     @Override
@@ -265,7 +265,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         }
         else
         {
-            ServerData serverData = mc.getCurrentServerData();
+            ServerData serverData = mc.func_147104_D();
 
             if (serverData != null)
             {
@@ -290,7 +290,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         else
         {
             mc = ForgeHelper.INSTANCE.getClient();
-            ServerData serverData = mc.getCurrentServerData();
+            ServerData serverData = mc.func_147104_D();
 
             if (serverData != null)
             {
@@ -422,7 +422,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     @Override
     public SocketAddress getSocketAddress(NetworkManager netManager)
     {
-        return netManager.getRemoteAddress();
+        return netManager.getSocketAddress();
     }
 
     @Override

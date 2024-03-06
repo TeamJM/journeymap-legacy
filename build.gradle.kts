@@ -20,7 +20,6 @@ val config = configFile.reader(Charsets.UTF_8).use {
 
 val forge_version = config.getProperty("forge_version")!!
 val minecraft_version = config.getProperty("minecraft_version")!!
-val snapshot = config.getProperty("snapshot")!!
 val group_id = config.getProperty("group_id")!!
 val mod_id = config.getProperty("mod_id")!!
 val fairPlay = config.getProperty("fairPlay")!!
@@ -43,10 +42,6 @@ minecraft {
   injectedTags.put("MINOR", jm_minor)
   injectedTags.put("MICRO", jm_micro)
   injectedTags.put("PATCH", jm_patch)
-
-  useForgeEmbeddedMappings = false
-  mcpMappingChannel = "snapshot"
-  mcpMappingVersion = snapshot
 }
 
 fun getDate(): String {
@@ -152,7 +147,6 @@ tasks.processResources {
 // -dev jar
 tasks.jar {
   dependsOn(processDocs)
-  archiveClassifier = "deobf-mcp${snapshot}"
   archiveVersion = "${version}-${unlimited}".lowercase()
   exclude("journeymap/client/feature/impl/NoRadar.class")
   filesMatching("mcmod.info") {

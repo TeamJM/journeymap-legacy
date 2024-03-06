@@ -29,8 +29,11 @@ public class ForgePlayerUtil implements IPlayerUtil
     public GameProfile getPlayerInfoById(UUID uuid)
     {
         MinecraftServer server = MinecraftServer.getServer();
+        // 1.7
+        GameProfile gameProfile = server.func_152358_ax().func_152652_a(uuid);
+
         // 1.8
-        GameProfile gameProfile = server.getPlayerProfileCache().func_152652_a(uuid);
+        // GameProfile gameProfile = server.getPlayerProfileCache().func_152652_a(uuid);
 
         // 1.8.8
         // GameProfile gameProfile = server.getPlayerProfileCache().getProfileByUUID(uuid);
@@ -46,7 +49,7 @@ public class ForgePlayerUtil implements IPlayerUtil
     public GameProfile getPlayerProfileByName(String playerName)
     {
         MinecraftServer server = MinecraftServer.getServer();
-        GameProfile gameProfile = server.getPlayerProfileCache().getGameProfileForUsername(playerName);
+        GameProfile gameProfile = server.func_152358_ax().func_152655_a(playerName);
         return gameProfile;
     }
 
@@ -61,8 +64,8 @@ public class ForgePlayerUtil implements IPlayerUtil
         EntityPlayerMP player = getPlayerEntityByName(playerName);
         if (player instanceof EntityPlayerMP)
         {
-            UserListOps ops = MinecraftServer.getServer().getConfigurationManager().getOppedPlayers();
-            for (String name : ops.getKeys())
+            UserListOps ops = MinecraftServer.getServer().getConfigurationManager().func_152603_m();
+            for (String name : ops.func_152685_a())
             {
                 if (playerName.equals(name))
                 {
@@ -82,7 +85,7 @@ public class ForgePlayerUtil implements IPlayerUtil
     public EntityPlayerMP getPlayerEntityByName(String name)
     {
         MinecraftServer server = MinecraftServer.getServer();
-        return server.getConfigurationManager().getPlayerByUsername(name);
+        return server.getConfigurationManager().func_152612_a(name);
     }
 
     /**

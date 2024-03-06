@@ -120,35 +120,35 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     public boolean isMouseOver()
     {
         // 1.7
-        //return field_146123_n;
+        return field_146123_n;
 
         // 1.8
-        return super.isMouseOver();
+        // return super.isMouseOver();
     }
 
     public void setMouseOver(boolean hover)
     {
         // 1.7.10
-        // field_146123_n = hover;
+        field_146123_n = hover;
 
         // 1.8
-        this.setHovered(hover);
+        // this.setHovered(hover);
     }
 
     @Override
     // 1.7
-    //public void func_146113_a(SoundHandler soundHandler)
+    public void func_146113_a(SoundHandler soundHandler)
     // 1.8
-    public void playPressSound(SoundHandler soundHandler)
+    // public void playPressSound(SoundHandler soundHandler)
     {
         // Play button click
         if (isEnabled())
         {
             // 1.7
-            //super.func_146113_a(soundHandler);
+            super.func_146113_a(soundHandler);
 
             // 1.8
-            super.playPressSound(soundHandler);
+            //super.playPressSound(soundHandler);
         }
     }
 
@@ -606,11 +606,11 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public boolean isHovered()
     {
-        return super.hovered;
+        return super.field_146123_n;
     }
 
     public void setHovered(boolean hovered)
     {
-        super.hovered = hovered;
+        super.field_146123_n = hovered;
     }
 }
