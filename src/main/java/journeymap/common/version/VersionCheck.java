@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import cpw.mods.fml.common.Loader;
+import journeymap.common.BuildInfo;
 import journeymap.common.Journeymap;
 import journeymap.common.thread.JMThreadFactory;
 
@@ -125,7 +126,8 @@ public class VersionCheck
                         connection.setConnectTimeout(6000);
                         connection.setReadTimeout(6000);
                         connection.setRequestMethod("GET");
-                        in = new InputStreamReader(uri.openStream());
+                        connection.setRequestProperty("User-Agent", "JourneyMap " + BuildInfo.JM_VERSION);
+                        in = new InputStreamReader(connection.getInputStream());
                         rawResponse = CharStreams.toString(in);
 
                         String currentVersion = Journeymap.JM_VERSION.toString();

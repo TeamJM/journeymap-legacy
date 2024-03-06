@@ -32,9 +32,9 @@ public class Journeymap
     public static final String SHORT_MOD_NAME = "JourneyMap";
     public static final Version JM_VERSION = Version.from(BuildInfo.MAJOR, BuildInfo.MINOR, BuildInfo.MICRO, BuildInfo.PATCH, new Version(5, 1, 4, "dev"));
     public static final String FORGE_VERSION = BuildInfo.FORGE_VERSION;
-    public static final String WEBSITE_URL = "http://journeymap.info/";
-    public static final String DOWNLOAD_URL = "http://minecraft.curseforge.com/projects/journeymap-32274/files/";
-    public static final String VERSION_URL = "http://widget.mcf.li/mc-mods/minecraft/journeymap-32274.json";
+    public static final String WEBSITE_URL = "https://teamjm.github.io/journeymap-docs/";
+    public static final String DOWNLOAD_URL = "https://www.curseforge.com/minecraft/mc-mods/journeymap/files/all?page=1&pageSize=20&version=1.7.10";
+    public static final String VERSION_URL = "https://api.cfwidget.com/minecraft/mc-mods/journeymap";
 
     @Mod.Instance(Journeymap.MOD_ID)
     public static Journeymap instance;
