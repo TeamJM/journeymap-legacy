@@ -3,4 +3,4 @@
 
 # Files that will always have CRLF line endings on checkout.
 *.md text eol=crlf
-
+*.bat text eol=crlf
