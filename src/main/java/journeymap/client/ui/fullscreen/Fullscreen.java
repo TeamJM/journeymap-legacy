@@ -620,7 +620,7 @@ public class Fullscreen extends JmUI
                 }
                 else
                 {
-                    mouseReleased(mx, my, Mouse.getEventButton());
+                    mouseMovedOrUp(mx, my, Mouse.getEventButton());
                 }
             }
         }
@@ -648,10 +648,9 @@ public class Fullscreen extends JmUI
     }
 
     @Override
-    // 1.7 mouseMovedOrUp
-    protected void mouseReleased(int mouseX, int mouseY, int which)
+    protected void mouseMovedOrUp(int mouseX, int mouseY, int which)
     {
-        super.mouseReleased(mouseX, mouseY, which);
+        super.mouseMovedOrUp(mouseX, mouseY, which);
 
         if (isMouseOverButton(mouseX, mouseY))
         {

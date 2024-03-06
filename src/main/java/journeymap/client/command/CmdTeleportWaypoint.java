@@ -41,10 +41,10 @@ public class CmdTeleportWaypoint
                 configurationManager = mcServer.getConfigurationManager();
 
                 // 1.7
-                //return configurationManager.func_152596_g(profile);
+                return configurationManager.func_152596_g(profile);
 
                 // 1.8
-                return configurationManager.canSendCommands(profile);
+                //return configurationManager.canSendCommands(profile);
             }
             catch (Exception e)
             {
