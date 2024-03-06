@@ -30,6 +30,8 @@ import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -561,7 +563,9 @@ public class FileHandler
             boolean inJar = FileHandler.isInJar();
             if (inJar)
             {
-                fromPath = URLDecoder.decode(resourceDir.getPath(), "utf-8").split("file:")[1].split("!/")[0];
+                final String resourceDirString = resourceDir.toString();
+                final URL jarUrl = new URL(resourceDirString.substring(4, resourceDirString.lastIndexOf('!')));
+                fromPath = Paths.get(jarUrl.toURI()).toString();
                 FileHandler.copyFromZip(fromPath, toPath, toDir, overwrite);
             }
             else
