@@ -20,6 +20,8 @@ import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.util.MathHelper;
+import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -36,6 +38,7 @@ public class WaypointManager extends JmUI
     final static int COLLOCATION = 20;
     final static int COLNAME = 60;
     final static int DEFAULT_ITEMWIDTH = 460;
+    final static boolean HAS_MODERN_LWJGL = !Sys.getVersion().startsWith("2.");
     private static WaypointManagerItem.Sort currentSort;
     private final String on = Constants.getString("jm.common.on");
     private final String off = Constants.getString("jm.common.off");
@@ -331,17 +334,13 @@ public class WaypointManager extends JmUI
 
         if (i != 0)
         {
-            if (i > 1)
+            // LWJGL 2's reported scroll amounts are not uniformly scaled across operating systems
+            if (!HAS_MODERN_LWJGL)
             {
-                i = -1;
+                i = MathHelper.clamp_int(i, -1, 1);
             }
 
-            if (i < -1)
-            {
-                i = 1;
-            }
-
-            this.itemScrollPane.scrollBy(this.rowHeight * i);
+            this.itemScrollPane.scrollBy(- this.rowHeight * i);
         }
     }
 
