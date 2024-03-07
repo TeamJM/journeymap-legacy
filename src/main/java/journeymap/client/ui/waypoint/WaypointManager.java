@@ -308,11 +308,7 @@ public class WaypointManager extends JmUI
     {
         super.mouseMovedOrUp(mouseX, mouseY, state);
 
-        // 1.7
         itemScrollPane.mouseMovedOrUp(mouseX, mouseY, state);
-
-        // 1.8
-        // itemScrollPane.mouseReleased(mouseX, mouseY, state);
     }
 
     @Override

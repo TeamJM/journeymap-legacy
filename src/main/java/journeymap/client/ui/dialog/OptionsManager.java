@@ -439,11 +439,7 @@ public class OptionsManager extends JmUI
     {
         super.mouseMovedOrUp(mouseX, mouseY, mouseEvent);
 
-        // 1.7
         optionsListPane.mouseMovedOrUp(mouseX, mouseY, mouseEvent);
-
-        // 1.8
-        // optionsListPane.mouseReleased(mouseX, mouseY, mouseEvent);
     }
 
     @Override

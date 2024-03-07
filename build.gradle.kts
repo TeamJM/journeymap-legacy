@@ -29,10 +29,10 @@ val curse_release_type = config.getProperty("curse_release_type")!!
 val dateFormat = config.getProperty("dateFormat")!!
 
 val jmVersionComponents = project.version.toString().split(".")
-val jm_major = jmVersionComponents.getOrNull(0) ?: "1"
-val jm_minor = jmVersionComponents.getOrNull(1) ?: "0"
-val jm_micro = jmVersionComponents.getOrNull(2) ?: "0"
-val jm_patch = jmVersionComponents.getOrNull(3) ?: "0"
+val jm_major = jmVersionComponents.getOrNull(0) ?: "5"
+val jm_minor = jmVersionComponents.getOrNull(1) ?: "1"
+val jm_micro = jmVersionComponents.getOrNull(2) ?: "4"
+val jm_patch = jmVersionComponents.getOrNull(3) ?: "p8"
 
 minecraft {
   injectedTags.put("JM_VERSION", project.version.toString())
