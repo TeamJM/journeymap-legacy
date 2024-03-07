@@ -23,6 +23,7 @@ import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiPlayerInfo;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiScreenRealmsProxy;
 import net.minecraft.client.gui.ScaledResolution;
@@ -50,6 +51,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import java.net.SocketAddress;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -231,6 +233,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         {
             try
             {
+
                 NetHandlerPlayClient netHandler = mc.getNetHandler();
                 GuiScreen netHandlerGui = ReflectionHelper.getPrivateValue(NetHandlerPlayClient.class, netHandler, "field_147307_j", "guiScreenServer");
 

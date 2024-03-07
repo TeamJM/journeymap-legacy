@@ -40,8 +40,8 @@ import java.util.zip.ZipInputStream;
 public class FileHandler
 {
     public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
-    public static final String ASSETS_JOURNEYMAP_WEB = "/assets/journeymap/web";
-
+    public static final String ASSETS_WEBMAP = "/assets/journeymap/web";
+    public static final String ASSETS_JOURNEYMAP_UI = "/assets/journeymap/web/img/ico";
     public static final File MinecraftDirectory = ForgeHelper.INSTANCE.getClient().mcDataDir;
     public static final File JourneyMapDirectory = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR);
     public static final File StandardConfigDirectory = new File(MinecraftDirectory, Constants.CONFIG_DIR);
@@ -363,7 +363,7 @@ public class FileHandler
     {
         try
         {
-            String png = FileHandler.ASSETS_JOURNEYMAP_WEB + "/img/" + fileName;//$NON-NLS-1$
+            String png = FileHandler.ASSETS_WEBMAP + "/img/" + fileName;//$NON-NLS-1$
             InputStream is = JourneymapClient.class.getResourceAsStream(png);
             if (is == null)
             {
@@ -480,7 +480,7 @@ public class FileHandler
         try
         {
             final File outFile = new File(toDir, fileName);
-            String htmlPath = FileHandler.ASSETS_JOURNEYMAP_WEB + "/" + fileName;
+            String htmlPath = FileHandler.ASSETS_WEBMAP + "/" + fileName;
             InputStream inputStream = JourneymapClient.class.getResource(htmlPath).openStream();
 
             ByteSink out = new ByteSink()

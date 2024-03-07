@@ -25,7 +25,12 @@ import java.util.Map;
 /**
  * Forge Mod entry point
  */
-@Mod(modid = Journeymap.MOD_ID, name = Journeymap.SHORT_MOD_NAME, version = BuildInfo.JM_VERSION, canBeDeactivated = true, dependencies = "required-after:Forge@[" + BuildInfo.FORGE_VERSION + ",)")
+@Mod(modid = Journeymap.MOD_ID,
+        name = Journeymap.SHORT_MOD_NAME,
+        version = BuildInfo.JM_VERSION,
+        canBeDeactivated = true,
+        modLanguageAdapter = "net.shadowfacts.forgelin.KotlinAdapter",
+dependencies = "required-after:Forge@[" + BuildInfo.FORGE_VERSION + ",)")
 public class Journeymap
 {
     public static final String MOD_ID = "journeymap";
