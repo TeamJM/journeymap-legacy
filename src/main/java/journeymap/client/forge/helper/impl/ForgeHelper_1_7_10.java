@@ -265,6 +265,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         }
         else
         {
+            // mc.getCurrentServerData();
             ServerData serverData = mc.func_147104_D();
 
             if (serverData != null)
@@ -290,6 +291,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         else
         {
             mc = ForgeHelper.INSTANCE.getClient();
+            // mc.getCurrentServerData();
             ServerData serverData = mc.func_147104_D();
 
             if (serverData != null)

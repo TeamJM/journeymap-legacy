@@ -49,6 +49,7 @@ public class ForgePlayerUtil implements IPlayerUtil
     public GameProfile getPlayerProfileByName(String playerName)
     {
         MinecraftServer server = MinecraftServer.getServer();
+        // server.getPlayerProfileCache().getGameProfileForUsername(playerName);
         GameProfile gameProfile = server.func_152358_ax().func_152655_a(playerName);
         return gameProfile;
     }
@@ -64,7 +65,9 @@ public class ForgePlayerUtil implements IPlayerUtil
         EntityPlayerMP player = getPlayerEntityByName(playerName);
         if (player instanceof EntityPlayerMP)
         {
+            // MinecraftServer.getServer().getConfigurationManager().getOppedPlayers();
             UserListOps ops = MinecraftServer.getServer().getConfigurationManager().func_152603_m();
+            // for (String name : ops.getKeys())
             for (String name : ops.func_152685_a())
             {
                 if (playerName.equals(name))
@@ -85,6 +88,7 @@ public class ForgePlayerUtil implements IPlayerUtil
     public EntityPlayerMP getPlayerEntityByName(String name)
     {
         MinecraftServer server = MinecraftServer.getServer();
+        // return server.getConfigurationManager().getPlayerByUsername(name);
         return server.getConfigurationManager().func_152612_a(name);
     }
 

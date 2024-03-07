@@ -112,11 +112,7 @@ public abstract class JmUI extends GuiScreen
     @Override
     protected void mouseMovedOrUp(int mouseX, int mouseY, int mouseEvent)
     {
-        // 1.7
         super.mouseMovedOrUp(mouseX, mouseY, mouseEvent);
-
-        // 1.8
-        // super.mouseReleased(mouseX, mouseY, mouseEvent);
     }
 
     //    protected boolean mouseOverButtons(int x, int y)
