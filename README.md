@@ -44,7 +44,9 @@ Check out a branch of the JourneyMap GIT repo to a directory called journeymap. 
 
 ### 3. Build the jars
 
-* Update `project.properties` version info
+* For releases, ensure all your changes are commited and create a git tag named after the version you want to build, e.g. `5.1.4p8`.
+* If you don't make a dedicated tag, metadata about your current git branch will be automatically appended to create a unique jar version, e.g. `5.1.4p8-my-branch.1+c5c1d4797c`
+* You can also set the environment variable `VERSION` when running Gradle to any version to fully override the automatic version assignment, e.g. `VERSION=5.1.4p8`
 * Build using Gradle (build.gradle) > build
 * The end result will be in `build/libs/journeymap*.jar`
 
