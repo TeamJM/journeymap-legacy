@@ -432,10 +432,7 @@ public class OptionsManager extends JmUI
     }
 
     @Override
-    // 1.7
     protected void mouseMovedOrUp(int mouseX, int mouseY, int mouseEvent)
-    // 1.8
-    // protected void mouseReleased(int mouseX, int mouseY, int mouseEvent)
     {
         super.mouseMovedOrUp(mouseX, mouseY, mouseEvent);
 
