@@ -41,7 +41,6 @@ import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.version.VersionCheck;
-import modinfo.ModInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import org.apache.logging.log4j.LogManager;
@@ -258,7 +257,7 @@ public class JourneymapClient implements CommonProxy
 
             // Logging for thread debugging
             threadLogging = false;
-            
+
             logger.info("initialize EXIT, " + (timer == null ? "" : timer.getLogReportString()));
         }
         catch (Throwable t)
@@ -313,11 +312,6 @@ public class JourneymapClient implements CommonProxy
 
             VersionCheck.getVersionAvailable();
 
-            // ModInfo with a single ping
-            ModInfo modInfo = new ModInfo("UA-28839029-5", "en_US", Journeymap.MOD_ID, MOD_NAME, FULL_VERSION, false);
-            modInfo.reportAppView();
-
-            // threadLogging = getLogger().isTraceEnabled();
         }
         catch (Throwable t)
         {
