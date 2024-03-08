@@ -383,7 +383,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     protected Integer getSliceBlockHeight(final ChunkMD chunkMd, final int x, final Integer vSlice, final int z, final int sliceMinY, final int sliceMaxY,
                                           final HeightsCache chunkHeights)
     {
-        Integer[][] blockSliceHeights = chunkHeights.getUnchecked(chunkMd.getCoord());
+        Integer[][] blockSliceHeights = chunkHeights.getUnchecked(chunkMd.getCoordLong());
         if (blockSliceHeights == null)
         {
             return null;
@@ -455,11 +455,11 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
     }
 
     @Override
-    public void onRemoval(RemovalNotification<ChunkCoordIntPair, ChunkMD> notification)
+    public void onRemoval(RemovalNotification<Long, ChunkMD> notification)
     {
         synchronized (chunkLock)
         {
-            ChunkCoordIntPair coord = notification.getKey();
+            long coord = notification.getKey();
             for (HeightsCache heightsCache : chunkSliceHeights)
             {
                 if (heightsCache != null)

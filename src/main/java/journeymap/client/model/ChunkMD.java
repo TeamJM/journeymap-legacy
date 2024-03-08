@@ -266,6 +266,11 @@ public class ChunkMD
         return coord;
     }
 
+    public long getCoordLong()
+    {
+        return ChunkCoordIntPair.chunkXZ2Int(coord.chunkXPos, coord.chunkZPos);
+    }
+
     public boolean isSlimeChunk()
     {
         return (Boolean) getProperty(PROP_IS_SLIME_CHUNK, Boolean.FALSE);
@@ -334,14 +339,16 @@ public class ChunkMD
         }
     }
 
-    public static class SimpleCacheLoader extends CacheLoader<ChunkCoordIntPair, ChunkMD>
+    public static class SimpleCacheLoader extends CacheLoader<Long, ChunkMD>
     {
         Minecraft mc = ForgeHelper.INSTANCE.getClient();
 
         @Override
-        public ChunkMD load(ChunkCoordIntPair coord) throws Exception
+        public ChunkMD load(Long coord) throws Exception
         {
-            return ChunkLoader.getChunkMdFromMemory(mc.theWorld, coord.chunkXPos, coord.chunkZPos);
+            int x = (int) (coord & 4294967295L);
+            int z = (int) (coord >>> 32 & 4294967295L);
+            return ChunkLoader.getChunkMdFromMemory(mc.theWorld, x, z);
         }
     }
 }

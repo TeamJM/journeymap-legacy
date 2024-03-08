@@ -9,7 +9,6 @@ package journeymap.client.cartography.render;
 import com.google.common.cache.*;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.IChunkRenderer;
-import journeymap.client.cartography.MutableChunkCoordIntPair;
 import journeymap.client.cartography.RGB;
 import journeymap.client.cartography.Stratum;
 import journeymap.client.data.DataCache;
@@ -33,10 +32,9 @@ import java.util.HashMap;
  *
  * @author techbrew
  */
-public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<ChunkCoordIntPair, ChunkMD>
+public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Long, ChunkMD>
 {
     public static final String PROP_WATER_HEIGHT = "waterHeight";
-    private static final MutableChunkCoordIntPair coordinates = new MutableChunkCoordIntPair(0, 0);
     protected static final AlphaComposite ALPHA_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
     protected static final int COLOR_BLACK = Color.black.getRGB();
     protected static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
@@ -203,7 +201,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
                                        final SlopesCache chunkSlopes)
     {
 
-        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
+        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoordLong());
         int y = 0, sliceMinY = 0, sliceMaxY = 0;
         boolean isSurface = (vSlice == null);
         Float slope, primarySlope, secondarySlope;
@@ -292,14 +290,14 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
         final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
         ChunkMD targetChunkMd;
-
-        if (blockX >> 4 == chunkMd.getCoord().chunkXPos && blockZ >> 4 == chunkMd.getCoord().chunkZPos)
+        final long targetCoord = ChunkCoordIntPair.chunkXZ2Int(blockX >> 4, blockZ >> 4);
+        if (targetCoord == ChunkCoordIntPair.chunkXZ2Int(chunkMd.getCoord().chunkXPos, chunkMd.getCoord().chunkZPos))
         {
             targetChunkMd = chunkMd;
         }
         else
         {
-            targetChunkMd = dataCache.getChunkMD(coordinates.setChunkXPos(blockX >> 4).setChunkZPos(blockZ >> 4));
+            targetChunkMd = dataCache.getChunkMD(targetCoord);
         }
 
         if (targetChunkMd != null)
@@ -387,25 +385,6 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         return slope;
     }
 
-//    /**
-//     * Get the height of the block at the x, z coordinate in the chunk, optionally ignoring NoShadow blocks.
-//     * Ignoring NoShadow blocks won't change the saved surfaceHeights.
-//     */
-//    public int getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, boolean ignoreNoShadowBlocks)
-//    {
-//        int y = getSurfaceBlockHeight(chunkMd, x, z, ignoreWater);
-//        if(ignoreNoShadowBlocks)
-//        {
-//            BlockMD blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
-//            while (y > 0 && blockMD.hasFlag(BlockMD.Flag.NoShadow) || blockMD.isAir() || (ignoreWater && (blockMD.isWater())))
-//            {
-//                y--;
-//                blockMD = dataCache.getBlockMD(chunkMd, x, y, z);
-//            }
-//        }
-//        return y;
-//    }
-
     /**
      * Added because getHeight() sometimes returns an air block.
      * Returns the value in the height map at this x, z coordinate in the chunk, disregarding
@@ -413,7 +392,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
      */
     public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, final HeightsCache chunkHeights)
     {
-        Integer[][] heights = chunkHeights.getUnchecked(chunkMd.getCoord());
+        Integer[][] heights = chunkHeights.getUnchecked(chunkMd.getCoordLong());
         if (heights == null)
         {
             // Not in cache anymore
@@ -500,14 +479,14 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
         final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
         ChunkMD targetChunkMd;
-
-        if (blockX >> 4 == chunkMd.getCoord().chunkXPos && blockZ >> 4 == chunkMd.getCoord().chunkXPos)
+        final long targetCoord = ChunkCoordIntPair.chunkXZ2Int(blockX >> 4, blockZ >> 4);
+        if (targetCoord == ChunkCoordIntPair.chunkXZ2Int(chunkMd.getCoord().chunkXPos, chunkMd.getCoord().chunkZPos))
         {
             targetChunkMd = chunkMd;
         }
         else
         {
-            targetChunkMd = dataCache.getChunkMD(coordinates.setChunkXPos(blockX >> 4).setChunkZPos(blockZ >> 4));
+            targetChunkMd = dataCache.getChunkMD(targetCoord);
         }
 
         if (targetChunkMd != null)
@@ -587,16 +566,16 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     /**
      * Cache for storing block heights in a 2-dimensional array, keyed to chunk coordinates.
      */
-    public class HeightsCache extends ForwardingLoadingCache<ChunkCoordIntPair, Integer[][]>
+    public class HeightsCache extends ForwardingLoadingCache<Long, Integer[][]>
     {
-        final LoadingCache<ChunkCoordIntPair, Integer[][]> internal;
+        final LoadingCache<Long, Integer[][]> internal;
 
         protected HeightsCache(String name)
         {
-            this.internal = getCacheBuilder().build(new CacheLoader<ChunkCoordIntPair, Integer[][]>()
+            this.internal = getCacheBuilder().build(new CacheLoader<Long, Integer[][]>()
             {
                 @Override
-                public Integer[][] load(ChunkCoordIntPair key) throws Exception
+                public Integer[][] load(Long key) throws Exception
                 {
                     //JourneyMap.getLogger().info("Initialized heights for chunk " + key);
                     return new Integer[16][16];
@@ -606,7 +585,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
 
         @Override
-        protected LoadingCache<ChunkCoordIntPair, Integer[][]> delegate()
+        protected LoadingCache<Long, Integer[][]> delegate()
         {
             return internal;
         }
@@ -615,16 +594,16 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     /**
      * Cache for storing block slopes in a 2-dimensional array, keyed to chunk coordinates.
      */
-    public class SlopesCache extends ForwardingLoadingCache<ChunkCoordIntPair, Float[][]>
+    public class SlopesCache extends ForwardingLoadingCache<Long, Float[][]>
     {
-        final LoadingCache<ChunkCoordIntPair, Float[][]> internal;
+        final LoadingCache<Long, Float[][]> internal;
 
         protected SlopesCache(String name)
         {
-            this.internal = getCacheBuilder().build(new CacheLoader<ChunkCoordIntPair, Float[][]>()
+            this.internal = getCacheBuilder().build(new CacheLoader<Long, Float[][]>()
             {
                 @Override
-                public Float[][] load(ChunkCoordIntPair key) throws Exception
+                public Float[][] load(Long key) throws Exception
                 {
                     //JourneyMap.getLogger().info("Initialized slopes for chunk " + key);
                     return new Float[16][16];
@@ -634,7 +613,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
 
         @Override
-        protected LoadingCache<ChunkCoordIntPair, Float[][]> delegate()
+        protected LoadingCache<Long, Float[][]> delegate()
         {
             return internal;
         }

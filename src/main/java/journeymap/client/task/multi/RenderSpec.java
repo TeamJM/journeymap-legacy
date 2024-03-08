@@ -188,12 +188,12 @@ public class RenderSpec
         if (primaryRenderCoords == null || primaryRenderCoords.isEmpty())
         {
             List<Offset> primaryOffsets = offsets.get(primaryRenderDistance);
-            primaryRenderCoords = new ArrayList<ChunkCoordIntPair>(primaryOffsets.size());
+            primaryRenderCoords = new ArrayList<>(primaryOffsets.size());
             for (Offset offset : primaryOffsets)
             {
                 ChunkCoordIntPair primaryCoord = offset.from(lastPlayerCoord);
                 primaryRenderCoords.add(primaryCoord);
-                dataCache.getChunkMD(primaryCoord);
+                dataCache.getChunkMD(ChunkCoordIntPair.chunkXZ2Int(primaryCoord.chunkXPos, primaryCoord.chunkZPos));
             }
         }
 
@@ -219,7 +219,7 @@ public class RenderSpec
             {
                 ChunkCoordIntPair secondaryCoord = offset.from(lastPlayerCoord);
                 renderCoords.add(secondaryCoord);
-                dataCache.getChunkMD(secondaryCoord);
+                dataCache.getChunkMD(ChunkCoordIntPair.chunkXZ2Int(secondaryCoord.chunkXPos, secondaryCoord.chunkZPos));
             }
 
             return renderCoords;

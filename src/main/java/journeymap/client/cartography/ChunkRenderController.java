@@ -37,7 +37,6 @@ public class ChunkRenderController
         SurfaceRenderer surfaceRenderer = new SurfaceRenderer();
         overWorldSurfaceRenderer = surfaceRenderer;
         overWorldCaveRenderer = new CaveRenderer(surfaceRenderer);
-        //standardRenderer = new ChunkTopoRenderer();
     }
 
     public boolean renderChunk(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
