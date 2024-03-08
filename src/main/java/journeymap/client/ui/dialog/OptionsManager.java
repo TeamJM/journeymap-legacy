@@ -17,7 +17,6 @@ import journeymap.client.properties.CoreProperties;
 import journeymap.client.properties.config.Config;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.map.TileDrawStepCache;
-import journeymap.client.service.webmap.Webmap;
 import journeymap.client.task.main.SoftResetTask;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.client.task.multi.RenderSpec;
@@ -29,6 +28,7 @@ import journeymap.client.ui.option.CategorySlot;
 import journeymap.client.ui.option.OptionSlotFactory;
 import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
+import journeymap.client.webmap.WebMap;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -677,11 +677,11 @@ public class OptionsManager extends JmUI
                     DataCache.instance().resetRadarCaches();
                     if (JourneymapClient.getWebMapProperties().enabled.get())
                     {
-                        Webmap.INSTANCE.start();
+                        WebMap.getInstance().start();
                     }
                     else
                     {
-                        Webmap.INSTANCE.stop();
+                        WebMap.getInstance().stop();
                     }
 
                     ChatLog.announceMod(true);
@@ -709,11 +709,11 @@ public class OptionsManager extends JmUI
                     SoftResetTask.queue();
                     if (JourneymapClient.getWebMapProperties().enabled.get())
                     {
-                        Webmap.INSTANCE.start();
+                        WebMap.getInstance().start();
                     }
                     else
                     {
-                        Webmap.INSTANCE.stop();
+                        WebMap.getInstance().stop();
                     }
                     break;
                 }

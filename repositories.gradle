@@ -1,0 +1,14 @@
+// Add any additional repositories for your dependencies here
+
+repositories {
+    mavenCentral()
+
+    maven {
+        name = "JourneyMap"
+        url = "https://jm.gserv.me/repository/maven-snapshots/"
+    }
+    maven {
+        name = "jitpack"
+        url = "https://jitpack.io"
+    }
+}

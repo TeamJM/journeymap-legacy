@@ -29,7 +29,6 @@ import journeymap.client.model.RegionImageCache;
 import journeymap.client.network.WorldInfoHandler;
 import journeymap.client.properties.*;
 import journeymap.client.render.map.TileDrawStepCache;
-import journeymap.client.service.webmap.Webmap;
 import journeymap.client.task.main.IMainThreadTask;
 import journeymap.client.task.main.MainTaskController;
 import journeymap.client.task.main.MappingMonitorTask;
@@ -38,6 +37,7 @@ import journeymap.client.task.multi.TaskController;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.waypoint.WaypointStore;
+import journeymap.client.webmap.WebMap;
 import journeymap.common.CommonProxy;
 import journeymap.common.Journeymap;
 import journeymap.common.version.VersionCheck;
@@ -309,7 +309,7 @@ public class JourneymapClient implements CommonProxy
             // Webserver
             if (webMapProperties.enabled.get())
             {
-                Webmap.INSTANCE.start();
+                WebMap.getInstance().start();
             }
             initialized = true;
 
@@ -387,9 +387,9 @@ public class JourneymapClient implements CommonProxy
      *
      * @return
      */
-    public Webmap getJmServer()
+    public WebMap getJmServer()
     {
-        return Webmap.INSTANCE;
+        return WebMap.getInstance();
     }
 
     /**

@@ -7,7 +7,7 @@ package journeymap.client.log;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
-import journeymap.client.service.webmap.Webmap;
+import journeymap.client.webmap.WebMap;
 import journeymap.common.Journeymap;
 import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
@@ -156,7 +156,7 @@ public class ChatLog
             {
                 try
                 {
-                    Webmap webServer = JourneymapClient.getInstance().getJmServer();
+                    WebMap webServer = JourneymapClient.getInstance().getJmServer();
                     String keyName = Constants.getKeyName(Constants.KB_MAP);
                     String port = webServer.getPort() == 80 ? "" : ":" + webServer.getPort();
                     String message = Constants.getString("jm.common.webserver_and_mapgui_ready", keyName, port); //$NON-NLS-1$
