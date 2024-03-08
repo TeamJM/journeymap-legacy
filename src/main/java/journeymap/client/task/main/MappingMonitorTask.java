@@ -11,7 +11,11 @@ import journeymap.client.log.LogFormatter;
 import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.GuiGameOver;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.GuiMultiplayer;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiSelectWorld;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -59,6 +63,11 @@ public class MappingMonitorTask implements IMainThreadTask
             }
             else if (lastDimension != mc.thePlayer.dimension)
             {
+                if (mc.thePlayer.dimension != Minecraft.getMinecraft().theWorld.provider.dimensionId)
+                {
+                    mc.thePlayer.dimension = Minecraft.getMinecraft().theWorld.provider.dimensionId;
+                }
+
                 lastDimension = mc.thePlayer.dimension;
                 if (jm.isMapping())
                 {

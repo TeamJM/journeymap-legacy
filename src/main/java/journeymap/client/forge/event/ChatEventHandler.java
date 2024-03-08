@@ -20,12 +20,6 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import java.util.EnumSet;
 import java.util.Set;
 
-// 1.7.10
-// 1.8
-//import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-//import net.minecraftforge.fml.relauncher.Side;
-//import net.minecraftforge.fml.relauncher.SideOnly;
-
 /**
  * @author techbrew 1/29/14.
  */
