@@ -44,11 +44,10 @@ public class DataCache
     final Cache<String, MapType> mapTypes;
     final LoadingCache<Long, ChunkMD> chunkMetadata;
     final ProxyRemovalListener<Long, ChunkMD> chunkMetadataRemovalListener;
-    final HashMap<Cache, String> managedCaches = new HashMap<Cache, String>();
-    final WeakHashMap<Cache, String> privateCaches = new WeakHashMap<Cache, String>();
+    final Map<Cache, String> managedCaches = new HashMap<>();
+    final Map<Cache, String> privateCaches = new WeakHashMap<>();
     private final int chunkCacheExpireSeconds = 30;
     private final int defaultConcurrencyLevel = 1;
-
 
     // Private constructor
     private DataCache()

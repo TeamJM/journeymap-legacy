@@ -204,8 +204,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Lo
         Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoordLong());
         int y = 0, sliceMinY = 0, sliceMaxY = 0;
         boolean isSurface = (vSlice == null);
-        Float slope, primarySlope, secondarySlope;
-        BlockMD blockMD;
+        float slope, primarySlope, secondarySlope;
 
         if (!isSurface)
         {
@@ -258,7 +257,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Lo
                 }
 
                 // Set that slope.  Set it good.  Aw yeah.
-                if (slope.isNaN())
+                if (Float.isNaN(slope))
                 {
                     slope = 1f;
                 }
@@ -337,8 +336,8 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Lo
             }
             slopeSum += ((y * 1f) / offsetHeight);
         }
-        Float slope = slopeSum / offsets.size();
-        if (slope.isNaN())
+        float slope = slopeSum / offsets.size();
+        if (Float.isNaN(slope))
         {
             slope = 1f;
         }
