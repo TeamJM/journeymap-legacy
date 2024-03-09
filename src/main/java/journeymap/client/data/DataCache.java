@@ -42,8 +42,8 @@ public class DataCache
     final LoadingCache<EntityLivingBase, EntityDTO> entityDTOs;
     final Cache<String, RegionCoord> regionCoords;
     final Cache<String, MapType> mapTypes;
-    final LoadingCache<Long, ChunkMD> chunkMetadata;
-    final ProxyRemovalListener<Long, ChunkMD> chunkMetadataRemovalListener;
+    final LoadingCache<ChunkCoordIntPair, ChunkMD> chunkMetadata;
+    final ProxyRemovalListener<ChunkCoordIntPair, ChunkMD> chunkMetadataRemovalListener;
     final Map<Cache, String> managedCaches = new HashMap<>();
     final Map<Cache, String> privateCaches = new WeakHashMap<>();
     private final int chunkCacheExpireSeconds = 30;
@@ -100,11 +100,8 @@ public class DataCache
         regionImageSets = RegionImageCache.initRegionImageSetsCache(getCacheBuilder());
         managedCaches.put(regionImageSets, "RegionImageSet");
 
-        chunkMetadataRemovalListener = new ProxyRemovalListener<>();
-        chunkMetadata = getCacheBuilder()
-                .expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS)
-                .removalListener(chunkMetadataRemovalListener)
-                .build(new ChunkMD.SimpleCacheLoader());
+        chunkMetadataRemovalListener = new ProxyRemovalListener<ChunkCoordIntPair, ChunkMD>();
+        chunkMetadata = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).removalListener(chunkMetadataRemovalListener).build(new ChunkMD.SimpleCacheLoader());
         managedCaches.put(chunkMetadata, "ChunkMD");
 
         regionCoords = getCacheBuilder().expireAfterAccess(chunkCacheExpireSeconds, TimeUnit.SECONDS).build();
@@ -397,7 +394,7 @@ public class DataCache
 //        }
 //    }
 
-    public ChunkMD getChunkMD(long coord)
+    public ChunkMD getChunkMD(ChunkCoordIntPair coord)
     {
         synchronized (chunkMetadata)
         {
@@ -429,12 +426,19 @@ public class DataCache
     {
         synchronized (chunkMetadata)
         {
-
-            chunkMetadata.put(ChunkCoordIntPair.chunkXZ2Int(chunkMD.getCoord().chunkXPos, chunkMD.getCoord().chunkZPos), chunkMD);
+            chunkMetadata.put(chunkMD.getCoord(), chunkMD);
         }
     }
 
-    public void invalidateChunkMD(long coord)
+    public Set<ChunkCoordIntPair> getCachedChunkCoordinates()
+    {
+        synchronized (chunkMetadata)
+        {
+            return chunkMetadata.asMap().keySet();
+        }
+    }
+
+    public void invalidateChunkMD(ChunkCoordIntPair coord)
     {
         synchronized (chunkMetadata)
         {
@@ -450,7 +454,7 @@ public class DataCache
         }
     }
 
-    public void addChunkMDListener(RemovalListener<Long, ChunkMD> listener)
+    public void addChunkMDListener(RemovalListener<ChunkCoordIntPair, ChunkMD> listener)
     {
         synchronized (chunkMetadataRemovalListener)
         {

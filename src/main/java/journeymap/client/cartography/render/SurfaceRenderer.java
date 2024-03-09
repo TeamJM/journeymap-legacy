@@ -356,11 +356,11 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     }
 
     @Override
-    public void onRemoval(RemovalNotification<Long, ChunkMD> notification)
+    public void onRemoval(RemovalNotification<ChunkCoordIntPair, ChunkMD> notification)
     {
         synchronized (chunkLock)
         {
-            long coord = notification.getKey();
+            ChunkCoordIntPair coord = notification.getKey();
             chunkSurfaceHeights.invalidate(coord);
             chunkSurfaceSlopes.invalidate(coord);
             columnPropertiesCache.invalidate(coord);

@@ -226,7 +226,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
 
     public Integer getSurfaceBlockHeight(final ChunkMD chunkMd, int x, int z, final HeightsCache chunkHeights)
     {
-        Integer[][] heights = chunkHeights.getUnchecked(chunkMd.getCoordLong());
+        Integer[][] heights = chunkHeights.getUnchecked(chunkMd.getCoord());
         if (heights == null)
         {
             // Not in cache anymore
@@ -297,7 +297,7 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
         BlockCoordIntPair offsetS = new BlockCoordIntPair(0, 1);
         BlockCoordIntPair offsetE = new BlockCoordIntPair(1, 0);
 
-        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoordLong());
+        Float[][] slopes = chunkSlopes.getUnchecked(chunkMd.getCoord());
         float h;
         Float slope;
         float hN, hW, hE, hS;
@@ -385,11 +385,11 @@ public class TopoRenderer extends BaseRenderer implements IChunkRenderer
     }
 
     @Override
-    public void onRemoval(RemovalNotification<Long, ChunkMD> notification)
+    public void onRemoval(RemovalNotification<ChunkCoordIntPair, ChunkMD> notification)
     {
         synchronized (chunkLock)
         {
-            long coord = notification.getKey();
+            ChunkCoordIntPair coord = notification.getKey();
             chunkSurfaceHeights.invalidate(coord);
             chunkSurfaceSlopes.invalidate(coord);
             columnPropertiesCache.invalidate(coord);

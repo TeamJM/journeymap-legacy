@@ -14,6 +14,11 @@ import net.minecraftforge.event.world.ChunkEvent;
 
 import java.util.EnumSet;
 
+// 1.8
+//import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+//import net.minecraftforge.fml.relauncher.Side;
+//import net.minecraftforge.fml.relauncher.SideOnly;
+
 /**
  * Listen for events which are likely to need the map to be updated.
  */
@@ -33,6 +38,7 @@ public class ChunkUpdateHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void onChunkEvent(ChunkEvent.Unload event)
     {
-        DataCache.instance().invalidateChunkMD(ChunkCoordIntPair.chunkXZ2Int(event.getChunk().xPosition, event.getChunk().zPosition));
+        ChunkCoordIntPair coord = event.getChunk().getChunkCoordIntPair();
+        DataCache.instance().invalidateChunkMD(coord);
     }
 }

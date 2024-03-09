@@ -9,10 +9,10 @@ import journeymap.client.model.ChunkMD;
 
 public interface IChunkRenderer
 {
-    boolean render(final ChunkPainter g2D, final ChunkMD chunkStub, final Integer vSlice);
+    public boolean render(final ChunkPainter g2D, final ChunkMD chunkStub, final Integer vSlice);
 
-    void setStratumColors(Stratum stratum, int lightAttenuation, Integer waterColor, boolean waterAbove, boolean underground, boolean mapCaveLighting);
+    public void setStratumColors(Stratum stratum, int lightAttenuation, Integer waterColor, boolean waterAbove, boolean underground, boolean mapCaveLighting);
 
-    float[] getAmbientColor();
+    public float[] getAmbientColor();
 
 }
