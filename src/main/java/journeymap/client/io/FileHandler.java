@@ -11,6 +11,7 @@ import com.google.common.io.ByteSink;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import com.google.gson.GsonBuilder;
+import cpw.mods.fml.client.FMLClientHandler;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.WorldData;
@@ -39,14 +40,28 @@ import java.util.zip.ZipInputStream;
 
 public class FileHandler
 {
+    public static final String DEV_MINECRAFT_DIR = "run/";
     public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
-    public static final String ASSETS_JOURNEYMAP_WEB = "/assets/journeymap/web";
-
+    public static final String ASSETS_WEBMAP = "/assets/journeymap/web";
+    public static final String ASSETS_JOURNEYMAP_UI = "/assets/journeymap/web/img/";
     public static final File MinecraftDirectory = ForgeHelper.INSTANCE.getClient().mcDataDir;
     public static final File JourneyMapDirectory = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR);
     public static final File StandardConfigDirectory = new File(MinecraftDirectory, Constants.CONFIG_DIR);
 
     private static WorldClient theLastWorld;
+
+    public static File getMinecraftDirectory()
+    {
+        Minecraft minecraft = FMLClientHandler.instance().getClient();
+        if (minecraft != null)
+        {
+            return minecraft.mcDataDir;
+        }
+        else
+        {
+            return new File(DEV_MINECRAFT_DIR);
+        }
+    }
 
     public static File getMCWorldDir(Minecraft minecraft)
     {
@@ -363,7 +378,7 @@ public class FileHandler
     {
         try
         {
-            String png = FileHandler.ASSETS_JOURNEYMAP_WEB + "/img/" + fileName;//$NON-NLS-1$
+            String png = FileHandler.ASSETS_WEBMAP + "/img/" + fileName;//$NON-NLS-1$
             InputStream is = JourneymapClient.class.getResourceAsStream(png);
             if (is == null)
             {
@@ -480,7 +495,7 @@ public class FileHandler
         try
         {
             final File outFile = new File(toDir, fileName);
-            String htmlPath = FileHandler.ASSETS_JOURNEYMAP_WEB + "/" + fileName;
+            String htmlPath = FileHandler.ASSETS_WEBMAP + "/" + fileName;
             InputStream inputStream = JourneymapClient.class.getResource(htmlPath).openStream();
 
             ByteSink out = new ByteSink()
@@ -551,7 +566,7 @@ public class FileHandler
         }
     }
 
-    public static void copyResources(File targetDirectory, String assetsPath, String setName, boolean overwrite)
+    public static boolean copyResources(File targetDirectory, String assetsPath, String setName, boolean overwrite)
     {
         String fromPath = null;
         File toDir = null;
@@ -574,11 +589,13 @@ public class FileHandler
                 fromPath = fromDir.getPath();
                 FileHandler.copyFromDirectory(fromDir, toDir, overwrite);
             }
+            return true;
         }
         catch (Throwable t)
         {
             Journeymap.getLogger().error(String.format("Couldn't unzip resource set from %s to %s: %s", fromPath, toDir, t));
         }
+        return false;
     }
 
     /**

@@ -7,7 +7,6 @@ package journeymap.client.properties;
 
 import journeymap.client.model.MapType;
 import journeymap.client.properties.config.Config;
-import journeymap.client.service.MapApiService;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,9 +24,6 @@ public class WebMapProperties extends MapProperties
 
     @Config(category = WebMap, key = "jm.advanced.port", minValue = 80, maxValue = 10000, defaultValue = 8080)
     public final AtomicInteger port = new AtomicInteger(8080);
-
-    @Config(category = WebMap, key = "jm.webmap.google_domain", stringListProvider = MapApiService.TopLevelDomains.class)
-    public final AtomicReference<String> googleMapApiDomain = new AtomicReference<String>(".com");
 
     public final AtomicReference<MapType.Name> preferredMapType = new AtomicReference<MapType.Name>(MapType.Name.day);
     protected transient final String name = "webmap";

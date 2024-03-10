@@ -19,7 +19,12 @@ import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 // 1.8
 //import net.minecraftforge.fml.common.Loader;
@@ -58,6 +63,8 @@ public class Constants
     public static String ENTITY_ICON_DIR = path.join(ICON_DIR, "entity", END);
     public static String WAYPOINT_ICON_DIR = path.join(ICON_DIR, "waypoint", END);
     public static String THEME_ICON_DIR = path.join(ICON_DIR, "theme", END);
+
+    public static String WEB_DIR = path.join(JOURNEYMAP_DIR, "web", END);
 
     // Network Channel IDs
 

@@ -11,12 +11,12 @@ import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.forge.event.KeyEventHandler;
 import journeymap.client.io.ThemeFileHandler;
+import journeymap.client.log.ChatLog;
 import journeymap.client.log.JMLogger;
 import journeymap.client.properties.CoreProperties;
 import journeymap.client.properties.config.Config;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.map.TileDrawStepCache;
-import journeymap.client.service.WebServer;
 import journeymap.client.task.main.SoftResetTask;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.client.task.multi.RenderSpec;
@@ -28,6 +28,7 @@ import journeymap.client.ui.option.CategorySlot;
 import journeymap.client.ui.option.OptionSlotFactory;
 import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
+import journeymap.client.webmap.WebMap;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -674,7 +675,16 @@ public class OptionsManager extends JmUI
                 case WebMap:
                 {
                     DataCache.instance().resetRadarCaches();
-                    WebServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), true);
+                    if (JourneymapClient.getWebMapProperties().enabled.get())
+                    {
+                        WebMap.getInstance().start();
+                    }
+                    else
+                    {
+                        WebMap.getInstance().stop();
+                    }
+
+                    ChatLog.announceMod(true);
                     break;
                 }
                 case Waypoint:
@@ -697,7 +707,14 @@ public class OptionsManager extends JmUI
                 case Advanced:
                 {
                     SoftResetTask.queue();
-                    WebServer.setEnabled(JourneymapClient.getWebMapProperties().enabled.get(), false);
+                    if (JourneymapClient.getWebMapProperties().enabled.get())
+                    {
+                        WebMap.getInstance().start();
+                    }
+                    else
+                    {
+                        WebMap.getInstance().stop();
+                    }
                     break;
                 }
             }

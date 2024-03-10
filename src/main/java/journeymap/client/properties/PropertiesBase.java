@@ -92,6 +92,16 @@ public abstract class PropertiesBase
     }
 
     /**
+     * Gets a Json representation of this object.
+     *
+     * @return json string
+     */
+    public String toJsonString()
+    {
+        return gson.toJson(this);
+    }
+
+    /**
      * Name used in property file
      *
      * @return name
