@@ -36,7 +36,7 @@
 dependencies {
 //    shadowImplementation("ar.com.hjg:pngj:2.1.0") //TODO: remove the code and use the dependency instead
     shadowImplementation("javax.servlet:javax.servlet-api:4.0.1")
-    shadowImplementation("info.journeymap:webmap-client:0.8.5-SNAPSHOT")
+    shadowImplementation("info.journeymap:webmap-client:0.8-SNAPSHOT")
     shadowImplementation("io.javalin:javalin:4.6.8")
 
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.8.0-beta4'
