@@ -138,7 +138,7 @@ pluginManager.withPlugin("com.modrinth.minotaur") {
     processDocs {
         doLast {
             // If the task executes, update the changelog in Minotaur as it doesn't support passing in a File
-            modrinth.changelog = project.file("/build/doc/changelog.html").readText(Charsets.UTF_8)
+            modrinth.changelog = project.file("build/doc/changelog.html").readText(Charsets.UTF_8)
         }
     }
     tasks.named("modrinth") {
