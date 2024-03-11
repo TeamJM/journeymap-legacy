@@ -18,7 +18,6 @@ When submitting a pull request, please follow these guidelines:
 - Make sure to describe your changes in the pull request description.
 - Make sure to run your code locally to ensure that your changes are functioning correctly and have not broken anything. See the section below for instructions on how to do this.
 
-
 ## Environment Setup
 
 ### 1. Git the JourneyMap source
@@ -50,6 +49,16 @@ Check out a branch of the JourneyMap GIT repo to a directory called journeymap. 
 * To get the current version use `./gradlew printVersion`
 * Build using Gradle (build.gradle) > build
 * The end result will be in `build/libs/journeymap*.jar`
+
+## Thanks
+
+<img src="https://www.yourkit.com/images/yklogo.png">
+Thanks to YourKit for providing licenses to open source projects.
+YourKit supports open source projects with innovative and intelligent tools
+for monitoring and profiling Java and .NET applications.
+YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>,
+<a href="https://www.yourkit.com/dotnet-profiler/">YourKit .NET Profiler</a>,
+and <a href="https://www.yourkit.com/youmonitor/">YourKit YouMonitor</a>.
 
 [1]: https://github.com/TeamJM/journeymap-legacy
 [2]: http://journeymap.info
