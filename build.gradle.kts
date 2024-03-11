@@ -1,4 +1,3 @@
-import com.matthewprenger.cursegradle.CurseExtension
 import com.modrinth.minotaur.ModrinthExtension
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -137,13 +136,14 @@ pluginManager.withPlugin("com.modrinth.minotaur") {
         modrinth.changelog = project.file("/build/doc/changelog.html").readText(Charsets.UTF_8)
 }
 
-pluginManager.withPlugin("com.matthewprenger.cursegradle") {
-    val curse = project.extensions.getByType<CurseExtension>()
-    curse.curseProjects.forEach {
-        it.releaseType = curse_release_type
-        it.changelogType = "html"
-        it.addArtifact(fairPlayJar.get().archiveFile)
-        it.mainArtifact.changelog = project.file("build/doc/changelog.html")
-        it.additionalArtifacts.forEach { it.changelog = project.file("build/doc/changelog.html") }
+tasks.publishCurseforge {
+    val mainArtifact = this.uploadArtifacts[0]
+    mainArtifact.releaseType = curse_release_type
+    mainArtifact.changelogType = "html"
+    mainArtifact.changelog = project.file("/build/doc/changelog.html")
+    mainArtifact.withAdditionalFile(fairPlayJar.get().archiveFile.get().asFile)
+    mainArtifact.additionalArtifacts.forEach { additionalArtifact ->
+        additionalArtifact.changelogType = mainArtifact.changelogType
+        additionalArtifact.changelog = mainArtifact.changelog
     }
 }
