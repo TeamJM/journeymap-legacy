@@ -131,13 +131,26 @@ publishing.publications.withType<MavenPublication> {
 
 pluginManager.withPlugin("com.modrinth.minotaur") {
     val modrinth = project.extensions.getByType<ModrinthExtension>()
+    modrinth.versionName = "${mod_id}-${minecraft_version}-${project.version}"
     modrinth.additionalFiles.add(fairPlayJar)
     if (project.file("/build/doc/changelog.html").exists())
         modrinth.changelog = project.file("/build/doc/changelog.html").readText(Charsets.UTF_8)
+    processDocs {
+        doLast {
+            // If the task executes, update the changelog in Minotaur as it doesn't support passing in a File
+            modrinth.changelog = project.file("/build/doc/changelog.html").readText(Charsets.UTF_8)
+        }
+    }
+    tasks.named("modrinth") {
+        dependsOn(processDocs)
+    }
 }
 
 tasks.publishCurseforge {
+    dependsOn(processDocs)
+
     val mainArtifact = this.uploadArtifacts[0]
+    mainArtifact.displayName = "${mod_id}-${minecraft_version}-${project.version}"
     mainArtifact.releaseType = curse_release_type
     mainArtifact.changelogType = "html"
     mainArtifact.changelog = project.file("/build/doc/changelog.html")
