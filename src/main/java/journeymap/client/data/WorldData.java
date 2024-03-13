@@ -8,6 +8,7 @@ package journeymap.client.data;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.feature.Feature;
@@ -46,6 +47,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
 {
     String name;
     int dimension;
+    static private TIntObjectHashMap<String> dimNames;
     long time;
     boolean hardcore;
     boolean singlePlayer;
@@ -285,10 +287,25 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
         try
         {
-            return worldProvider.getDimensionName();
+            if (dimNames == null) {
+                dimNames = new TIntObjectHashMap<String>();
+            }
+            if (dimNames.containsKey(worldProvider.dimensionId)) {
+                return dimNames.get(worldProvider.dimensionId);
+            }
+
+            String langKey = String.format("jm.dimension.%1$d.name", worldProvider.dimensionId);
+            String dimName = Constants.getString(langKey);
+            if (dimName.equals(langKey))
+            {
+                dimName = worldProvider.getDimensionName();
+            }
+
+            return dimNames.put(worldProvider.dimensionId, dimName);
         }
         catch (Exception e)
         {
+            JMLogger.logOnce(String.format("Failed to retrieve dimension %d name: error: %s", worldProvider.dimensionId, e), e);
             return Constants.getString("jm.common.dimension", ForgeHelper.INSTANCE.getDimension(worldProvider));
         }
     }
