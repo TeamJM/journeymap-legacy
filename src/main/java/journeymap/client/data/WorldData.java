@@ -285,10 +285,18 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
         try
         {
-            return worldProvider.getDimensionName();
+            String langKey = String.format("jm.common.dimension.%1$d.name", worldProvider.dimensionId);
+            String dimName = Constants.getString(langKey);
+            if (langKey.equals(dimName))
+            {
+                dimName = worldProvider.getDimensionName();
+            }
+
+            return dimName;
         }
         catch (Exception e)
         {
+            JMLogger.logOnce(String.format("Failed to retrieve dimension %d error: ", worldProvider.dimensionId), e);
             return Constants.getString("jm.common.dimension", ForgeHelper.INSTANCE.getDimension(worldProvider));
         }
     }
