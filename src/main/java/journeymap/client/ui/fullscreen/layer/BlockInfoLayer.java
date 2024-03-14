@@ -19,6 +19,7 @@ import journeymap.client.render.map.GridRenderer;
 import journeymap.client.ui.option.LocationFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.chunk.Chunk;
 
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             String info;
             if (!chunk.isEmpty())
             {
-                ChunkMD chunkMD = DataCache.instance().getChunkMD(chunk.getChunkCoordIntPair());
+                ChunkMD chunkMD = DataCache.instance().getChunkMD(ChunkCoordIntPair.chunkXZ2Int(chunk.xPosition, chunk.zPosition));
                 int blockY = chunkMD.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15);
                 String biome = ForgeHelper.INSTANCE.getBiome(blockCoord.x, blockY, blockCoord.z).biomeName;
 

@@ -396,7 +396,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     @Override
     public BiomeGenBase getBiome(int x, int y, int z)
     {
-        ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(x >> 4, z >> 4));
+        ChunkMD chunkMD = DataCache.instance().getChunkMD(ChunkCoordIntPair.chunkXZ2Int(x >> 4, z >> 4));
         return getBiome(chunkMD, x, y, z);
     }
 
@@ -449,7 +449,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     {
         private Chunk getChunk(int x, int z)
         {
-            ChunkMD chunkMD = DataCache.instance().getChunkMD(new ChunkCoordIntPair(x >> 4, z >> 4));
+            ChunkMD chunkMD = DataCache.instance().getChunkMD(ChunkCoordIntPair.chunkXZ2Int(x >> 4, z >> 4));
             if (chunkMD != null && chunkMD.hasChunk())
             {
                 return chunkMD.getChunk();
