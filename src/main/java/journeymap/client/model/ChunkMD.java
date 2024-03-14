@@ -261,6 +261,11 @@ public class ChunkMD
         return ForgeHelper.INSTANCE.canBlockSeeTheSky(getChunk(), x, y, z);
     }
 
+    public long asLong()
+    {
+        return ChunkCoordIntPair.chunkXZ2Int(coord.chunkXPos, coord.chunkZPos);
+    }
+
     public ChunkCoordIntPair getCoord()
     {
         return coord;

@@ -291,14 +291,14 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         final int blockX = (chunkMd.getCoord().chunkXPos << 4) + (x + offset.x);
         final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
         ChunkMD targetChunkMd;
-
-        if (blockX >> 4 == chunkMd.getCoord().chunkXPos && blockZ >> 4 == chunkMd.getCoord().chunkZPos)
+        long coord = ChunkCoordIntPair.chunkXZ2Int(blockX >> 4, blockZ >> 4);
+        if (coord == chunkMd.asLong())
         {
             targetChunkMd = chunkMd;
         }
         else
         {
-            targetChunkMd = dataCache.getChunkMD(coordinates.setChunkXPos(blockX >> 4).setChunkZPos(blockZ >> 4));
+            targetChunkMd = dataCache.getChunkMD(coord);
         }
 
         if (targetChunkMd != null)
@@ -500,13 +500,14 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         final int blockZ = (chunkMd.getCoord().chunkZPos << 4) + (z + offset.z);
         ChunkMD targetChunkMd;
 
-        if (blockX >> 4 == chunkMd.getCoord().chunkXPos && blockZ >> 4 == chunkMd.getCoord().chunkXPos)
+        long coord = ChunkCoordIntPair.chunkXZ2Int(blockX >> 4, blockZ >> 4);
+        if (coord == chunkMd.asLong())
         {
             targetChunkMd = chunkMd;
         }
         else
         {
-            targetChunkMd = dataCache.getChunkMD(coordinates.setChunkXPos(blockX >> 4).setChunkZPos(blockZ >> 4));
+            targetChunkMd = dataCache.getChunkMD(coord);
         }
 
         if (targetChunkMd != null)

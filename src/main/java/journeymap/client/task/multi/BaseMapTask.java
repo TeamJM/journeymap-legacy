@@ -109,7 +109,7 @@ public abstract class BaseMapTask implements ITask
                 }
 
                 ChunkCoordIntPair coord = chunkIter.next();
-                ChunkMD chunkMd = DataCache.instance().getChunkMD(coord);
+                ChunkMD chunkMd = DataCache.instance().getChunkMD(ChunkCoordIntPair.chunkXZ2Int(coord.chunkXPos, coord.chunkZPos));
                 if (chunkMd != null && chunkMd.hasChunk())
                 {
                     try

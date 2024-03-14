@@ -5,10 +5,24 @@
 
 package journeymap.client.data;
 
-import com.google.common.cache.*;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.CacheStats;
+import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
+import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
 import journeymap.client.JourneymapClient;
 import journeymap.client.log.LogFormatter;
-import journeymap.client.model.*;
+import journeymap.client.model.ChunkMD;
+import journeymap.client.model.EntityDTO;
+import journeymap.client.model.MapType;
+import journeymap.client.model.RegionCoord;
+import journeymap.client.model.RegionImageCache;
+import journeymap.client.model.RegionImageSet;
+import journeymap.client.model.Waypoint;
 import journeymap.client.render.draw.DrawEntityStep;
 import journeymap.client.render.draw.DrawWayPointStep;
 import journeymap.client.waypoint.WaypointStore;
@@ -16,7 +30,14 @@ import journeymap.common.Journeymap;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.ChunkCoordIntPair;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -48,6 +69,8 @@ public class DataCache
     final Map<Cache, String> privateCaches = new WeakHashMap<>();
     private final int chunkCacheExpireSeconds = 30;
     private final int defaultConcurrencyLevel = 1;
+
+    final TLongObjectMap<ChunkCoordIntPair> longCoordMap = new TLongObjectHashMap<>();
 
     // Private constructor
     private DataCache()
@@ -381,24 +404,22 @@ public class DataCache
             return waypointDrawSteps.getUnchecked(waypoint);
         }
     }
-//    public RGB getColor(Color color)
-//    {
-//        return getColor(color.getRGB());
-//    }
-//
-//    public RGB getColor(int rgbInt)
-//    {
-//        synchronized (colors)
-//        {
-//            return colors.getUnchecked(rgbInt);
-//        }
-//    }
 
-    public ChunkMD getChunkMD(ChunkCoordIntPair coord)
+    public ChunkMD getChunkMD(long coordLong)
     {
+
         synchronized (chunkMetadata)
         {
             ChunkMD chunkMD = null;
+
+            ChunkCoordIntPair coord = longCoordMap.get(coordLong);
+            if (coord == null)
+            {
+                int x = (int) (coordLong & 4294967295L);
+                int z = (int) (coordLong >>> 32 & 4294967295L);
+                coord = new ChunkCoordIntPair(x, z);
+                longCoordMap.put(coordLong, coord);
+            }
 
             try
             {
@@ -480,7 +501,7 @@ public class DataCache
     {
         // Flush images, do syncronously to ensure it's done before cache invalidates
         RegionImageCache.instance().flushToDisk(false);
-
+        longCoordMap.clear();
         synchronized (managedCaches)
         {
             for (Cache cache : managedCaches.keySet())
