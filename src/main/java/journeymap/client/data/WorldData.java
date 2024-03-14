@@ -8,8 +8,6 @@ package journeymap.client.data;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.feature.Feature;
@@ -48,7 +46,6 @@ public class WorldData extends CacheLoader<Class, WorldData>
 {
     String name;
     int dimension;
-    private static TIntObjectMap<String> dimNames;
     long time;
     boolean hardcore;
     boolean singlePlayer;
@@ -66,11 +63,6 @@ public class WorldData extends CacheLoader<Class, WorldData>
      */
     public WorldData()
     {
-    }
-
-    static
-    {
-        dimNames = new TIntObjectHashMap<String>();
     }
 
     public static boolean isHardcoreAndMultiplayer()
@@ -293,10 +285,6 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
         try
         {
-            if (dimNames.containsKey(worldProvider.dimensionId)) {
-                return dimNames.get(worldProvider.dimensionId);
-            }
-
             String langKey = String.format("jm.common.dimension.%1$d.name", worldProvider.dimensionId);
             String dimName = Constants.getString(langKey);
             if (langKey.equals(dimName))
@@ -304,7 +292,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                 dimName = worldProvider.getDimensionName();
             }
 
-            return dimNames.put(worldProvider.dimensionId, dimName);
+            return dimName;
         }
         catch (Exception e)
         {
