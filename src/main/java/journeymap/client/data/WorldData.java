@@ -8,6 +8,8 @@ package journeymap.client.data;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.feature.Feature;
@@ -19,6 +21,7 @@ import journeymap.client.log.LogFormatter;
 import journeymap.common.Journeymap;
 import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.world.WorldProvider;
@@ -31,7 +34,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 // 1.8
 //import net.minecraftforge.fml.client.FMLClientHandler;
@@ -58,11 +68,21 @@ public class WorldData extends CacheLoader<Class, WorldData>
     String[] iconSetNames;
     int browser_poll;
 
+    public static TIntObjectMap<String> dimNames;
+
     /**
      * Constructor.
      */
     public WorldData()
     {
+    }
+
+    static
+    {
+        dimNames = new TIntObjectHashMap<>();
+        ((IReloadableResourceManager)  Minecraft.getMinecraft()
+                .getResourceManager())
+                .registerReloadListener(iResourceManager -> dimNames.clear());
     }
 
     public static boolean isHardcoreAndMultiplayer()
@@ -285,11 +305,16 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
         try
         {
-            String langKey = String.format("jm.common.dimension.%1$d.name", worldProvider.dimensionId);
-            String dimName = Constants.getString(langKey);
-            if (langKey.equals(dimName))
+            String dimName = dimNames.get(worldProvider.dimensionId);
+            if (dimName == null)
             {
-                dimName = worldProvider.getDimensionName();
+                String langKey = String.format("jm.common.dimension.%1$d.name", worldProvider.dimensionId);
+                dimName = Constants.getString(langKey);
+                if (langKey.equals(dimName))
+                {
+                    dimName = worldProvider.getDimensionName();
+                }
+                dimNames.put(worldProvider.dimensionId, dimName);
             }
 
             return dimName;

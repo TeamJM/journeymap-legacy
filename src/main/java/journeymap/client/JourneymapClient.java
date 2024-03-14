@@ -14,6 +14,7 @@ import journeymap.client.cartography.ChunkRenderController;
 import journeymap.client.cartography.ColorManager;
 import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
+import journeymap.client.data.WorldData;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.EventHandlerManager;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -494,6 +495,7 @@ public class JourneymapClient implements CommonProxy
             WorldInfoHandler.requestWorldID();
         }
 
+        WorldData.dimNames.clear();
         loadConfigProperties();
         DataCache.instance().purge();
         chunkRenderController = new ChunkRenderController();
