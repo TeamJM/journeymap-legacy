@@ -11,4 +11,8 @@ repositories {
         name = "jitpack"
         url = "https://jitpack.io"
     }
+    maven {
+        url "https://www.cursemaven.com"
+    }
+
 }

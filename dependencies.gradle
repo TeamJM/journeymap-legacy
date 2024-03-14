@@ -38,7 +38,8 @@ dependencies {
     shadowImplementation("javax.servlet:javax.servlet-api:4.0.1")
     shadowImplementation("info.journeymap:webmap-client:0.8-SNAPSHOT")
     shadowImplementation("io.javalin:javalin:4.6.8")
-
+//    implementation devOnlyNonPublishable(rfg.deobf("curse.maven:bop-220318:2280933"))
+//    implementation devOnlyNonPublishable(rfg.deobf("curse.maven:waila-73488:2230518"))
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.8.0-beta4'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4'
 }

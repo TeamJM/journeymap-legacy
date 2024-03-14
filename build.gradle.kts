@@ -87,6 +87,7 @@ tasks.jar {
     dependsOn(processDocs)
     archiveVersion = "${version}-${unlimited}".lowercase()
     exclude("journeymap/client/feature/impl/NoRadar.class")
+    exclude("**/module-info.class")
     filesMatching("mcmod.info") {
         expand("jm_edition" to unlimited)
     }
@@ -108,6 +109,7 @@ val fairPlayJar by tasks.registering(Jar::class) {
     from(tasks.reobfJar.map { zipTree(it.archiveFile.get().asFile) }) {
         exclude("META-INF/MANIFEST.MF")
         exclude("mcmod.info")
+        exclude("**/module-info.class")
     }
     manifest.from(tasks.jar.get().manifest)
     exclude("journeymap/client/feature/impl/Unlimited.class")
