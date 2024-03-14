@@ -8,6 +8,7 @@ package journeymap.client.data;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheLoader;
 import cpw.mods.fml.client.FMLClientHandler;
+import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
@@ -47,7 +48,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
 {
     String name;
     int dimension;
-    static private TIntObjectHashMap<String> dimNames;
+    private static TIntObjectMap<String> dimNames;
     long time;
     boolean hardcore;
     boolean singlePlayer;
@@ -65,6 +66,11 @@ public class WorldData extends CacheLoader<Class, WorldData>
      */
     public WorldData()
     {
+    }
+
+    static
+    {
+        dimNames = new TIntObjectHashMap<String>();
     }
 
     public static boolean isHardcoreAndMultiplayer()
@@ -287,16 +293,13 @@ public class WorldData extends CacheLoader<Class, WorldData>
 
         try
         {
-            if (dimNames == null) {
-                dimNames = new TIntObjectHashMap<String>();
-            }
             if (dimNames.containsKey(worldProvider.dimensionId)) {
                 return dimNames.get(worldProvider.dimensionId);
             }
 
-            String langKey = String.format("jm.dimension.%1$d.name", worldProvider.dimensionId);
+            String langKey = String.format("jm.common.dimension.%1$d.name", worldProvider.dimensionId);
             String dimName = Constants.getString(langKey);
-            if (dimName.equals(langKey))
+            if (langKey.equals(dimName))
             {
                 dimName = worldProvider.getDimensionName();
             }
@@ -305,7 +308,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         catch (Exception e)
         {
-            JMLogger.logOnce(String.format("Failed to retrieve dimension %d name: error: %s", worldProvider.dimensionId, e), e);
+            JMLogger.logOnce(String.format("Failed to retrieve dimension %d error: ", worldProvider.dimensionId), e);
             return Constants.getString("jm.common.dimension", ForgeHelper.INSTANCE.getDimension(worldProvider));
         }
     }
