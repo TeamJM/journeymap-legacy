@@ -60,9 +60,10 @@ public class TerraFirmaCraft
                 {
                     blockMD.addFlags(NoTopo, Foliage);
                 }
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         @Override

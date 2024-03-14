@@ -33,7 +33,8 @@ public class ModBlockDelegate
                 new VanillaBlockHandler(),
                 new CarpentersBlocks.CommonHandler(),
                 new TerraFirmaCraft.TfcBlockHandler(),
-                new Miscellaneous.CommonHandler());
+                new Miscellaneous.CommonHandler(),
+                new BiomesOPlenty());
     }
 
     /**
@@ -129,8 +130,8 @@ public class ModBlockDelegate
      */
     public interface IModBlockColorHandler
     {
-        public Integer getBlockColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ);
+        Integer getBlockColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ);
 
-        public Integer getTextureColor(BlockMD blockMD);
+        Integer getTextureColor(BlockMD blockMD);
     }
 }
