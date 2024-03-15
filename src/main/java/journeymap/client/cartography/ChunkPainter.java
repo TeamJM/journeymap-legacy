@@ -7,7 +7,9 @@ package journeymap.client.cartography;
 
 import journeymap.common.Journeymap;
 
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -28,6 +30,7 @@ public class ChunkPainter
     public ChunkPainter(Graphics2D g2D)
     {
         this.g2D = g2D;
+        initColorsArray();
         g2D.setComposite(ALPHA_OPAQUE);
     }
 
@@ -37,7 +40,7 @@ public class ChunkPainter
     public void paintDimOverlay(int x, int z, float alpha)
     {
         int color = colors[x][z];
-        if (color != -1)
+        if (color != Integer.MIN_VALUE)
         {
             paintBlock(x, z, RGB.adjustBrightness(color, alpha));
         }
@@ -96,7 +99,7 @@ public class ChunkPainter
                 for (int x = 0; x < 16; x++)
                 {
                     color = colors[x][z];
-                    if (color == -1)
+                    if (color == Integer.MIN_VALUE)
                     {
                         continue;
                     }
@@ -120,10 +123,13 @@ public class ChunkPainter
         }
     }
 
-    public void initColorsArray(){
-        for (int x=0; x < 16;x++) {
-            for (int z=0;z<16;z++){
-                colors[x][z]=-1;
+    public void initColorsArray()
+    {
+        for (int x = 0; x < 16; x++)
+        {
+            for (int z = 0; z < 16; z++)
+            {
+                colors[x][z] = Integer.MIN_VALUE;
             }
         }
     }
