@@ -9,7 +9,7 @@ Source code and build resources for [JourneyMap][2] ([http://journeymap.info][2]
 
 ## Contributing
 
-We're huge fans of the open source community, and we're happy to accept pull requests for patches and improvements. That said, we would prefer that you join the discord server and have a chat with us about it first. This allows us to cooperate with you and ensure that your PR makes sense, and isn't stepping on anyone else's toes.
+We're huge fans of the open source community, and we're happy to accept pull requests for patches and improvements. That said, we would prefer that you join the [discord server](discord.gg/eP8gE69) and have a chat with us about it first. This allows us to cooperate with you and ensure that your PR makes sense, and isn't stepping on anyone else's toes.
 
 If you would like to contribute, please fork this repository and submit a pull request.
 
