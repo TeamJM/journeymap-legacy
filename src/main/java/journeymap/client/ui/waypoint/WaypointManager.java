@@ -50,7 +50,7 @@ public class WaypointManager extends JmUI
     Boolean canUserTeleport;
     private SortButton buttonSortName, buttonSortDistance;
     private DimensionsButton buttonDimensions;
-    private Button buttonClose, buttonAdd, buttonOptions;
+    private Button buttonClose, buttonAdd, buttonOptions, buttonRemoveAllWaypoints;
     private OnOffButton buttonToggleAll;
     private ButtonList bottomButtons;
     private Waypoint focusWaypoint;
@@ -137,9 +137,15 @@ public class WaypointManager extends JmUI
 //                buttonOptions.setTooltip(tooltip);
             }
 
+            if (buttonRemoveAllWaypoints == null)
+            {
+                buttonRemoveAllWaypoints = new Button(Constants.getString("jm.common.remove_all"));
+                buttonRemoveAllWaypoints.fitWidth(getFontRenderer());
+            }
+
             buttonClose = new Button(Constants.getString("jm.common.close"));
 
-            bottomButtons = new ButtonList(buttonOptions, buttonAdd, buttonDimensions, buttonClose);
+            bottomButtons = new ButtonList(buttonOptions, buttonAdd, buttonDimensions, buttonRemoveAllWaypoints, buttonClose);
             buttonList.addAll(bottomButtons);
 
 
@@ -165,10 +171,6 @@ public class WaypointManager extends JmUI
                         buttonSortDistance.setActive(false);
                     }
                 }
-            }
-            else
-            {
-
             }
 
             if (itemScrollPane == null)
@@ -347,8 +349,8 @@ public class WaypointManager extends JmUI
         SlotMetadata slotMetadata = itemScrollPane.getLastPressed();
         if (slotMetadata != null) // TODO
         {
-
-
+            // It's so scared me 'Katyara22'
+            // Why does it contain nothing?
         }
 
         ScrollListPane.ISlot parentSlot = (CategorySlot) itemScrollPane.getLastPressedParentSlot();
@@ -400,6 +402,18 @@ public class WaypointManager extends JmUI
         if (guibutton == buttonOptions)
         {
             UIManager.getInstance().openOptionsManager(this, Config.Category.Waypoint, Config.Category.WaypointBeacon);
+            return;
+        }
+        if (guibutton == buttonRemoveAllWaypoints)
+        {
+            WaypointStore.instance().getAll().forEach(x -> {
+                WaypointStore.instance().remove(x);
+            });
+
+            this.items = new ArrayList<WaypointManagerItem>();
+
+            initGui();
+
             return;
         }
     }
