@@ -58,6 +58,7 @@ jm.common.close=Fechar
 jm.common.day=Dia
 jm.common.deletemap_dialog=Apagar o mapa
 jm.common.deletemap_dialog_all=Todas as dimensões
+jm.common.remove_all=Remover todos os pontos de passagem
 jm.common.deletemap_dialog_text=Apagar o mapa em todas as dimensões ou somente nesta dimensão?
 jm.common.deletemap_dialog_this=Esta Dimensão
 jm.common.deletemap_status_done=Mapa apagado.

@@ -58,6 +58,7 @@ jm.common.day=Jour
 jm.common.deletemap_dialog=Effacer Carte
 jm.common.deletemap_dialog_all=Toutes les Dimensions
 jm.common.deletemap_dialog_text=Effacer Carte dans toutes les dimensions ou juste la Dimension actuelle?
+jm.common.remove_all=Supprimer tous les points de passage
 jm.common.deletemap_dialog_this=Cette Dimension
 jm.common.deletemap_status_done=Carte effacée.
 jm.common.deletemap_status_error=Impossible d'effacer la Carte. Voir le fichier "journeymap.log" pour plus de détails.

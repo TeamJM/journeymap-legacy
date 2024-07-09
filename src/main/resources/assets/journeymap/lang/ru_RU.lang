@@ -57,6 +57,7 @@ jm.common.automap_dialog_none=Ничего
 jm.common.automap_dialog_text=Автоматически прорисовать все регионы или только пропущенные?
 jm.common.automap_status=Прорисовка поверхности (%1$s).
 jm.common.automap_status_underground=Прорисовка слоя %1$s (%2$s).
+jm.common.remove_all=Удалить все путевые точки
 jm.common.automap_text=Автоматическая прорисовка поверхности (одиночная игра)
 jm.common.automap_title=Авто карта…
 jm.common.chat_announcement=§eJourneyMap:§f %1$s
