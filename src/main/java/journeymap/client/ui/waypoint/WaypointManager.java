@@ -50,9 +50,11 @@ public class WaypointManager extends JmUI
     Boolean canUserTeleport;
     private SortButton buttonSortName, buttonSortDistance;
     private DimensionsButton buttonDimensions;
-    private Button buttonClose, buttonAdd, buttonOptions, buttonRemoveAllWaypoints;
+    private Button buttonClose, buttonAdd, buttonOptions, buttonRemoveAllWaypoints, buttonConfirmClose, buttonConfirm;
     private OnOffButton buttonToggleAll;
     private ButtonList bottomButtons;
+    private ButtonList bottomButtonsMainList;
+    private ButtonList bottomButtonsConfirmList;
     private Waypoint focusWaypoint;
     private ArrayList<WaypointManagerItem> items = new ArrayList<WaypointManagerItem>();
 
@@ -74,6 +76,68 @@ public class WaypointManager extends JmUI
 
     @Override
     public void initGui()
+    {
+        initBasicGui(() -> {
+            // Bottom buttons
+            if (buttonDimensions == null)
+            {
+                buttonDimensions = new DimensionsButton();
+            }
+
+            if (buttonAdd == null)
+            {
+                buttonAdd = new Button(Constants.getString("jm.waypoint.new"));
+                buttonAdd.fitWidth(getFontRenderer());
+                buttonAdd.setWidth(buttonAdd.getWidth() * 2);
+//                String tooltip = Constants.getString("jm.waypoint.new.tooltip");
+//                buttonAdd.setTooltip(tooltip);
+            }
+
+            if (buttonOptions == null)
+            {
+                buttonOptions = new Button(Constants.getString("jm.common.options_button"));
+                buttonOptions.fitWidth(getFontRenderer());
+//                String tooltip = Constants.getString("jm.waypoint.help.tooltip");
+//                buttonOptions.setTooltip(tooltip);
+            }
+
+            if (buttonRemoveAllWaypoints == null)
+            {
+                buttonRemoveAllWaypoints = new Button(Constants.getString("jm.common.remove_all"));
+                buttonRemoveAllWaypoints.fitWidth(getFontRenderer());
+            }
+
+            buttonClose = new Button(Constants.getString("jm.common.close"));
+
+            bottomButtonsMainList = new ButtonList(buttonOptions, buttonAdd, buttonDimensions, buttonRemoveAllWaypoints, buttonClose);
+            bottomButtons = bottomButtonsMainList;
+            buttonList.addAll(bottomButtons);
+        });
+    }
+
+    private void initConfirmGui()
+    {
+        initBasicGui(() -> {
+            // Bottom buttons
+            if (buttonConfirmClose == null)
+            {
+                buttonConfirmClose = new Button(Constants.getString("jm.common.close"));
+                buttonConfirmClose.fitWidth(getFontRenderer());
+            }
+
+            if (buttonConfirm == null)
+            {
+                buttonConfirm = new Button(Constants.getString("jm.common.confirm"));
+                buttonConfirm.fitWidth(getFontRenderer());
+            }
+
+            bottomButtonsConfirmList = new ButtonList(buttonConfirm, buttonConfirmClose);
+            bottomButtons = bottomButtonsConfirmList;
+            buttonList.addAll(bottomButtons);
+        });
+    }
+
+    private void initBasicGui(Runnable init)
     {
         try
         {
@@ -114,40 +178,7 @@ public class WaypointManager extends JmUI
             }
             buttonList.add(buttonToggleAll);
 
-            // Bottom buttons
-            if (buttonDimensions == null)
-            {
-                buttonDimensions = new DimensionsButton();
-            }
-
-            if (buttonAdd == null)
-            {
-                buttonAdd = new Button(Constants.getString("jm.waypoint.new"));
-                buttonAdd.fitWidth(getFontRenderer());
-                buttonAdd.setWidth(buttonAdd.getWidth() * 2);
-//                String tooltip = Constants.getString("jm.waypoint.new.tooltip");
-//                buttonAdd.setTooltip(tooltip);
-            }
-
-            if (buttonOptions == null)
-            {
-                buttonOptions = new Button(Constants.getString("jm.common.options_button"));
-                buttonOptions.fitWidth(getFontRenderer());
-//                String tooltip = Constants.getString("jm.waypoint.help.tooltip");
-//                buttonOptions.setTooltip(tooltip);
-            }
-
-            if (buttonRemoveAllWaypoints == null)
-            {
-                buttonRemoveAllWaypoints = new Button(Constants.getString("jm.common.remove_all"));
-                buttonRemoveAllWaypoints.fitWidth(getFontRenderer());
-            }
-
-            buttonClose = new Button(Constants.getString("jm.common.close"));
-
-            bottomButtons = new ButtonList(buttonOptions, buttonAdd, buttonDimensions, buttonRemoveAllWaypoints, buttonClose);
-            buttonList.addAll(bottomButtons);
-
+            init.run();
 
             if (this.items.isEmpty())
             {
@@ -189,7 +220,6 @@ public class WaypointManager extends JmUI
             {
                 itemScrollPane.scrollTo(items.get(0));
             }
-
         }
         catch (Throwable t)
         {
@@ -349,8 +379,7 @@ public class WaypointManager extends JmUI
         SlotMetadata slotMetadata = itemScrollPane.getLastPressed();
         if (slotMetadata != null) // TODO
         {
-            // It's so scared me 'Katyara22'
-            // Why does it contain nothing?
+
         }
 
         ScrollListPane.ISlot parentSlot = (CategorySlot) itemScrollPane.getLastPressedParentSlot();
@@ -405,6 +434,20 @@ public class WaypointManager extends JmUI
             return;
         }
         if (guibutton == buttonRemoveAllWaypoints)
+        {
+            initConfirmGui();
+
+            return;
+        }
+
+        // confirm buttons
+        if (guibutton == buttonConfirmClose)
+        {
+            UIManager.getInstance().openWaypointManager(null, this);
+
+            return;
+        }
+        if (guibutton == buttonConfirm)
         {
             WaypointStore.instance().getAll().forEach(x -> {
                 WaypointStore.instance().remove(x);
