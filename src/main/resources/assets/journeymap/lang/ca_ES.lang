@@ -55,6 +55,7 @@ jm.common.automap_text=Assignar automàticament regions del mapa (un únic jugad
 jm.common.automap_title=Mapa automàtic...
 jm.common.chat_announcement=§eJourneyMap:§f %1$s
 jm.common.close=Tancar
+jm.common.confirm=Confirma
 jm.common.day=Dia
 # jm.common.deletemap_dialog=Delete Map
 # jm.common.deletemap_dialog_all=All Dimensions

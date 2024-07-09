@@ -55,6 +55,7 @@ jm.common.automap_text=자동적으로 지형의 지도를 생성합니다 (싱�
 jm.common.automap_title=오토맵...
 jm.common.chat_announcement=§eJourneyMap:§f %1$s
 jm.common.close=닫기
+jm.common.confirm=확인
 jm.common.day=낮
 # jm.common.deletemap_dialog=Delete Map
 jm.common.remove_all=모든 웨이포인트 제거

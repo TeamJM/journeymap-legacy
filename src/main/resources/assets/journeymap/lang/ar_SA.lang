@@ -55,6 +55,7 @@ jm.common.automap_text=تلقائيا خريطة المناطق (لاعب واح
 jm.common.automap_title=تلقائي للخرائط ...
 jm.common.chat_announcement=§eJourneyMap : §f %1$s
 jm.common.close=إغلاق
+jm.common.confirm=تأكيد
 jm.common.day=يوم
 # jm.common.deletemap_dialog=Delete Map
 # jm.common.deletemap_dialog_all=All Dimensions

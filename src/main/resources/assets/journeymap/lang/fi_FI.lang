@@ -55,6 +55,7 @@ jm.common.automap_text=Kartoita alueet automaattisesti (single-player)
 jm.common.automap_title=Automaattinen kartoitus...
 jm.common.chat_announcement=§eJourneyMap:§f %1$s
 jm.common.close=Sulje
+jm.common.confirm=Vahvista
 jm.common.day=Päivä
 jm.common.deletemap_dialog=Poista kartta...
 jm.common.remove_all=Poista kaikki reittipisteet

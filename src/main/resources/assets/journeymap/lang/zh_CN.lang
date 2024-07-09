@@ -55,6 +55,7 @@ jm.common.automap_text=自动绘制区域地图(单人游戏)
 jm.common.automap_title=自动绘制地图...
 jm.common.chat_announcement=§eJourneyMap:§f %1$s
 jm.common.close=关闭
+jm.common.confirm=确认
 jm.common.day=白天
 # jm.common.deletemap_dialog=Delete Map
 # jm.common.deletemap_dialog_all=All Dimensions

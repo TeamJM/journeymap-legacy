@@ -54,6 +54,7 @@ jm.common.automap_text=Automatisch Regionen aufzeichnen (Einzelspieler)
 jm.common.automap_title=Auto-Mapping...
 jm.common.chat_announcement=§eJourneyMap:§f %1$s
 jm.common.close=Schließen
+jm.common.confirm=Bestätigen
 jm.common.day=Tag
 jm.common.deletemap_dialog=Karte löschen
 jm.common.deletemap_dialog_all=Alle Dimensionen
