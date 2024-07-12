@@ -22,6 +22,8 @@ import journeymap.common.Journeymap;
 import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.world.WorldProvider;
@@ -82,7 +84,10 @@ public class WorldData extends CacheLoader<Class, WorldData>
         dimNames = new TIntObjectHashMap<>();
         ((IReloadableResourceManager)  Minecraft.getMinecraft()
                 .getResourceManager())
-                .registerReloadListener(iResourceManager -> dimNames.clear());
+                .registerReloadListener(new IResourceManagerReloadListener() {
+                    @Override
+                    public void onResourceManagerReload(IResourceManager p_110549_1_) { dimNames.clear(); }
+                });
     }
 
     public static boolean isHardcoreAndMultiplayer()
