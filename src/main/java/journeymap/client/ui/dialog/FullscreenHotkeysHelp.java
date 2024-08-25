@@ -97,8 +97,7 @@ public class FullscreenHotkeysHelp extends JmUI
         drawHelpStrings(Constants.getString("key.journeymap.map_toggle_alt"), Constants.getKeyName(Constants.KB_MAP), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.zoom_in"), Constants.getKeyName(Constants.KB_MAP_ZOOMIN), x, y += 12);
         drawHelpStrings(Constants.getString("key.journeymap.zoom_out"), Constants.getKeyName(Constants.KB_MAP_ZOOMOUT), x, y += 12);
-        drawHelpStrings(Constants.getString("key.journeymap.day"), Constants.getKeyName(Constants.KB_MAP_DAY), x, y += 12);
-        drawHelpStrings(Constants.getString("key.journeymap.night"), Constants.getKeyName(Constants.KB_MAP_NIGHT), x, y += 12);
+        drawHelpStrings(Constants.getString("key.journeymap.minimap_type"), Constants.getKeyName(Constants.KB_MAP_SWITCH_TYPE), x, y += 12);
         drawHelpStrings(Constants.getString("jm.fullscreen.hotkeys_north"), Constants.getKeyName(mc.gameSettings.keyBindForward), x, y += 12);
         drawHelpStrings(Constants.getString("jm.fullscreen.hotkeys_west"), Constants.getKeyName(mc.gameSettings.keyBindLeft), x, y += 12);
         drawHelpStrings(Constants.getString("jm.fullscreen.hotkeys_south"), Constants.getKeyName(mc.gameSettings.keyBindBack), x, y += 12);

@@ -786,16 +786,10 @@ public class Fullscreen extends JmUI
             return;
         }
 
-        if (Constants.isPressed(Constants.KB_MAP_DAY) || Constants.isPressed(Constants.KB_MAP_NIGHT))
+        if (Constants.isPressed(Constants.KB_MAP_SWITCH_TYPE))
         {
             state.toggleMapType();
             KeyBinding.unPressAllKeys();
-            return;
-        }
-
-        if (Constants.isPressed(Constants.KB_MAP_NIGHT))
-        {
-            state.setMapType(MapType.Name.night);
             return;
         }
 
