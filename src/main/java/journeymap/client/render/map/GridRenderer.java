@@ -74,11 +74,6 @@ public class GridRenderer
     private FloatBuffer winPosBuf;
     private FloatBuffer objPosBuf;
 
-    @Deprecated
-    public GridRenderer(int gridSize) {
-        this();
-    }
-
     public GridRenderer()
     {
         viewportBuf = BufferUtils.createIntBuffer(16);
@@ -164,8 +159,7 @@ public class GridRenderer
         return gridSize;
     }
 
-    // TODO: This shouldn't be public anymore, as grid size is now automatically calculated on each update
-    public void setGridSize(int gridSize)
+    private void setGridSize(int gridSize)
     {
         if (this.gridSize == gridSize) return;
         this.gridSize = gridSize;  // Must be an odd number so as to have a center tile.
