@@ -74,14 +74,18 @@ public class GridRenderer
     private FloatBuffer winPosBuf;
     private FloatBuffer objPosBuf;
 
-    public GridRenderer(int gridSize)
+    @Deprecated
+    public GridRenderer(int gridSize) {
+        this();
+    }
+
+    public GridRenderer()
     {
         viewportBuf = BufferUtils.createIntBuffer(16);
         modelMatrixBuf = BufferUtils.createFloatBuffer(16);
         projMatrixBuf = BufferUtils.createFloatBuffer(16);
         winPosBuf = BufferUtils.createFloatBuffer(16);
         objPosBuf = BufferUtils.createFloatBuffer(16);
-        setGridSize(gridSize);
     }
 
     public static void addDebugMessage(String key, String message)
@@ -160,10 +164,13 @@ public class GridRenderer
         return gridSize;
     }
 
+    // TODO: This shouldn't be public anymore, as grid size is now automatically calculated on each update
     public void setGridSize(int gridSize)
     {
+        if (this.gridSize == gridSize) return;
         this.gridSize = gridSize;  // Must be an odd number so as to have a center tile.
         srcSize = gridSize * Tile.TILESIZE;
+        clear();
     }
 
     public boolean hasUnloadedTile(boolean preview)
@@ -235,6 +242,7 @@ public class GridRenderer
 
         // Update screen dimensions
         updateBounds(width, height);
+        updateGridSize();
 
         // Get center tile, check if present and current
         Tile centerTile = grid.get(centerPos);
@@ -249,7 +257,7 @@ public class GridRenderer
         // Derive offsets for centering the map
         Point2D blockPixelOffset = centerTile.blockPixelOffsetInTile(centerBlockX, centerBlockZ);
         final double blockSizeOffset = Math.pow(2, zoom) / 2;
-        final int magic = (gridSize == 5 ? 2 : 1) * Tile.TILESIZE; // TODO:  Understand why "2" as it relates to gridSize.  If gridSize is 3, this has to be "1".
+        final int magic = (gridSize / 2) * Tile.TILESIZE;
 
         double displayOffsetX = xOffset + magic - ((srcSize - lastWidth) / 2);
         if (centerBlockX < 0)
@@ -581,6 +589,13 @@ public class GridRenderer
                 screenBounds = new Rectangle2D.Double((width - viewPort.width) / 2, (height - viewPort.height) / 2, viewPort.width, viewPort.height);
             }
         }
+    }
+
+    private void updateGridSize() {
+        int newGridSize = (int) Math.ceil(Math.max(screenBounds.width, screenBounds.height) / Tile.TILESIZE) + 1;
+        // Grid size has to be uneven so a center tile exists.
+        if (newGridSize % 2 == 0) newGridSize++;
+        setGridSize(newGridSize);
     }
 
     private Tile findNeighbor(Tile tile, TilePos pos)

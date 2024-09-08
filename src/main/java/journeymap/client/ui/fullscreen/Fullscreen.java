@@ -67,7 +67,7 @@ import java.util.List;
 public class Fullscreen extends JmUI
 {
     final static MapState state = new MapState();
-    final static GridRenderer gridRenderer = new GridRenderer(5);
+    final static GridRenderer gridRenderer = new GridRenderer();
     final WaypointDrawStepFactory waypointRenderer = new WaypointDrawStepFactory();
     final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
     final LayerDelegate layerDelegate = new LayerDelegate();
