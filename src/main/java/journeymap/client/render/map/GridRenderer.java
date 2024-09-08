@@ -54,9 +54,8 @@ public class GridRenderer
     StatTimer updateTilesTimer1 = StatTimer.get("GridRenderer.updateTiles(1)", 5, 500);
     StatTimer updateTilesTimer2 = StatTimer.get("GridRenderer.updateTiles(2)", 5, 500);
     private int glErrors = 0;
-
-    private int gridSize; // 5 = 2560px.
-    private double srcSize;
+    private int gridSizeHeight, gridSizeWidth; // Amount of 512x512 tiles that should be loaded in each direction.
+    private double srcSizeHeight, srcSizeWidth; // Total pixel height/width of the loaded grid tiles
     private Rectangle2D.Double viewPort = null;
     private Rectangle2D.Double screenBounds = null;
     private int lastHeight = -1;
@@ -121,8 +120,8 @@ public class GridRenderer
 
     private void populateGrid(Tile centerTile)
     {
-        final int endRow = (gridSize - 1) / 2;
-        final int endCol = (gridSize - 1) / 2;
+        final int endRow = (gridSizeHeight - 1) / 2;
+        final int endCol = (gridSizeWidth - 1) / 2;
         final int startRow = -endRow;
         final int startCol = -endCol;
 
@@ -154,16 +153,19 @@ public class GridRenderer
         return hasUnloadedTile(false);
     }
 
-    public int getGridSize()
+    private void setGridSizes(int gridSizeHeight, int gridSizeWidth)
     {
-        return gridSize;
-    }
+        if (this.gridSizeHeight == gridSizeHeight && this.gridSizeWidth == gridSizeWidth) return;
+        if (gridSizeHeight % 2 == 0) gridSizeHeight++;
+        if (gridSizeWidth % 2 == 0) gridSizeWidth++;
 
-    private void setGridSize(int gridSize)
-    {
-        if (this.gridSize == gridSize) return;
-        this.gridSize = gridSize;  // Must be an odd number so as to have a center tile.
-        srcSize = gridSize * Tile.TILESIZE;
+        // Both must be odd so that a center tile exists
+        this.gridSizeHeight = gridSizeHeight;
+        this.gridSizeWidth = gridSizeWidth;
+
+        this.srcSizeHeight = gridSizeHeight * Tile.TILESIZE;
+        this.srcSizeWidth = gridSizeWidth * Tile.TILESIZE;
+
         clear();
     }
 
@@ -251,9 +253,10 @@ public class GridRenderer
         // Derive offsets for centering the map
         Point2D blockPixelOffset = centerTile.blockPixelOffsetInTile(centerBlockX, centerBlockZ);
         final double blockSizeOffset = Math.pow(2, zoom) / 2;
-        final int magic = (gridSize / 2) * Tile.TILESIZE;
 
-        double displayOffsetX = xOffset + magic - ((srcSize - lastWidth) / 2);
+        // TODO: Why is the extra offset necessary and what are we subtracting here? (2x)
+        int extraOffsetX = (gridSizeWidth / 2) * Tile.TILESIZE;
+        double displayOffsetX = xOffset + extraOffsetX - ((srcSizeWidth - lastWidth) / 2);
         if (centerBlockX < 0)
         {
             displayOffsetX -= blockSizeOffset;
@@ -262,7 +265,9 @@ public class GridRenderer
         {
             displayOffsetX += blockSizeOffset;
         }
-        double displayOffsetY = yOffset + magic - ((srcSize - lastHeight) / 2);
+
+        int extraOffsetY = (gridSizeHeight / 2) * Tile.TILESIZE;
+        double displayOffsetY = yOffset + extraOffsetY - ((srcSizeHeight - lastHeight) / 2);
         if (centerBlockZ < 0)
         {
             displayOffsetY -= blockSizeOffset;
@@ -586,10 +591,10 @@ public class GridRenderer
     }
 
     private void updateGridSize() {
-        int newGridSize = (int) Math.ceil(Math.max(screenBounds.width, screenBounds.height) / Tile.TILESIZE) + 1;
-        // Grid size has to be uneven so a center tile exists.
-        if (newGridSize % 2 == 0) newGridSize++;
-        setGridSize(newGridSize);
+        int newGridSizeHeight = (int) Math.ceil(screenBounds.height / Tile.TILESIZE + 0.5);
+        int newGridSizeWidth = (int) Math.ceil(screenBounds.width / Tile.TILESIZE + 0.5);
+
+        setGridSizes(newGridSizeHeight, newGridSizeWidth);
     }
 
     private Tile findNeighbor(Tile tile, TilePos pos)
@@ -681,11 +686,6 @@ public class GridRenderer
     public boolean setZoom(int zoom)
     {
         return center(mapType, centerBlockX, centerBlockZ, zoom);
-    }
-
-    public int getRenderSize()
-    {
-        return this.gridSize * Tile.TILESIZE;
     }
 
     public void clear()
