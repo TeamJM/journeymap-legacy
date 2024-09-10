@@ -254,7 +254,6 @@ public class GridRenderer
         Point2D blockPixelOffset = centerTile.blockPixelOffsetInTile(centerBlockX, centerBlockZ);
         final double blockSizeOffset = Math.pow(2, zoom) / 2;
 
-        // TODO: Why is the extra offset necessary and what are we subtracting here? (2x)
         int extraOffsetX = (gridSizeWidth / 2) * Tile.TILESIZE;
         double displayOffsetX = xOffset + extraOffsetX - ((srcSizeWidth - lastWidth) / 2);
         if (centerBlockX < 0)
