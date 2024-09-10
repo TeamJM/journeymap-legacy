@@ -48,7 +48,7 @@ public class MiniMap
     private static final float lightmapS = (float) (15728880 % 65536) / 1f;
     private static final float lightmapT = (float) (15728880 / 65536) / 1f;
     private static final long labelRefreshRate = 400;
-    private final static GridRenderer gridRenderer = new GridRenderer(3);
+    private final static GridRenderer gridRenderer = new GridRenderer();
     private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
     private final Logger logger = Journeymap.getLogger();
     private final Minecraft mc = ForgeHelper.INSTANCE.getClient();
@@ -98,8 +98,6 @@ public class MiniMap
 
         MapType mapType = state.getMapType(showCaves);
 
-        int gridSize = miniMapProperties.getSize() <= 768 ? 3 : 5;
-        gridRenderer.setGridSize(gridSize);
         gridRenderer.setContext(state.getWorldDir(), mapType);
         gridRenderer.center(mapType, mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
 
