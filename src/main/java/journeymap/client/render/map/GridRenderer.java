@@ -590,8 +590,8 @@ public class GridRenderer
     }
 
     private void updateGridSize() {
-        int newGridSizeHeight = (int) Math.ceil(screenBounds.height / Tile.TILESIZE + 0.5);
-        int newGridSizeWidth = (int) Math.ceil(screenBounds.width / Tile.TILESIZE + 0.5);
+        int newGridSizeHeight = (int) Math.ceil(screenBounds.height / Tile.TILESIZE) + 1;
+        int newGridSizeWidth = (int) Math.ceil(screenBounds.width / Tile.TILESIZE) + 1;
 
         setGridSizes(newGridSizeHeight, newGridSizeWidth);
     }
