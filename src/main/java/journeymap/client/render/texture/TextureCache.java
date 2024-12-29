@@ -5,6 +5,7 @@
 
 package journeymap.client.render.texture;
 
+import javax.imageio.ImageTypeSpecifier;
 import journeymap.client.io.FileHandler;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.io.RegionImageHandler;
@@ -36,11 +37,11 @@ import java.util.concurrent.*;
  */
 public class TextureCache
 {
-    private final Map<Name, TextureImpl> namedTextures = Collections.synchronizedMap(new HashMap<Name, TextureImpl>(Name.values().length + (Name.values().length / 2) + 1));
-    //private final Map<String, TextureImpl> customTextures = Collections.synchronizedMap(new HashMap<String, TextureImpl>(3));
-    private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
-    private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
-    private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<String, TextureImpl>());
+    private final Map<Name, TextureImpl> namedTextures = Collections.synchronizedMap(new HashMap<>(Name.values().length + (Name.values().length / 2) + 1));
+    //private final Map<String, TextureImpl> customTextures = Collections.synchronizedMap(new HashMap<>(3));
+    private final Map<String, TextureImpl> playerSkins = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, TextureImpl> entityIcons = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, TextureImpl> themeImages = Collections.synchronizedMap(new HashMap<>());
 
     private ThreadPoolExecutor texExec = new ThreadPoolExecutor(2, 4, 15L, TimeUnit.SECONDS,
             new ArrayBlockingQueue<Runnable>(8), new JMThreadFactory("texture"), new ThreadPoolExecutor.CallerRunsPolicy());
@@ -322,7 +323,7 @@ public class TextureCache
                     {
                         if (alpha < 1f || img.getWidth() != width || img.getHeight() != height)
                         {
-                            BufferedImage tmp = new BufferedImage(width, height, img.getType());
+                            BufferedImage tmp = ImageTypeSpecifier.createFromRenderedImage(img).createBufferedImage(width, height);
                             Graphics2D g = tmp.createGraphics();
                             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
                             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
@@ -363,7 +364,7 @@ public class TextureCache
                 {
                     if (alpha < 1f || img.getWidth() != width || img.getHeight() != height)
                     {
-                        BufferedImage tmp = new BufferedImage(width, height, img.getType());
+                        BufferedImage tmp = ImageTypeSpecifier.createFromRenderedImage(img).createBufferedImage(width, height);
                         Graphics2D g = tmp.createGraphics();
                         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
                         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
@@ -424,7 +425,8 @@ public class TextureCache
                 BufferedImage img = downloadSkin(username);
                 if (img != null)
                 {
-                    final BufferedImage scaledImage = new BufferedImage(24, 24, img.getType());
+                    final BufferedImage scaledImage =
+                            ImageTypeSpecifier.createFromRenderedImage(img).createBufferedImage(24, 24);
                     final Graphics2D g = RegionImageHandler.initRenderingHints(scaledImage.createGraphics());
                     g.drawImage(img, 0, 0, 24, 24, null);
                     g.dispose();
