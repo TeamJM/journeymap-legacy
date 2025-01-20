@@ -92,7 +92,8 @@ public class WebMapProperties extends MapProperties
                 ", showPets=" + showPets +
                 ", showPlayers=" + showPlayers +
                 ", showWaypoints=" + showWaypoints +
-                ", entityIconSetName=" + getEntityIconSetName();
+                ", entityIconSetName=" + getEntityIconSetName() +
+                ", entityScale=" + entityScale;
     }
 
 

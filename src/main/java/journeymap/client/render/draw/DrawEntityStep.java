@@ -39,6 +39,7 @@ public class DrawEntityStep implements DrawStep
     WeakReference<EntityLivingBase> entityLivingRef;
     String customName;
     boolean flip;
+    double entityScale;
 
     private DrawEntityStep(EntityLivingBase entityLiving)
     {
@@ -46,12 +47,13 @@ public class DrawEntityStep implements DrawStep
         this.entityLivingRef = new WeakReference<EntityLivingBase>(entityLiving);
     }
 
-    public void update(boolean flip, TextureImpl locatorTexture, TextureImpl texture, boolean showHeading)
+    public void update(boolean flip, TextureImpl locatorTexture, TextureImpl texture, boolean showHeading, double entityScale)
     {
         this.locatorTexture = locatorTexture;
         this.texture = texture;
         this.flip = flip;
         this.showHeading = showHeading;
+        this.entityScale = entityScale;
         EntityLivingBase entityLiving = entityLivingRef.get();
         if (entityLiving != null)
         {
@@ -68,6 +70,8 @@ public class DrawEntityStep implements DrawStep
         {
             return;
         }
+
+        drawScale *= entityScale;
 
         Point2D pixel = gridRenderer.getPixel(entityLiving.posX, entityLiving.posZ);
         if (pixel != null)
