@@ -132,7 +132,7 @@ public class ThemeMinimapFrame
         }
         else
         {
-            DrawUtil.drawQuad(textureCircleMask, x, y, this.width, this.height, 0, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
+            DrawUtil.drawQuad(textureCircleMask, x, y, this.width, this.height, 0, null, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true, true);
         }
     }
 
@@ -209,7 +209,7 @@ public class ThemeMinimapFrame
             }
             else
             {
-                DrawUtil.drawQuad(textureCircle, x, y, this.width, this.height, 0, frameColor, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
+                DrawUtil.drawQuad(textureCircle, x, y, this.width, this.height, 0, frameColor, 1f, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true, true);
             }
         }
     }

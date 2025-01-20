@@ -110,12 +110,12 @@ public class DrawEntityStep implements DrawStep
 
         if (locatorTexture != null && showHeading)
         {
-            DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, alpha, drawScale, rotation);
+            DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, alpha, drawScale, rotation, true);
         }
 
         if (texture != null)
         {
-            DrawUtil.drawEntity(drawX, drawY, heading, true, texture, alpha, drawScale * .75f, rotation);
+            DrawUtil.drawEntity(drawX, drawY, heading, true, texture, alpha, drawScale * .75f, rotation, true);
         }
         int labelOffset = texture == null ? 0 : rotation == 0 ? -texture.getHeight() / 2 : texture.getHeight() / 2;
         Point2D labelPoint = gridRenderer.shiftWindowPosition(drawX, drawY, 0, -labelOffset);
@@ -144,7 +144,7 @@ public class DrawEntityStep implements DrawStep
 
         if (locatorTexture != null && showHeading)
         {
-            DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, alpha, drawScale, rotation);
+            DrawUtil.drawEntity(drawX, drawY, heading, false, locatorTexture, alpha, drawScale, rotation, true);
         }
 
         int labelOffset = texture == null ? 8 : rotation == 0 ? texture.getHeight() : -texture.getHeight();
@@ -157,7 +157,7 @@ public class DrawEntityStep implements DrawStep
 
         if (texture != null)
         {
-            DrawUtil.drawEntity(drawX, drawY, heading, true, texture, alpha, drawScale, rotation);
+            DrawUtil.drawEntity(drawX, drawY, heading, true, texture, alpha, drawScale, rotation, false);
         }
     }
 
