@@ -36,6 +36,8 @@ public class RadarDrawStepFactory
         final boolean showMobHeading = mapProperties.showMobHeading.get();
         final boolean showPlayerHeading = mapProperties.showPlayerHeading.get();
         final List<DrawStep> drawStepList = new ArrayList<DrawStep>();
+        final double entityScale = (double)mapProperties.entityScale.get() / 100;
+        final boolean entityBlur = mapProperties.entityBlur.get();
 
         try
         {
@@ -104,7 +106,7 @@ public class RadarDrawStepFactory
                         {
                             entityIcon = tc.getPlayerSkin(ForgeHelper.INSTANCE.getEntityName(entityLiving));
                             DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(entityLiving);
-                            drawStep.update(false, locatorImg, entityIcon, showPlayerHeading);
+                            drawStep.update(false, locatorImg, entityIcon, showPlayerHeading, entityScale, true);
                             drawStepList.add(drawStep);
                         }
                         else
@@ -113,7 +115,7 @@ public class RadarDrawStepFactory
                             if (entityIcon != null)
                             {
                                 DrawEntityStep drawStep = DataCache.instance().getDrawEntityStep(entityLiving);
-                                drawStep.update(false, locatorImg, entityIcon, showMobHeading);
+                                drawStep.update(false, locatorImg, entityIcon, showMobHeading, entityScale, entityBlur);
                                 drawStepList.add(drawStep);
                             }
                         }

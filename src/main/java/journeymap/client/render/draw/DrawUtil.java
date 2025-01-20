@@ -230,14 +230,14 @@ public class DrawUtil
         return fr.FONT_HEIGHT + (2 * vpad);
     }
 
-    private static void drawQuad(TextureImpl texture, float alpha, final double x, final double y, final double width, final double height, boolean flip, double rotation)
+    private static void drawQuad(TextureImpl texture, float alpha, final double x, final double y, final double width, final double height, boolean flip, double rotation, boolean linear)
     {
-        drawQuad(texture, x, y, width, height, rotation, null, alpha, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+        drawQuad(texture, x, y, width, height, rotation, null, alpha, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false, linear);
     }
 
     private static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, boolean flip, double rotation)
     {
-        drawQuad(texture, x, y, width, height, rotation, null, 1f, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+        drawQuad(texture, x, y, width, height, rotation, null, 1f, flip, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false, true);
     }
 
     /**
@@ -252,7 +252,7 @@ public class DrawUtil
      * @param glBlendSfactor For normal alpha blending: GL11.GL_SRC_ALPHA
      * @param glBlendDFactor For normal alpha blending: GL11.GL_ONE_MINUS_SRC_ALPHA
      */
-    public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, double rotation, Integer color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor, boolean clampTexture)
+    public static void drawQuad(TextureImpl texture, final double x, final double y, final double width, final double height, double rotation, Integer color, float alpha, boolean flip, boolean blend, int glBlendSfactor, int glBlendDFactor, boolean clampTexture, boolean linear)
     {
         GL11.glPushMatrix();
 
@@ -277,8 +277,8 @@ public class DrawUtil
                 renderHelper.glColor4f(1, 1, 1, alpha);
             }
 
-            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, linear ? GL11.GL_LINEAR : GL11.GL_NEAREST);
+            renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, linear ? GL11.GL_LINEAR : GL11.GL_NEAREST);
 
             int texEdgeBehavior = clampTexture ? GL12.GL_CLAMP_TO_EDGE : GL11.GL_REPEAT;
             renderHelper.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, texEdgeBehavior);
@@ -388,9 +388,9 @@ public class DrawUtil
         renderHelper.draw();
     }
 
-    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float alpha, float scale, double rotation)
+    public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float alpha, float scale, double rotation, boolean linear)
     {
-        drawQuad(texture, alpha, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), flip, rotation);
+        drawQuad(texture, alpha, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), flip, rotation, linear);
     }
 
     public static void drawImage(TextureImpl texture, double x, double y, boolean flip, float scale, double rotation)
@@ -405,17 +405,17 @@ public class DrawUtil
 
     public static void drawClampedImage(TextureImpl texture, Integer color, double x, double y, float scale, float alpha, double rotation)
     {
-        drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true);
+        drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, true, true);
     }
 
     public static void drawColoredImage(TextureImpl texture, int alpha, Integer color, double x, double y, float scale, double rotation)
     {
-        drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+        drawQuad(texture, x, y, (texture.getWidth() * scale), (texture.getHeight() * scale), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false, true);
     }
 
     public static void drawColoredImage(TextureImpl texture, int alpha, Integer color, double x, double y, double rotation)
     {
-        drawQuad(texture, x, y, texture.getWidth(), texture.getHeight(), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false);
+        drawQuad(texture, x, y, texture.getWidth(), texture.getHeight(), rotation, color, alpha, false, true, GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, false, true);
     }
 
     /**
@@ -430,7 +430,7 @@ public class DrawUtil
      */
     public static void drawEntity(double x, double y, double heading, boolean flipInsteadOfRotate, TextureImpl texture, float scale, double rotation)
     {
-        drawEntity(x, y, heading, flipInsteadOfRotate, texture, 1f, scale, rotation);
+        drawEntity(x, y, heading, flipInsteadOfRotate, texture, 1f, scale, rotation, true);
     }
 
     /**
@@ -443,7 +443,7 @@ public class DrawUtil
      * @param flipInsteadOfRotate
      * @param texture
      */
-    public static void drawEntity(double x, double y, double heading, boolean flipInsteadOfRotate, TextureImpl texture, float alpha, float scale, double rotation)
+    public static void drawEntity(double x, double y, double heading, boolean flipInsteadOfRotate, TextureImpl texture, float alpha, float scale, double rotation, boolean linear)
     {
         // Adjust to scale
         double width = (texture.getWidth() * scale);
@@ -454,12 +454,12 @@ public class DrawUtil
         if (flipInsteadOfRotate)
         {
             boolean flip = (heading % 180) < 90;
-            drawImage(texture, drawX, drawY, flip, alpha, scale, -rotation);
+            drawImage(texture, drawX, drawY, flip, alpha, scale, -rotation, linear);
         }
         else
         {
             // Draw texture in rotated position
-            drawImage(texture, drawX, drawY, false, alpha, scale, heading);
+            drawImage(texture, drawX, drawY, false, alpha, scale, heading, linear);
         }
     }
 
