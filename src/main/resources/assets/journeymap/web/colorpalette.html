@@ -87,6 +87,43 @@
         var count = 0;
         var table = colorpalette.table;
 
+        if (table === undefined && colorpalette.basicColors !== undefined) {
+            table = Object.fromEntries(
+                colorpalette.basicColors
+                .reduce(
+                    (collector, basicColor) => {
+                        var parts = basicColor.uid.split(/:/, 2);
+
+                        if (!collector.has(parts[0])) {
+                            collector.set(parts[0], new Map());
+                        }
+                        var blocks = collector.get(parts[0]);
+
+                        if (!blocks.has(parts[1])) {
+                            blocks.set(parts[1], new Map());
+                        }
+                        var states = blocks.get(parts[1]);
+
+                        states.set(basicColor.meta, [basicColor.color, basicColor.alpha]);
+
+                        return collector;
+                    },
+                    new Map()
+                )
+                .entries()
+                .map(([mod, blocks]) => ([
+                    mod,
+                    Object.fromEntries(blocks
+                        .entries()
+                        .map(([block, states]) => ([
+                            block,
+                            Object.fromEntries(states.entries())
+                        ]))
+                    )
+                ]))
+            )
+        }
+
         for (var mod in table) {
             var modEl = document.createElement("div");
             modEl.className = "mod";
