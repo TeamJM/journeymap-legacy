@@ -28,8 +28,10 @@ src/minecraft/paulscode/
 !src/minecraft/net/minecraft/src/license.txt
 !src/minecraft/net/techbrew/
 
+.java-version
 /temp/
 .gradle/
+.vscode/
 tmp/
 .idea/
 eclipse/
