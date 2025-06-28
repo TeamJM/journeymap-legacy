@@ -56,6 +56,8 @@ public class MiniMapProperties2 extends MiniMapProperties
                 .add("position", position)
                 .add("showFps", showFps)
                 .add("showBiome", showBiome)
+                .add("showTime", showTime)
+                .add("timeFormat", timeFormat)
                 .add("showLocation", showLocation)
                 .add("showWaypointLabels", showWaypointLabels)
                 .add("sizePercent", sizePercent)

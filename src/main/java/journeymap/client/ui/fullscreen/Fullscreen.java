@@ -1104,6 +1104,7 @@ public class Fullscreen extends JmUI
             MiniMapProperties mmp = JourneymapClient.getMiniMapProperties(JourneymapClient.getActiveMinimapId());
             mmp.shape.set(Shape.Rectangle);
             mmp.showBiome.set(false);
+            mmp.showTime.set(false);
             mmp.sizePercent.set(20);
             mmp.save();
             Theme theme = ThemeFileHandler.getThemeByName(name);
@@ -1118,4 +1119,3 @@ public class Fullscreen extends JmUI
         }
     }
 }
-

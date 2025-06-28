@@ -12,6 +12,7 @@ import journeymap.client.ui.minimap.Orientation;
 import journeymap.client.ui.minimap.Position;
 import journeymap.client.ui.minimap.ReticleOrientation;
 import journeymap.client.ui.minimap.Shape;
+import journeymap.client.ui.option.TimeFormat;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,11 +34,17 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = Inherit, key = "jm.minimap.position", defaultEnum = "TopRight")
     public final AtomicReference<Position> position = new AtomicReference<Position>(Position.TopRight);
 
+    @Config(category = Inherit, key = "jm.common.time_format", stringListProvider = TimeFormat.IdProvider.class)
+    public final AtomicReference<String> timeFormat = new AtomicReference<String>(new TimeFormat.IdProvider().getDefaultString());
+
     @Config(category = Inherit, key = "jm.minimap.show_fps", defaultBoolean = false)
     public final AtomicBoolean showFps = new AtomicBoolean(false);
 
     @Config(category = Inherit, key = "jm.minimap.show_biome")
     public final AtomicBoolean showBiome = new AtomicBoolean(true);
+
+    @Config(category = Inherit, key = "jm.minimap.show_time")
+    public final AtomicBoolean showTime = new AtomicBoolean(false);
 
     @Config(category = Inherit, key = "jm.minimap.show_location")
     public final AtomicBoolean showLocation = new AtomicBoolean(true);
@@ -164,6 +171,8 @@ public class MiniMapProperties extends InGameMapProperties
         result = 31 * result + (position != null ? position.hashCode() : 0);
         result = 31 * result + (showFps != null ? showFps.hashCode() : 0);
         result = 31 * result + (showBiome != null ? showBiome.hashCode() : 0);
+        result = 31 * result + (showTime != null ? showTime.hashCode() : 0);
+        result = 31 * result + timeFormat.hashCode();
         result = 31 * result + (showLocation != null ? showLocation.hashCode() : 0);
         result = 31 * result + showWaypointLabels.hashCode();
         result = 31 * result + sizePercent.hashCode();
@@ -195,6 +204,8 @@ public class MiniMapProperties extends InGameMapProperties
                 .add("reticleOrientation", reticleOrientation)
                 .add("shape", shape)
                 .add("showBiome", showBiome)
+                .add("showTime", showTime)
+                .add("timeFormat", timeFormat)
                 .add("showCompass", showCompass)
                 .add("showFps", showFps)
                 .add("showLocation", showLocation)

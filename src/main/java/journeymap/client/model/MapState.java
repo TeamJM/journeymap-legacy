@@ -9,6 +9,7 @@ package journeymap.client.model;
 import com.google.common.base.Objects;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
+import journeymap.client.data.WorldData;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.helper.ForgeHelper;
@@ -25,6 +26,7 @@ import journeymap.client.task.multi.MapPlayerTask;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ChatComponentTranslation;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -50,6 +52,8 @@ public class MapState
     private File worldDir = null;
     private long lastRefresh = 0;
     private long lastMapTypeChange = 0;
+    private long worldTime = 0L;
+    private long worldTotalTime = 0L;
 
     private boolean underground = false;
 
@@ -110,6 +114,9 @@ public class MapState
         }
 
         playerBiome = DataCache.getPlayer().biome;
+
+        worldTime = WorldData.getWorldTime();
+        worldTotalTime = WorldData.getWorldTotalTime();
 
         updateLastRefresh();
 
@@ -238,6 +245,14 @@ public class MapState
     public String getPlayerBiome()
     {
         return playerBiome;
+    }
+
+    public long getWorldTime() {
+        return worldTime;
+    }
+
+    public long getWorldTotalTime() {
+        return worldTotalTime;
     }
 
     public List<DrawStep> getDrawSteps()

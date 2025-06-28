@@ -59,6 +59,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
     String name;
     int dimension;
     long time;
+    long totalTime;
     boolean hardcore;
     boolean singlePlayer;
     Map<Feature, Boolean> features;
@@ -94,6 +95,18 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
         WorldData world = DataCache.instance().getWorld(false);
         return world.hardcore && !world.singlePlayer;
+    }
+
+    public static long getWorldTime()
+    {
+        WorldData world = DataCache.instance().getWorld(false);
+        return world.time;
+    }
+
+    public static long getWorldTotalTime()
+    {
+        WorldData world = DataCache.instance().getWorld(false);
+        return world.totalTime;
     }
 
     private static String getServerName()
@@ -344,7 +357,8 @@ public class WorldData extends CacheLoader<Class, WorldData>
         dimension = ForgeHelper.INSTANCE.getDimension(mc.theWorld.provider);
         hardcore = worldInfo.isHardcoreModeEnabled();
         singlePlayer = !multiplayer;
-        time = mc.theWorld.getWorldTime() % 24000L;
+        time = mc.theWorld.getWorldTime();
+        totalTime = mc.theWorld.getWorldInfo().getWorldTotalTime();
         features = FeatureManager.getAllowedFeatures();
 
         mod_name = JourneymapClient.MOD_NAME;
