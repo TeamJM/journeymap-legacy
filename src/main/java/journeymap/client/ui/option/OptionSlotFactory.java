@@ -346,6 +346,11 @@ public class OptionSlotFactory
                 button = new LocationFormat.Button(properties, property);
                 defaultTip = Constants.getString("jm.config.default", ((LocationFormat.Button) button).getLabel(slp.getDefaultString()));
             }
+            else if (slp instanceof TimeFormat.IdProvider)
+            {
+                button = new TimeFormat.Button(properties, property);
+                defaultTip = Constants.getString("jm.config.default", ((TimeFormat.Button) button).getLabel(slp.getDefaultString()));
+            }
             else
             {
                 button = new ListPropertyButton<String>(slp.getStrings(), name, properties, property);

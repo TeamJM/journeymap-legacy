@@ -449,10 +449,16 @@ public class Theme implements Comparable<Theme>
             public LabelSpec locationLabel = new LabelSpec();
 
             /**
-             * Label spec for showing location
+             * Label spec for showing biome
              */
             @Since(1)
             public LabelSpec biomeLabel = new LabelSpec();
+
+            /**
+             * Label spec for showing time
+             */
+            @Since(1)
+            public LabelSpec timeLabel = new LabelSpec();
 
             /**
              * Label spec for showing compass points

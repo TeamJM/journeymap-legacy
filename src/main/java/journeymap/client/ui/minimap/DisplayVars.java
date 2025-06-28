@@ -14,6 +14,7 @@ import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.option.LocationFormat;
+import journeymap.client.ui.option.TimeFormat;
 import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemeCompassPoints;
 import journeymap.client.ui.theme.ThemeMinimapFrame;
@@ -48,18 +49,21 @@ public class DisplayVars
     final double reticleSegmentLength;
     final int fpsLabelHeight;
     final int locationLabelHeight;
+    final int timeLabelHeight;
     final Point2D.Double centerPoint;
+    final boolean showTime;
     final boolean showFps;
     final boolean showBiome;
     final boolean showLocation;
     final boolean showCompass;
     final boolean showReticle;
-    final LabelVars labelFps, labelLocation, labelBiome, labelDebug1, labelDebug2;
+    final LabelVars labelFps, labelLocation, labelBiome, labelTime, labelDebug1, labelDebug2;
     final Theme theme;
     final ThemeMinimapFrame minimapFrame;
     final ThemeCompassPoints minimapCompassPoints;
     final Theme.Minimap.MinimapSpec minimapSpec;
     final LocationFormat.LocationFormatKeys locationFormatKeys;
+    final TimeFormat.TimeFormatKeys timeFormatKeys;
     final boolean locationFormatVerbose;
     int marginX, marginY;
     boolean forceUnicode;
@@ -76,6 +80,7 @@ public class DisplayVars
     {
         // Immutable member and local vars
         this.scaledResolution = ForgeHelper.INSTANCE.getScaledResolution();
+        this.showTime = miniMapProperties.showTime.get();
         this.showFps = miniMapProperties.showFps.get();
         this.showBiome = miniMapProperties.showBiome.get();
         this.showLocation = miniMapProperties.showLocation.get();
@@ -87,6 +92,7 @@ public class DisplayVars
         this.displayHeight = mc.displayHeight;
         this.terrainAlpha = Math.max(0f, Math.min(1f, miniMapProperties.terrainAlpha.get() / 100f));
         this.locationFormatKeys = new LocationFormat().getFormatKeys(miniMapProperties.locationFormat.get());
+        this.timeFormatKeys = new TimeFormat().getFormatKeys(miniMapProperties.timeFormat.get());
         this.locationFormatVerbose = miniMapProperties.locationFormatVerbose.get();
         this.theme = ThemeFileHandler.getCurrentTheme();
 
@@ -135,6 +141,7 @@ public class DisplayVars
         FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
         fpsLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.fpsLabel.shadow) * this.fontScale);
         locationLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.locationLabel.shadow) * this.fontScale);
+        timeLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.timeLabel.shadow) * this.fontScale);
 
         int compassFontScale = miniMapProperties.compassFontScale.get();
         int compassLabelHeight = 0;
@@ -177,10 +184,11 @@ public class DisplayVars
         {
             case BottomRight:
             {
-                if (!minimapSpec.labelBottomInside && (showLocation || showBiome))
+                if (!minimapSpec.labelBottomInside && (showLocation || showBiome || showTime))
                 {
                     int labels = showLocation ? 1 : 0;
                     labels += showBiome ? 1 : 0;
+                    labels += showTime ? 1 : 0;
                     marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels * locationLabelHeight) + compassLabelHeight / 2);
                 }
 
@@ -209,10 +217,11 @@ public class DisplayVars
             }
             case BottomLeft:
             {
-                if (!minimapSpec.labelBottomInside && (showLocation || showBiome))
+                if (!minimapSpec.labelBottomInside && (showLocation || showBiome || showTime))
                 {
                     int labels = showLocation ? 1 : 0;
                     labels += showBiome ? 1 : 0;
+                    labels += showTime ? 1 : 0;
 
                     marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels * locationLabelHeight) + compassLabelHeight / 2);
                 }
@@ -296,6 +305,20 @@ public class DisplayVars
 
         int labelMargin = minimapSpec.labelBottomMargin;
         int yOffset = minimapSpec.labelBottomInside ? -labelMargin : labelMargin;
+
+        if (showTime)
+        {
+            DrawUtil.VAlign vAlign = (minimapSpec.labelBottomInside) ? DrawUtil.VAlign.Above : DrawUtil.VAlign.Below;
+            labelTime = new LabelVars(this, centerX, bottomY + yOffset, DrawUtil.HAlign.Center, vAlign, fontScale, minimapSpec.timeLabel);
+            if (showLocation)
+            {
+                yOffset += timeLabelHeight;
+            }
+        }
+        else
+        {
+            labelTime = null;
+        }
 
         if (showLocation)
         {

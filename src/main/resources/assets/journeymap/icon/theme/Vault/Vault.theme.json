@@ -145,6 +145,13 @@
         "foregroundAlpha": 255,
         "shadow": true
       },
+      "timeLabel": {
+        "backgroundColor": "#005500",
+        "backgroundAlpha": 0,
+        "foregroundColor": "#00D56B",
+        "foregroundAlpha": 255,
+        "shadow": true
+      },
       "compassLabel": {
         "backgroundColor": "#005500",
         "backgroundAlpha": 0,

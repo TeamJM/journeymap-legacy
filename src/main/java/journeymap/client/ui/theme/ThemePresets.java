@@ -133,6 +133,7 @@ public class ThemePresets
             minimapSquare.fpsLabel = commonLabel;
             minimapSquare.locationLabel = commonLabel;
             minimapSquare.biomeLabel = commonLabel;
+            minimapSquare.timeLabel = commonLabel;
             minimapSquare.compassLabel = compassLabel;
             minimapSquare.compassPoint = new Theme.ImageSpec(28, 28);
             minimapSquare.compassPointLabelPad = 6;
@@ -153,6 +154,7 @@ public class ThemePresets
             minimapCircle.fpsLabel = commonLabel;
             minimapCircle.locationLabel = commonLabel;
             minimapCircle.biomeLabel = commonLabel;
+            minimapCircle.timeLabel = commonLabel;
             minimapCircle.compassLabel = compassLabel;
             minimapCircle.compassPointOffset = -3;
             minimapCircle.compassPoint = new Theme.ImageSpec(28, 28);
@@ -270,6 +272,7 @@ public class ThemePresets
             minimapSquare.fpsLabel = commonLabel;
             minimapSquare.locationLabel = commonLabel;
             minimapSquare.biomeLabel = commonLabel;
+            minimapSquare.timeLabel = commonLabel;
             minimapSquare.compassLabel = compassLabel;
             minimapSquare.compassPoint = null;
             minimapSquare.reticleColor = Theme.toHexColor(Color.lightGray);
@@ -285,6 +288,7 @@ public class ThemePresets
             minimapCircle.fpsLabel = commonLabel;
             minimapCircle.locationLabel = commonLabel;
             minimapCircle.biomeLabel = commonLabel;
+            minimapCircle.timeLabel = commonLabel;
             minimapCircle.compassLabel = compassLabel;
             minimapCircle.compassPoint = null;
             minimapCircle.reticleColor = Theme.toHexColor(Color.lightGray);
@@ -295,4 +299,3 @@ public class ThemePresets
         return theme;
     }
 }
-

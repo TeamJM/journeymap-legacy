@@ -64,6 +64,7 @@ public class MiniMap
     private String fpsLabelText;
     private String locationLabelText;
     private String biomeLabelText;
+    private String timeLabelText;
 
     private Point2D.Double centerPoint;
     private Rectangle2D.Double centerRect;
@@ -380,6 +381,10 @@ public class MiniMap
             {
                 dv.labelBiome.draw(biomeLabelText);
             }
+            if (dv.showTime)
+            {
+                dv.labelTime.draw(timeLabelText);
+            }
 
             // Return resolution to how it is normally scaled
             DrawUtil.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
@@ -657,8 +662,30 @@ public class MiniMap
             biomeLabelText = state.getPlayerBiome();
         }
 
+        // Time key
+        if (dv.showTime)
+        {
+            long worldTime = state.getWorldTime();
+            long days = (worldTime / 24000L);
+            long hours = (worldTime / 1000L + 6L) % 24L;
+            long minutes = (worldTime % 1000L) * 60L / 1000L;
+
+            String am_pm = "AM";
+            if (hours > 12) {
+                hours -= 12;
+                am_pm = "PM";
+            } else if (hours == 12) {
+                am_pm = "PM";
+            }
+            timeLabelText = dv.timeFormatKeys.format(
+                String.format("%d", days),
+                String.format("%02d", hours),
+                String.format("%02d", minutes),
+                am_pm
+            );
+        }
+
         // Update timestamp
         lastLabelRefresh = System.currentTimeMillis();
     }
 }
-
