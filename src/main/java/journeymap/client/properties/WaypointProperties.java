@@ -58,6 +58,12 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     @Config(category = Waypoint, key = "jm.waypoint.create_deathpoints")
     public final AtomicBoolean createDeathpoints = new AtomicBoolean(true);
 
+    @Config(category = WaypointBeacon, key = "jm.waypoint.beacon_fade_start", minValue = 0, maxValue = 500, defaultValue = 40)
+    public final AtomicInteger beaconFadeStart = new AtomicInteger(40);
+
+    @Config(category = WaypointBeacon, key = "jm.waypoint.beacon_fade_end", minValue = 0, maxValue = 500, defaultValue = 5)
+    public final AtomicInteger beaconFadeEnd = new AtomicInteger(5);
+
     protected transient final String name = "waypoint";
 
     @Override
@@ -98,6 +104,8 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
         result = 31 * result + textureSmall.hashCode();
         result = 31 * result + maxDistance.hashCode();
         result = 31 * result + createDeathpoints.hashCode();
+        result = 31 * result + beaconFadeStart.hashCode();
+        result = 31 * result + beaconFadeEnd.hashCode();
         result = 31 * result + name.hashCode();
         return result;
     }
@@ -120,6 +128,8 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
                 .add("showStaticBeam", showStaticBeam)
                 .add("showTexture", showTexture)
                 .add("textureSmall", textureSmall)
+                .add("beaconFadeStart", beaconFadeStart)
+                .add("beaconFadeEnd", beaconFadeEnd)
                 .toString();
     }
 
@@ -128,5 +138,4 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     {
         return Integer.valueOf(this.hashCode()).compareTo(other.hashCode());
     }
-
 }
