@@ -48,7 +48,7 @@ public class WaypointBeaconHandler implements EventHandlerManager.EventHandler
             {
                 mc.mcProfiler.startSection("journeymap");
                 mc.mcProfiler.startSection("beacons");
-                RenderWaypointBeacon.renderAll();
+                RenderWaypointBeacon.renderAll(event.partialTicks);
                 mc.mcProfiler.endSection();
                 mc.mcProfiler.endSection();
             }

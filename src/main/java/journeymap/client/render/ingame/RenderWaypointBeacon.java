@@ -43,6 +43,8 @@ public class RenderWaypointBeacon
     static String distanceLabel = Constants.getString("jm.waypoint.distance_meters", "%1.0f");
     static WaypointProperties waypointProperties;
 
+    private static final float MIN_VISIBLE_ALPHA = 0.01F;
+
     public static void resetStatTimers()
     {
 //        timer.reset();
@@ -50,6 +52,11 @@ public class RenderWaypointBeacon
     }
 
     public static void renderAll()
+    {
+        renderAll(1.0F);
+    }
+
+    public static void renderAll(float partialTicks)
     {
         try
         {
@@ -64,7 +71,7 @@ public class RenderWaypointBeacon
                 {
                     try
                     {
-                        doRender(wp);
+                        doRender(wp, partialTicks);
                     }
                     catch (Throwable t)
                     {
@@ -86,6 +93,11 @@ public class RenderWaypointBeacon
 
     static void doRender(Waypoint waypoint)
     {
+        doRender(waypoint, 1.0F);
+    }
+
+    static void doRender(Waypoint waypoint, float partialTicks)
+    {
         if (renderManager.livingPlayer == null)
         {
             return;
@@ -98,13 +110,28 @@ public class RenderWaypointBeacon
         try
         {
             // Player coords
-            Vec3 playerVec = ForgeHelper.INSTANCE.getEntityPositionVector(renderManager.livingPlayer);
+            Vec3 playerVec = Vec3.createVectorHelper(
+                    renderManager.livingPlayer.lastTickPosX + (renderManager.livingPlayer.posX - renderManager.livingPlayer.lastTickPosX) * partialTicks,
+                    renderManager.livingPlayer.lastTickPosY + (renderManager.livingPlayer.posY - renderManager.livingPlayer.lastTickPosY) * partialTicks,
+                    renderManager.livingPlayer.lastTickPosZ + (renderManager.livingPlayer.posZ - renderManager.livingPlayer.lastTickPosZ) * partialTicks
+            );
 
             // Move y up to put icon at eye height
             Vec3 waypointVec = waypoint.getPosition().addVector(0, .118, 0);
 
             // Get view distance from waypoint
             final double actualDistance = playerVec.distanceTo(waypointVec);
+
+            final double fadeStartDistance = waypointProperties.beaconFadeStart.get();
+            final double fadeEndDistance = waypointProperties.beaconFadeEnd.get();
+
+            final double horizontalDistance = getHorizontalDistance(playerVec, waypointVec);
+            final float fadeAlpha = getFadeAlpha(horizontalDistance, fadeStartDistance, fadeEndDistance);
+            if (fadeAlpha <= MIN_VISIBLE_ALPHA)
+            {
+                return;
+            }
+
             final int maxDistance = waypointProperties.maxDistance.get();
             if (maxDistance > 0 && actualDistance > maxDistance)
             {
@@ -132,7 +159,7 @@ public class RenderWaypointBeacon
             boolean showRotatingBeam = waypointProperties.showRotatingBeam.get();
             if (showStaticBeam || showRotatingBeam)
             {
-                renderBeam(shiftX, -renderManager.viewerPosY, shiftZ, waypoint.getColor(), showStaticBeam, showRotatingBeam);
+                renderBeam(shiftX, -renderManager.viewerPosY, shiftZ, waypoint.getColor(), showStaticBeam, showRotatingBeam, fadeAlpha);
             }
 
             String label = waypoint.getName();
@@ -181,6 +208,11 @@ public class RenderWaypointBeacon
 
             final TextureImpl texture = waypoint.getTexture();
             double halfTexHeight = texture.getHeight() / 2;
+
+            final int depthShadowAlpha = clampAlpha(Math.round(150.0F * fadeAlpha));
+            final int frontShadowAlpha = clampAlpha(Math.round(100.0F * fadeAlpha));
+            final int textAlpha        = clampAlpha(Math.round(255.0F * fadeAlpha));
+            final int iconAlpha        = textAlpha;
 
             // Depth-masked and non-masked label
             final boolean showName = waypointProperties.showName.get() && label != null && label.length() > 0;
@@ -233,13 +265,13 @@ public class RenderWaypointBeacon
                     double labelY = (0 - halfTexHeight) - 8;
 
                     // Depth label
-                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, 150, waypoint.getSafeColor(), 255, fontScale, false);
+                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, depthShadowAlpha, waypoint.getSafeColor(), textAlpha, fontScale, false);
 
                     renderHelper.glDisableDepth();
                     renderHelper.glDepthMask(false);
 
                     // Front label
-                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, 100, waypoint.getSafeColor(), 255, fontScale, false);
+                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, frontShadowAlpha, waypoint.getSafeColor(), textAlpha, fontScale, false);
 
                     GL11.glPopMatrix();
                 }
@@ -248,8 +280,6 @@ public class RenderWaypointBeacon
             // Depth-masked icon
             if (viewDistance > .1 && waypointProperties.showTexture.get())
             {
-                // Reset scale for the icon
-
                 GL11.glPushMatrix();
 
                 renderHelper.glDisableLighting();
@@ -267,14 +297,13 @@ public class RenderWaypointBeacon
                 GL11.glNormal3d(0, 0, -1.0F * scale);
 
                 // The .5 and .2 below centers the waypoint diamond icon
-                DrawUtil.drawColoredImage(texture, 255, waypoint.getColor(), 0 - (texture.getWidth() / 2) + .5, 0 - halfTexHeight + .2, 0);
+                DrawUtil.drawColoredImage(texture, iconAlpha, waypoint.getColor(), 0 - (texture.getWidth() / 2) + .5, 0 - halfTexHeight + .2, 0);
 
                 GL11.glPopMatrix();
             }
         }
         finally
         {
-
             renderHelper.glDepthMask(true);
             renderHelper.glEnableDepth();
             renderHelper.glEnableLighting();
@@ -292,6 +321,17 @@ public class RenderWaypointBeacon
      */
     static void renderBeam(double x, double y, double z, Integer color, boolean staticBeam, boolean rotatingBeam)
     {
+        renderBeam(x, y, z, color, staticBeam, rotatingBeam, 1.0F);
+    }
+
+    static void renderBeam(double x, double y, double z, Integer color, boolean staticBeam, boolean rotatingBeam, float alphaMultiplier)
+    {
+        alphaMultiplier = Math.max(0.0F, Math.min(1.0F, alphaMultiplier));
+        if (alphaMultiplier <= MIN_VISIBLE_ALPHA)
+        {
+            return;
+        }
+
         float f1 = 1f;
 
         mc.renderEngine.bindTexture(beam);
@@ -318,7 +358,7 @@ public class RenderWaypointBeacon
             double d3 = (double) time * 0.025D * (1.0D - (double) (b0 & 1) * 2.5D);
             //double d3 = (double) time * 0.025D * -1.5D;
 
-            int[] rgba = RGB.ints(color, 115);
+            int[] rgba = RGB.ints(color, clampAlpha(Math.round(115.0F * alphaMultiplier)));
             renderHelper.startDrawingQuads(true);
             renderHelper.glEnableBlend();
 
@@ -370,7 +410,7 @@ public class RenderWaypointBeacon
             renderHelper.glBlendFunc(770, 771, 1, 0);
             renderHelper.glDepthMask(false);
 
-            int[] rgba = RGB.ints(color, 40);
+            int[] rgba = RGB.ints(color, clampAlpha(Math.round(40.0F * alphaMultiplier)));
             renderHelper.startDrawingQuads(true);
             
             renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30, rgba);
@@ -398,7 +438,48 @@ public class RenderWaypointBeacon
 
         renderHelper.glEnableLighting();
         renderHelper.glEnableDepth();
-
     }
 
+    /**
+     * Calculates the alpha (transparency) multiplier based on the horizontal distance.
+     * 1.0F = fully visible, 0.0F = fully transparent.
+     * Uses the fade distances provided from the config.
+     */
+    private static float getFadeAlpha(double distance, double fadeStart, double fadeEnd)
+    {
+        if (fadeStart <= fadeEnd || fadeStart <= 0)
+        {
+            return 1.0F;
+        }
+
+        if (distance <= fadeEnd)
+        {
+            return 0.0F;
+        }
+
+        if (distance >= fadeStart)
+        {
+            return 1.0F;
+        }
+
+        return (float) ((distance - fadeEnd) / (fadeStart - fadeEnd));
+    }
+
+    /**
+     * Calculates the horizontal distance between two points (ignoring the Y coordinate).
+     */
+    private static double getHorizontalDistance(Vec3 from, Vec3 to)
+    {
+        double dx = to.xCoord - from.xCoord;
+        double dz = to.zCoord - from.zCoord;
+        return Math.sqrt(dx * dx + dz * dz);
+    }
+
+    /**
+     * Clamps the alpha value to the range of 0 to 255.
+     */
+    private static int clampAlpha(int alpha)
+    {
+        return Math.max(0, Math.min(255, alpha));
+    }
 }
