@@ -5,11 +5,12 @@
 
 package journeymap.client.feature;
 
-import com.google.common.reflect.ClassPath;
 import journeymap.common.Journeymap;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,7 +21,9 @@ public class FeatureManager
 {
     private static final String NAME_FAIRPLAY = "FairPlay";
     private static final String IMPL_PACKAGE = "journeymap.client.feature.impl";
-    private static final String CLASS_UNLIMITED = String.format("%s.Unlimited", IMPL_PACKAGE);
+    private static final List<String> POLICY_SET_CLASSES = Arrays.asList(
+            String.format("%s.Unlimited", IMPL_PACKAGE),
+            String.format("%s.NoRadar", IMPL_PACKAGE));
     private final PolicySet policySet;
     private final HashMap<Feature, Policy> policyMap = new HashMap<Feature, Policy>();
     private final HashMap<String, EnumSet<Feature>> disableControlCodes = new HashMap<String, EnumSet<Feature>>();
@@ -148,47 +151,41 @@ public class FeatureManager
 
     /**
      * Finds the FeatureSet via reflection.
-     *
-     * @return
      */
     private PolicySet locatePolicySet()
     {
-        PolicySet fs = null;
+        for (String className : POLICY_SET_CLASSES)
+        {
+            PolicySet policySet = instantiatePolicySet(className);
+            if (policySet != null)
+            {
+                return policySet;
+            }
+        }
+        return createFairPlay();
+    }
+
+    private PolicySet instantiatePolicySet(String className)
+    {
         try
         {
-            ClassPath cp = ClassPath.from(getClass().getClassLoader());
-            Set<ClassPath.ClassInfo> classInfos = cp.getTopLevelClasses(IMPL_PACKAGE);
-            if (classInfos.size() > 1)
+            Class<?> policySetClass = Class.forName(className);
+            if (!PolicySet.class.isAssignableFrom(policySetClass))
             {
-                try
-                {
-                    Class fsClass = Class.forName(CLASS_UNLIMITED);
-                    fs = (PolicySet) fsClass.newInstance();
-                }
-                catch (Throwable e)
-                {
-                }
+                Journeymap.getLogger().warn("Ignoring feature policy class that does not implement PolicySet: " + className);
+                return null;
             }
-
-            if (fs == null)
-            {
-                for (ClassPath.ClassInfo classInfo : classInfos)
-                {
-                    Class aClass = classInfo.load();
-                    if (PolicySet.class.isAssignableFrom(aClass))
-                    {
-                        fs = (PolicySet) aClass.newInstance();
-                        break;
-                    }
-                }
-            }
+            return (PolicySet) policySetClass.getDeclaredConstructor().newInstance();
+        }
+        catch (ClassNotFoundException e)
+        {
+            return null;
         }
         catch (Throwable t)
         {
-            t.printStackTrace(System.err);
+            Journeymap.getLogger().warn("Couldn't initialize feature policy class: " + className, t);
+            return null;
         }
-
-        return (fs != null) ? fs : createFairPlay();
     }
 
     /**
