@@ -108,7 +108,7 @@ public class ColorPalette
         lines.add(Constants.getString("jm.colorpalette.file_header_3", JSON_FILENAME, SAMPLE_WORLD_PATH));
         lines.add(Constants.getString("jm.colorpalette.file_header_4", JSON_FILENAME, SAMPLE_STANDARD_PATH));
         lines.add(Constants.getString("jm.config.file_header_5", HELP_PAGE));
-        this.description = lines.toArray(new String[4]);
+        this.description = lines.toArray(new String[0]);
 
         this.basicColors = toList(basicColorMap);
     }
@@ -266,13 +266,10 @@ public class ColorPalette
         {
             BlockMD blockMD = entry.getKey();
             Integer color = entry.getValue();
-            if (blockMD == null || color == null)
-            {
-                continue;
-            }
+
             if (blockMD.hasFlag(BlockMD.Flag.Error))
             {
-                Journeymap.getLogger().warn("Block with Error flag won't be saved to color palette: " + entry.getKey());
+                Journeymap.getLogger().warn("Block with Error flag won't be saved to color palette: " + blockMD);
             }
             else
             {
@@ -337,7 +334,8 @@ public class ColorPalette
                 Float alpha = blockColor.alpha;
                 blockMD.setAlpha((alpha != null) ? alpha : 1f);
             }
-            int color = RGB.ALPHA_OPAQUE | Integer.parseInt(blockColor.color.replaceFirst("#", ""), 16);
+            // substring #
+            int color = RGB.ALPHA_OPAQUE | Integer.parseInt(blockColor.color.substring(1), 16);
             map.put(blockMD, color);
         }
         return map;
