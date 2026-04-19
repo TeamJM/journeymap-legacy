@@ -31,11 +31,7 @@ public class IconSetFileHandler
     {
         Journeymap.getLogger().info("Initializing icon sets...");
 
-        // Mob icons
-        for (String setName : MOB_ICON_SETS)
-        {
-            FileHandler.copyResources(getEntityIconDir(), ASSETS_JOURNEYMAP_ICON_ENTITY, setName, false);
-        }
+        FileHandler.copyResources(getEntityIconDir(), ASSETS_JOURNEYMAP_ICON_ENTITY, MOB_ICON_SETS, false);
     }
 
     public static File getEntityIconDir()

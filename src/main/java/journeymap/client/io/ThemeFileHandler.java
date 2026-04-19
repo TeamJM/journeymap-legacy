@@ -37,24 +37,14 @@ public class ThemeFileHandler
 
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().setVersion(Theme.VERSION).create();
 
-    private static transient Theme currentTheme = null;
+    private static Theme currentTheme = null;
 
     public static void initialize()
     {
         Journeymap.getLogger().trace("Initializing themes ...");
 
-        // Theme dirs
-        Set<String> themeDirNames = new HashSet<String>();
-        for (String dir : ThemePresets.getPresetDirs())
-        {
-            themeDirNames.add(dir);
-        }
-
-        // Copy theme dirs from assets
-        for (String dirName : themeDirNames)
-        {
-            FileHandler.copyResources(getThemeIconDir(), ASSETS_JOURNEYMAP_ICON_THEME, dirName, true);
-        }
+        List<String> themeDirNames = ThemePresets.getPresetDirs();
+        FileHandler.copyResources(getThemeIconDir(), ASSETS_JOURNEYMAP_ICON_THEME, themeDirNames, true);
 
         // Save theme files
         for (Theme theme : ThemePresets.getPresets())
