@@ -34,6 +34,7 @@ public class BlockMD
     public static final EnumSet FlagsPlantAndCrop = EnumSet.of(Flag.Plant, Flag.Crop);
     public static final EnumSet FlagsBiomeColored = EnumSet.of(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
     private static final Map<Block, Map<Integer, BlockMD>> cache = new HashMap<Block, Map<Integer, BlockMD>>();
+    private static final Map<Block, ArrayList<Integer>> blockMetaCache = new HashMap<>();
     public static BlockMD AIRBLOCK;
     public static BlockMD VOIDBLOCK;
     private static ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
@@ -258,6 +259,9 @@ public class BlockMD
      */
     public static Collection<Integer> getMetaValuesForBlock(Block block)
     {
+        ArrayList<Integer> cached = blockMetaCache.get(block);
+        if (cached != null) return cached;
+
         ArrayList<Integer> metas = new ArrayList<Integer>();
         try
         {
@@ -280,6 +284,8 @@ public class BlockMD
         {
             Journeymap.getLogger().error("Couldn't get subblocks for block " + block + ": " + e);
         }
+
+        blockMetaCache.put(block, metas);
         return metas;
     }
 
@@ -297,7 +303,7 @@ public class BlockMD
         List<BlockMD> list = new ArrayList<BlockMD>(metas.size());
         for (int meta : metas)
         {
-            list.add(BlockMD.get(block, meta));
+            list.add(BlockMD.get(block, meta, metas.size()));
         }
         return list;
     }
