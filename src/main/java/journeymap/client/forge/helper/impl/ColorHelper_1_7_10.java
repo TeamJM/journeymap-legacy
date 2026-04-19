@@ -34,7 +34,7 @@ import java.util.HashSet;
  */
 public class ColorHelper_1_7_10 implements IColorHelper
 {
-    private static volatile BufferedImage blocksTexture;
+    private static volatile ArgbImage blocksTexture;
     Logger logger = Journeymap.getLogger();
     HashSet<BlockMD> failed = new HashSet<BlockMD>();
 
@@ -242,13 +242,13 @@ public class ColorHelper_1_7_10 implements IColorHelper
                 logger.warn("Couldn't get texture for " + icon.getIconName() + " because of an error matching it within the stitched blocks atlas.");
                 return null;
             }
-            BufferedImage textureImg = blocksTexture.getSubimage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight());
+            ArgbImage textureImg = blocksTexture.getSubimage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight());
             xStart = yStart = 0;
             xStop = textureImg.getWidth();
             yStop = textureImg.getHeight();
 
             boolean unusable = true;
-            if (textureImg != null && textureImg.getWidth() > 0)
+            if (textureImg.getWidth() > 0)
             {
                 outer:
                 for (x = xStart; x < xStop; x++)
@@ -394,9 +394,10 @@ public class ColorHelper_1_7_10 implements IColorHelper
             int[] aint = new int[width * height];
             GL11.glGetTexImage(GL11.GL_TEXTURE_2D, miplevel, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, intbuffer);
             intbuffer.get(aint);
-            BufferedImage bufferedimage = new BufferedImage(width, height, 2);
-            bufferedimage.setRGB(0, 0, width, height, aint, 0, width);
-            blocksTexture = bufferedimage;
+
+            ArgbImage argbImage = new ArgbImage(width, height);
+            argbImage.setRGB(0, 0, width, height, aint, 0, width);
+            blocksTexture = argbImage;
 
             double time = timer.stop();
             Journeymap.getLogger().info(String.format("initBlocksTexture: %sx%s loaded in %sms", width, height, time));
@@ -414,7 +415,7 @@ public class ColorHelper_1_7_10 implements IColorHelper
     /**
      * Facade to expose IIcon as a TextureAtlasSprite.
      */
-    class TempTextureAtlasSprite extends TextureAtlasSprite
+    public static class TempTextureAtlasSprite extends TextureAtlasSprite
     {
         IIcon wrapped;
 
@@ -446,6 +447,72 @@ public class ColorHelper_1_7_10 implements IColorHelper
         public int getIconHeight()
         {
             return wrapped.getIconHeight();
+        }
+    }
+
+    /**
+     * Minimal ARGB image implementation for fast pixel access.
+     * Avoids overhead of {@link BufferedImage#setRGB} since we store and use ARGB pixels only.
+     */
+    private static final class ArgbImage {
+        public final int[] pixels;
+        public final int width;
+        public final int height;
+        public final int stride;
+        public final int offset;
+
+        public ArgbImage(int width, int height) {
+            this(new int[width * height], width, height, width, 0);
+        }
+
+        public ArgbImage(int[] pixels, int width, int height, int stride, int offset) {
+            this.pixels = pixels;
+            this.width = width;
+            this.height = height;
+            this.stride = stride;
+            this.offset = offset;
+        }
+
+        public int getWidth() {
+            return width;
+        }
+        public int getHeight() {
+            return height;
+        }
+
+        public int getRGB(int x, int y) {
+            return pixels[offset + y * stride + x];
+        }
+
+        public void setRGB(int x, int y, int argb) {
+            pixels[offset + y * stride + x] = argb;
+        }
+
+        public void setRGB(int x, int y, int w, int h, int[] srcPixels, int srcOffset, int srcStride) {
+            if (x < 0 || y < 0 || w < 0 || h < 0 || x + w > width || y + h > height) {
+                throw new IllegalArgumentException("Region out of bounds");
+            }
+            if (w == 0 || h == 0) {
+                return;
+            }
+
+            // Fast path: both source and destination are tightly packed
+            if (x == 0 && y == 0 && w == width && h == height && srcStride == width && stride == width) {
+                System.arraycopy(srcPixels, srcOffset, pixels, offset, width * height);
+                return;
+            }
+
+            int dst = offset + y * stride + x;
+            for (int row = 0; row < h; row++) {
+                System.arraycopy(srcPixels, srcOffset + row * srcStride, pixels, dst + row * stride, w);
+            }
+        }
+
+        public ArgbImage getSubimage(int x, int y, int w, int h) {
+            if (x < 0 || y < 0 || w < 0 || h < 0 || x + w > width || y + h > height) {
+                throw new IllegalArgumentException("Subimage out of bounds");
+            }
+            return new ArgbImage(pixels, w, h, stride, offset + y * stride + x);
         }
     }
 }
