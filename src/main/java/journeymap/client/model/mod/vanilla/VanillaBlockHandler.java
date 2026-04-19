@@ -29,11 +29,15 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
     private final HashMap<Material, ArrayList<BlockMD.Flag>> materialFlags = new HashMap<Material, ArrayList<BlockMD.Flag>>();
     private final HashMap<Class<? extends Block>, ArrayList<BlockMD.Flag>> blockClassFlags = new HashMap<Class<? extends Block>, ArrayList<BlockMD.Flag>>();
     private final HashMap<Block, ArrayList<BlockMD.Flag>> blockFlags = new HashMap<Block, ArrayList<BlockMD.Flag>>();
+
     private final HashMap<Material, Float> materialAlphas = new HashMap<Material, Float>();
     private final HashMap<Block, Float> blockAlphas = new HashMap<Block, Float>();
     private final HashMap<Class<? extends Block>, Float> blockClassAlphas = new HashMap<Class<? extends Block>, Float>();
+
     private final HashMap<Block, Integer> blockTextureSides = new HashMap<Block, Integer>();
     private final HashMap<Class<? extends Block>, Integer> blockClassTextureSides = new HashMap<Class<? extends Block>, Integer>();
+
+    private final HashMap<Class<? extends Block>, Class<? extends Block>> cachedParentClasses = new HashMap<Class<? extends Block>, Class<? extends Block>>();
 
     public VanillaBlockHandler()
     {
@@ -136,26 +140,17 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         // Add flags based on block class inheritance
         if (blockMD.getFlags().isEmpty())
         {
-            for (Map.Entry<Class<? extends Block>, ArrayList<BlockMD.Flag>> entry : blockClassFlags.entrySet())
+            Class<? extends Block> parentClass = getParentClass(block.getClass());
+            if (parentClass != null)
             {
-                Class<? extends Block> parentClass = entry.getKey();
-                if (parentClass.isAssignableFrom(block.getClass()))
-                {
-                    blockMD.addFlags(entry.getValue());
-                    alpha = blockClassAlphas.get(parentClass);
-                    if (alpha != null)
-                    {
-                        blockMD.setAlpha(alpha);
-                    }
+                ArrayList<BlockMD.Flag> flags = blockClassFlags.get(parentClass);
+                if (flags != null) blockMD.addFlags(flags);
 
-                    Integer textureSide = blockClassTextureSides.get(parentClass);
-                    if (textureSide != null)
-                    {
-                        blockMD.setTextureSide(textureSide);
-                    }
+                alpha = blockClassAlphas.get(parentClass);
+                if (alpha != null) blockMD.setAlpha(alpha);
 
-                    break;
-                }
+                Integer classTextureSide = blockClassTextureSides.get(parentClass);
+                if (classTextureSide != null) blockMD.setTextureSide(classTextureSide);
             }
         }
 
@@ -244,5 +239,27 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
     private void setTextureSide(Block block, int side)
     {
         blockTextureSides.put(block, side);
+    }
+
+    // Class.isAssignableFrom is slow, so we cache resolved class connections
+    private Class<? extends Block> getParentClass(Class<? extends Block> blockClass)
+    {
+        if (cachedParentClasses.containsKey(blockClass))
+        {
+            return cachedParentClasses.get(blockClass);
+        }
+
+        for (Map.Entry<Class<? extends Block>, ArrayList<BlockMD.Flag>> entry : blockClassFlags.entrySet())
+        {
+            Class<? extends Block> parentClass = entry.getKey();
+            if (parentClass.isAssignableFrom(blockClass))
+            {
+                cachedParentClasses.put(blockClass, parentClass);
+                return parentClass;
+            }
+        }
+
+        cachedParentClasses.put(blockClass, null);
+        return null;
     }
 }
