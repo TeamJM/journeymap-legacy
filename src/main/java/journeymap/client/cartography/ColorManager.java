@@ -180,7 +180,6 @@ public class ColorManager
             {
                 Journeymap.getLogger().info(String.format("Initialized %s block colors from mods and resource packs in %sms", count, elapsed));
                 this.currentPalette = ColorPalette.create(standard, permanent);
-                Journeymap.getLogger().info(String.format("Updated color palette file: %s", this.currentPalette.getOrigin()));
             }
             else
             {

@@ -20,6 +20,7 @@ import journeymap.client.log.ChatLog;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
 import journeymap.common.Journeymap;
+import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 
@@ -31,7 +32,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 
 /**
@@ -45,10 +49,11 @@ public class ColorPalette
     public static final String JSON_FILENAME = "colorpalette.json";
     public static final String HTML_FILENAME = "colorpalette.html";
     public static final String VARIABLE = "var colorpalette=";
-    public static final Charset UTF8 = Charset.forName("UTF-8");
+    public static final Charset UTF8 = StandardCharsets.UTF_8;
 
     public static final int VERSION = 3;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).setPrettyPrinting().create();
+    private static final ExecutorService writeExecutor = Executors.newSingleThreadExecutor(new JMThreadFactory("ColorPaletteWrite"));
 
     @Since(3)
     int version;
@@ -181,9 +186,6 @@ public class ColorPalette
      */
     public static ColorPalette create(boolean standard, boolean permanent)
     {
-        long start = System.currentTimeMillis();
-
-        ColorPalette palette = null;
         try
         {
             String resourcePackNames = Constants.getResourcePackNames();
@@ -199,11 +201,10 @@ public class ColorPalette
                 }
             }
 
-            palette = new ColorPalette(resourcePackNames, modPackNames, baseColors);
+            ColorPalette palette = new ColorPalette(resourcePackNames, modPackNames, baseColors);
             palette.setPermanent(permanent);
-            palette.writeToFile(standard);
-            long elapsed = System.currentTimeMillis() - start;
-            Journeymap.getLogger().info(String.format("Color palette file generated with %d colors in %dms for: %s", palette.size(), elapsed, palette.getOrigin()));
+            palette.writeToFileAsync(standard);
+            Journeymap.getLogger().info("Queued color palette file with {} colors for: {}", palette.size(), palette.getOrigin());
             return palette;
         }
         catch (Exception e)
@@ -310,6 +311,10 @@ public class ColorPalette
         }
     }
 
+    private void writeToFileAsync(final boolean standard)
+    {
+        writeExecutor.submit(() -> writeToFile(standard));
+    }
 
     private HashMap<BlockMD, Integer> listToMap(ArrayList<BlockColor> list)
     {
