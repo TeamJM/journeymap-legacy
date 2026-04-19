@@ -415,7 +415,7 @@ public class ColorPalette
     }
 
 
-    class BlockColor implements Comparable<BlockColor>
+    static class BlockColor implements Comparable<BlockColor>
     {
         @Since(1)
         String name;
@@ -439,8 +439,9 @@ public class ColorPalette
             this.uid = GameData.getBlockRegistry().getNameForObject(blockMD.getBlock()).toString();
             this.meta = blockMD.getMeta();
 
-            Color awtColor = new Color(intColor);
-            this.color = String.format("#%02x%02x%02x", awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue());
+            String hex = Integer.toHexString(intColor & 0xFFFFFF);
+            this.color = "#" + "000000".substring(hex.length()) + hex;
+
             if (blockMD.getAlpha() < 1f)
             {
                 this.alpha = blockMD.getAlpha();
