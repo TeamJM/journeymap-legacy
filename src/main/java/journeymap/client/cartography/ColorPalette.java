@@ -9,6 +9,7 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
+import com.google.gson.stream.JsonWriter;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameData;
 import journeymap.client.Constants;
@@ -23,8 +24,12 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -221,11 +226,11 @@ public class ColorPalette
 
     private static ColorPalette loadFromFile(File file)
     {
-        String jsonString = null;
-        try
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF8)))
         {
-            jsonString = Files.toString(file, UTF8).replaceFirst(VARIABLE, "");
-            ColorPalette palette = GSON.fromJson(jsonString, ColorPalette.class);
+            reader.skip(VARIABLE.length());
+
+            ColorPalette palette = GSON.fromJson(reader, ColorPalette.class);
             palette.origin = file;
 
             // Ensure current HTML file accompanies the data
@@ -284,8 +289,15 @@ public class ColorPalette
         {
             // Write JSON
             palleteFile = standard ? getStandardPaletteFile() : getWorldPaletteFile();
-            Files.write(VARIABLE + GSON.toJson(this), palleteFile, UTF8);
             this.origin = palleteFile;
+
+            try (Writer out = Files.newWriter(palleteFile, UTF8);
+                 JsonWriter jsonWriter = new JsonWriter(out))
+            {
+                out.write(VARIABLE);
+                jsonWriter.setIndent("  ");
+                GSON.toJson(this, this.getClass(), jsonWriter);
+            }
 
             // Write HTML
             getOriginHtml(true, true);
