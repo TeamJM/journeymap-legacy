@@ -35,7 +35,7 @@ public class BiomesOPlenty implements ModBlockDelegate.IModBlockHandler
     {
 
         boolean initialized = false;
-        if (blockMD.getUid().modId.equalsIgnoreCase("BiomesOPlenty"))
+        if (blockMD.getUid().modId.equals("BiomesOPlenty"))
         {
             String name = blockMD.getUid().name.toLowerCase();
 //            if (name.contains("grass"))

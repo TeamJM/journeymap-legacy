@@ -36,6 +36,7 @@ tmp/
 .idea/
 eclipse/
 out/
+.DS_Store
 journeymap.iml
 journeymap.ipr
 journeymap.iws

@@ -14,9 +14,8 @@ import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.Color;
+import java.util.HashSet;
 
 import static journeymap.client.model.BlockMD.Flag.*;
 
@@ -35,7 +34,7 @@ public class Miscellaneous
         // Thaumcraft leaves (greatwood, silverwood)
         GameRegistry.UniqueIdentifier thaumcraftLeavesId = new GameRegistry.UniqueIdentifier("Thaumcraft:blockMagicalLeaves");
 
-        List<GameRegistry.UniqueIdentifier> torches = new ArrayList<GameRegistry.UniqueIdentifier>();
+        HashSet<GameRegistry.UniqueIdentifier> torches = new HashSet<>();
 
         public CommonHandler()
         {

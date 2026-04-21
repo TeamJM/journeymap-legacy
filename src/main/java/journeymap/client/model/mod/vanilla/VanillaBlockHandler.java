@@ -5,8 +5,6 @@
 
 package journeymap.client.model.mod.vanilla;
 
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.MultimapBuilder;
 import journeymap.client.JourneymapClient;
 import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
@@ -19,6 +17,8 @@ import net.minecraft.init.Blocks;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static journeymap.client.model.BlockMD.Flag.*;
 
@@ -27,14 +27,18 @@ import static journeymap.client.model.BlockMD.Flag.*;
  */
 public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHandler
 {
-    ListMultimap<Material, BlockMD.Flag> materialFlags = MultimapBuilder.ListMultimapBuilder.linkedHashKeys().arrayListValues().build();
-    ListMultimap<Class<? extends Block>, BlockMD.Flag> blockClassFlags = MultimapBuilder.ListMultimapBuilder.linkedHashKeys().arrayListValues().build();
-    ListMultimap<Block, BlockMD.Flag> blockFlags = MultimapBuilder.ListMultimapBuilder.linkedHashKeys().arrayListValues().build();
-    HashMap<Material, Float> materialAlphas = new HashMap<Material, Float>();
-    HashMap<Block, Float> blockAlphas = new HashMap<Block, Float>();
-    HashMap<Class<? extends Block>, Float> blockClassAlphas = new HashMap<Class<? extends Block>, Float>();
-    HashMap<Block, Integer> blockTextureSides = new HashMap<Block, Integer>();
-    HashMap<Class<? extends Block>, Integer> blockClassTextureSides = new HashMap<Class<? extends Block>, Integer>();
+    private final HashMap<Material, ArrayList<BlockMD.Flag>> materialFlags = new HashMap<Material, ArrayList<BlockMD.Flag>>();
+    private final HashMap<Class<? extends Block>, ArrayList<BlockMD.Flag>> blockClassFlags = new LinkedHashMap<Class<? extends Block>, ArrayList<BlockMD.Flag>>();
+    private final HashMap<Block, ArrayList<BlockMD.Flag>> blockFlags = new HashMap<Block, ArrayList<BlockMD.Flag>>();
+
+    private final HashMap<Material, Float> materialAlphas = new HashMap<Material, Float>();
+    private final HashMap<Block, Float> blockAlphas = new HashMap<Block, Float>();
+    private final HashMap<Class<? extends Block>, Float> blockClassAlphas = new HashMap<Class<? extends Block>, Float>();
+
+    private final HashMap<Block, Integer> blockTextureSides = new HashMap<Block, Integer>();
+    private final HashMap<Class<? extends Block>, Integer> blockClassTextureSides = new HashMap<Class<? extends Block>, Integer>();
+
+    private final HashMap<Class<? extends Block>, Class<? extends Block>> cachedParentClasses = new HashMap<Class<? extends Block>, Class<? extends Block>>();
 
     public VanillaBlockHandler()
     {
@@ -106,7 +110,11 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
 
         // Set flags based on material
         Material material = blockMD.getBlock().getMaterial();
-        blockMD.addFlags(materialFlags.get(material));
+        ArrayList<BlockMD.Flag> materialFlagList = materialFlags.get(material);
+        if (materialFlagList != null)
+        {
+            blockMD.addFlags(materialFlagList);
+        }
 
         // Set alpha based on material
         Float alpha = materialAlphas.get(material);
@@ -117,9 +125,10 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
 
         // Set flags based on exact block
         Block block = blockMD.getBlock();
-        if (blockFlags.containsKey(block))
+        ArrayList<BlockMD.Flag> blockFlagList = blockFlags.get(block);
+        if (blockFlagList != null)
         {
-            blockMD.addFlags(blockFlags.get(block));
+            blockMD.addFlags(blockFlagList);
         }
 
         // Set alpha based on exact block
@@ -132,25 +141,17 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
         // Add flags based on block class inheritance
         if (blockMD.getFlags().isEmpty())
         {
-            for (Class<? extends Block> parentClass : blockClassFlags.keys())
+            Class<? extends Block> parentClass = getParentClass(block.getClass());
+            if (parentClass != null)
             {
-                if (parentClass.isAssignableFrom(block.getClass()))
-                {
-                    blockMD.addFlags(blockClassFlags.get(parentClass));
-                    alpha = blockClassAlphas.get(parentClass);
-                    if (alpha != null)
-                    {
-                        blockMD.setAlpha(alpha);
-                    }
+                ArrayList<BlockMD.Flag> flags = blockClassFlags.get(parentClass);
+                if (flags != null) blockMD.addFlags(flags);
 
-                    Integer textureSide = blockClassTextureSides.get(parentClass);
-                    if (textureSide != null)
-                    {
-                        blockMD.setTextureSide(textureSide);
-                    }
+                alpha = blockClassAlphas.get(parentClass);
+                if (alpha != null) blockMD.setAlpha(alpha);
 
-                    break;
-                }
+                Integer classTextureSide = blockClassTextureSides.get(parentClass);
+                if (classTextureSide != null) blockMD.setTextureSide(classTextureSide);
             }
         }
 
@@ -197,7 +198,8 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
 
     private void setFlags(Material material, BlockMD.Flag... flags)
     {
-        materialFlags.putAll(material, new ArrayList<BlockMD.Flag>(Arrays.asList(flags)));
+        materialFlags.computeIfAbsent(material, k -> new ArrayList<>())
+            .addAll(Arrays.asList(flags));
     }
 
     private void setFlags(Material material, Float alpha, BlockMD.Flag... flags)
@@ -208,7 +210,8 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
 
     private void setFlags(Class<? extends Block> parentClass, BlockMD.Flag... flags)
     {
-        blockClassFlags.putAll(parentClass, new ArrayList<BlockMD.Flag>(Arrays.asList(flags)));
+        blockClassFlags.computeIfAbsent(parentClass, k -> new ArrayList<>())
+            .addAll(Arrays.asList(flags));
     }
 
     private void setFlags(Class<? extends Block> parentClass, Float alpha, BlockMD.Flag... flags)
@@ -219,7 +222,8 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
 
     private void setFlags(Block block, BlockMD.Flag... flags)
     {
-        blockFlags.putAll(block, new ArrayList<BlockMD.Flag>(Arrays.asList(flags)));
+        blockFlags.computeIfAbsent(block, k -> new ArrayList<>())
+            .addAll(Arrays.asList(flags));
     }
 
     private void setFlags(Block block, Float alpha, BlockMD.Flag... flags)
@@ -236,5 +240,27 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
     private void setTextureSide(Block block, int side)
     {
         blockTextureSides.put(block, side);
+    }
+
+    // Class.isAssignableFrom is slow, so we cache resolved class connections
+    private Class<? extends Block> getParentClass(Class<? extends Block> blockClass)
+    {
+        if (cachedParentClasses.containsKey(blockClass))
+        {
+            return cachedParentClasses.get(blockClass);
+        }
+
+        for (Map.Entry<Class<? extends Block>, ArrayList<BlockMD.Flag>> entry : blockClassFlags.entrySet())
+        {
+            Class<? extends Block> parentClass = entry.getKey();
+            if (parentClass.isAssignableFrom(blockClass))
+            {
+                cachedParentClasses.put(blockClass, parentClass);
+                return parentClass;
+            }
+        }
+
+        cachedParentClasses.put(blockClass, null);
+        return null;
     }
 }

@@ -9,6 +9,7 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
+import com.google.gson.stream.JsonWriter;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameData;
 import journeymap.client.Constants;
@@ -19,14 +20,22 @@ import journeymap.client.log.ChatLog;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
 import journeymap.common.Journeymap;
+import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 
 /**
@@ -40,10 +49,11 @@ public class ColorPalette
     public static final String JSON_FILENAME = "colorpalette.json";
     public static final String HTML_FILENAME = "colorpalette.html";
     public static final String VARIABLE = "var colorpalette=";
-    public static final Charset UTF8 = Charset.forName("UTF-8");
+    public static final Charset UTF8 = StandardCharsets.UTF_8;
 
     public static final int VERSION = 3;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).setPrettyPrinting().create();
+    private static final JMThreadFactory writeThreadFactory = new JMThreadFactory("ColorPaletteWrite");
 
     @Since(3)
     int version;
@@ -98,7 +108,7 @@ public class ColorPalette
         lines.add(Constants.getString("jm.colorpalette.file_header_3", JSON_FILENAME, SAMPLE_WORLD_PATH));
         lines.add(Constants.getString("jm.colorpalette.file_header_4", JSON_FILENAME, SAMPLE_STANDARD_PATH));
         lines.add(Constants.getString("jm.config.file_header_5", HELP_PAGE));
-        this.description = lines.toArray(new String[4]);
+        this.description = lines.toArray(new String[0]);
 
         this.basicColors = toList(basicColorMap);
     }
@@ -176,9 +186,6 @@ public class ColorPalette
      */
     public static ColorPalette create(boolean standard, boolean permanent)
     {
-        long start = System.currentTimeMillis();
-
-        ColorPalette palette = null;
         try
         {
             String resourcePackNames = Constants.getResourcePackNames();
@@ -194,11 +201,11 @@ public class ColorPalette
                 }
             }
 
-            palette = new ColorPalette(resourcePackNames, modPackNames, baseColors);
+            ColorPalette palette = new ColorPalette(resourcePackNames, modPackNames, baseColors);
+            palette.origin = standard ? getStandardPaletteFile() : getWorldPaletteFile();
             palette.setPermanent(permanent);
-            palette.writeToFile(standard);
-            long elapsed = System.currentTimeMillis() - start;
-            Journeymap.getLogger().info(String.format("Color palette file generated with %d colors in %dms for: %s", palette.size(), elapsed, palette.getOrigin()));
+            palette.writeToFileAsync();
+            Journeymap.getLogger().info("Queued color palette file with {} colors for: {}", palette.size(), palette.getOrigin());
             return palette;
         }
         catch (Exception e)
@@ -221,11 +228,11 @@ public class ColorPalette
 
     private static ColorPalette loadFromFile(File file)
     {
-        String jsonString = null;
-        try
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF8)))
         {
-            jsonString = Files.toString(file, UTF8).replaceFirst(VARIABLE, "");
-            ColorPalette palette = GSON.fromJson(jsonString, ColorPalette.class);
+            reader.skip(VARIABLE.length());
+
+            ColorPalette palette = GSON.fromJson(reader, ColorPalette.class);
             palette.origin = file;
 
             // Ensure current HTML file accompanies the data
@@ -260,13 +267,10 @@ public class ColorPalette
         {
             BlockMD blockMD = entry.getKey();
             Integer color = entry.getValue();
-            if (blockMD == null || color == null)
-            {
-                continue;
-            }
+
             if (blockMD.hasFlag(BlockMD.Flag.Error))
             {
-                Journeymap.getLogger().warn("Block with Error flag won't be saved to color palette: " + entry.getKey());
+                Journeymap.getLogger().warn("Block with Error flag won't be saved to color palette: " + blockMD);
             }
             else
             {
@@ -277,27 +281,30 @@ public class ColorPalette
         return list;
     }
 
-    private boolean writeToFile(boolean standard)
+    private void writeToFile()
     {
-        File palleteFile = null;
-        try
+        // Write JSON
+        try (Writer out = Files.newWriter(origin, UTF8);
+             JsonWriter jsonWriter = new JsonWriter(out))
         {
-            // Write JSON
-            palleteFile = standard ? getStandardPaletteFile() : getWorldPaletteFile();
-            Files.write(VARIABLE + GSON.toJson(this), palleteFile, UTF8);
-            this.origin = palleteFile;
-
-            // Write HTML
-            getOriginHtml(true, true);
-            return true;
+            out.write(VARIABLE);
+            jsonWriter.setIndent("  ");
+            GSON.toJson(this, this.getClass(), jsonWriter);
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error(String.format("Can't save color pallete file %s: %s", palleteFile, LogFormatter.toString(e)));
-            return false;
+            Journeymap.getLogger().error("Can't save color pallete file {}: {}", origin, LogFormatter.toString(e));
+            return;
         }
+
+        // Write HTML
+        getOriginHtml(true, true);
     }
 
+    private void writeToFileAsync()
+    {
+        writeThreadFactory.newThread(this::writeToFile).start();
+    }
 
     private HashMap<BlockMD, Integer> listToMap(ArrayList<BlockColor> list)
     {
@@ -320,7 +327,8 @@ public class ColorPalette
                 Float alpha = blockColor.alpha;
                 blockMD.setAlpha((alpha != null) ? alpha : 1f);
             }
-            int color = RGB.ALPHA_OPAQUE | Integer.parseInt(blockColor.color.replaceFirst("#", ""), 16);
+            // substring #
+            int color = RGB.ALPHA_OPAQUE | Integer.parseInt(blockColor.color.substring(1), 16);
             map.put(blockMD, color);
         }
         return map;
@@ -398,7 +406,7 @@ public class ColorPalette
     }
 
 
-    class BlockColor implements Comparable<BlockColor>
+    static class BlockColor implements Comparable<BlockColor>
     {
         @Since(1)
         String name;
@@ -422,8 +430,9 @@ public class ColorPalette
             this.uid = GameData.getBlockRegistry().getNameForObject(blockMD.getBlock()).toString();
             this.meta = blockMD.getMeta();
 
-            Color awtColor = new Color(intColor);
-            this.color = String.format("#%02x%02x%02x", awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue());
+            String hex = Integer.toHexString(intColor & 0xFFFFFF);
+            this.color = "#" + "000000".substring(hex.length()) + hex;
+
             if (blockMD.getAlpha() < 1f)
             {
                 this.alpha = blockMD.getAlpha();
