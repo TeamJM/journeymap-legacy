@@ -20,7 +20,6 @@ import journeymap.client.log.JMLogger;
 import journeymap.client.log.LogFormatter;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.Util;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.Sys;
@@ -30,25 +29,19 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 public class FileHandler
 {
     public static final String DEV_MINECRAFT_DIR = "run/";
-    public static final String ASSETS_JOURNEYMAP = "/assets/journeymap";
     public static final String ASSETS_WEBMAP = "/assets/journeymap/web";
     public static final String ASSETS_JOURNEYMAP_UI = "/assets/journeymap/web/img/";
     public static final File MinecraftDirectory = ForgeHelper.INSTANCE.getClient().mcDataDir;
     public static final File JourneyMapDirectory = new File(MinecraftDirectory, Constants.JOURNEYMAP_DIR);
     public static final File StandardConfigDirectory = new File(MinecraftDirectory, Constants.CONFIG_DIR);
-
-    private static WorldClient theLastWorld;
 
     public static File getMinecraftDirectory()
     {
@@ -186,8 +179,6 @@ public class FileHandler
     {
         if (minecraft.theWorld == null)
         {
-            theLastWorld = null;
-
             return null;
         }
 
@@ -282,7 +273,6 @@ public class FileHandler
             throw new RuntimeException(e);
         }
 
-        theLastWorld = minecraft.theWorld;
         return worldDirectory;
     }
 
@@ -568,77 +558,82 @@ public class FileHandler
 
     public static boolean copyResources(File targetDirectory, String assetsPath, String setName, boolean overwrite)
     {
+        return copyResources(targetDirectory, assetsPath, Collections.singletonList(setName), overwrite);
+    }
+
+    public static boolean copyResources(File targetDirectory, String assetsPath, Collection<String> setNames, boolean overwrite)
+    {
         String fromPath = null;
-        File toDir = null;
         try
         {
             URL resourceDir = JourneymapClient.class.getResource(assetsPath);
-            String toPath = String.format("%s/%s", assetsPath, setName);
-            toDir = new File(targetDirectory, setName);
             boolean inJar = FileHandler.isInJar();
             if (inJar)
             {
                 final String resourceDirString = resourceDir.toString();
                 final URL jarUrl = new URL(resourceDirString.substring(4, resourceDirString.lastIndexOf('!')));
                 fromPath = Paths.get(jarUrl.toURI()).toString();
-                FileHandler.copyFromZip(fromPath, toPath, toDir, overwrite);
+                FileHandler.copyFromZip(fromPath, assetsPath, setNames, targetDirectory, overwrite);
             }
             else
             {
-                File fromDir = new File(JourneymapClient.class.getResource(toPath).getFile());
-                fromPath = fromDir.getPath();
-                FileHandler.copyFromDirectory(fromDir, toDir, overwrite);
+                for (String setName : setNames)
+                {
+                    String toPath = assetsPath + "/" + setName;
+                    File fromDir = new File(JourneymapClient.class.getResource(toPath).getFile());
+                    File toDir = new File(targetDirectory, setName);
+                    fromPath = fromDir.getPath();
+                    FileHandler.copyFromDirectory(fromDir, toDir, overwrite);
+                }
             }
             return true;
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error(String.format("Couldn't unzip resource set from %s to %s: %s", fromPath, toDir, t));
+            Journeymap.getLogger().error("Couldn't unzip resource sets from {} to {}: {}", fromPath, targetDirectory, t);
         }
         return false;
     }
 
     /**
-     * Extracts a zip file specified by the zipFilePath to a directory specified by
-     * destDirectory (will be created if does not exists)
+     * Copies files from zipFilePath/setName/* to targetDirectory/setName/*
      *
-     * @throws IOException
+     * @param zipFilePath path to a zip file to copy from
+     * @param assetsPath path to assets inside the zip file
+     * @param iconSetNames folder names located inside assetsPath
+     * @param targetDirectory target directory to copy into
+     * @param overwrite whether to copy the file if it already exists
      */
-    static void copyFromZip(String zipFilePath, String zipEntryName, File destDir, boolean overWrite) throws Throwable
+    static void copyFromZip(String zipFilePath, String assetsPath, Collection<String> iconSetNames, File targetDirectory, boolean overwrite) throws IOException
     {
+        // it begins with '/', but we don't need it here
+        assetsPath = assetsPath.substring(1);
 
-        if (zipEntryName.startsWith("/"))
+        try (ZipFile zipFile = new ZipFile(zipFilePath))
         {
-            zipEntryName = zipEntryName.substring(1);
-        }
-        final ZipFile zipFile = new ZipFile(zipFilePath);
-        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
-        ZipEntry entry = zipIn.getNextEntry();
-
-        try
-        {
-            while (entry != null)
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements())
             {
-                if (entry.getName().startsWith(zipEntryName))
-                {
-                    File toFile = new File(destDir, entry.getName().split(zipEntryName)[1]);
-                    if (overWrite || !toFile.exists())
-                    {
-                        if (!entry.isDirectory())
-                        {
-                            Files.createParentDirs(toFile);
-                            new ZipEntryByteSource(zipFile, entry).copyTo(Files.asByteSink(toFile));
-                        }
-                    }
-                }
+                ZipEntry entry = entries.nextElement();
+                String path = entry.getName();
+                if (entry.isDirectory()) continue;
+                if (!path.startsWith(assetsPath)) continue;
 
-                zipIn.closeEntry();
-                entry = zipIn.getNextEntry();
+                for (String iconSetName : iconSetNames)
+                {
+                    String iconSetPath = assetsPath + "/" + iconSetName;
+                    if (!path.startsWith(iconSetPath)) continue;
+
+                    File destDir = new File(targetDirectory, iconSetName);
+                    File toFile = new File(destDir, path.substring(iconSetPath.length()));
+                    if (overwrite || !toFile.exists())
+                    {
+                        Files.createParentDirs(toFile);
+                        new ZipEntryByteSource(zipFile, entry).copyTo(Files.asByteSink(toFile));
+                    }
+                    break;
+                }
             }
-        }
-        finally
-        {
-            zipIn.close();
         }
     }
 
