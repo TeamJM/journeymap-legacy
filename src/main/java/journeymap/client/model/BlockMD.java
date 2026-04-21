@@ -275,7 +275,9 @@ public class BlockMD
                 block.getSubBlocks(item, null, subBlocks);
                 for (ItemStack subBlockStack : subBlocks)
                 {
-                    metas.add(subBlockStack.getItemDamage());
+                    // Item.getDamage(ItemStack) is an equivalent of ItemStack.getItemDamage() but faster,
+                    // because we're skipping the Item delegate lookup which would always return the same Item
+                    metas.add(item.getDamage(subBlockStack));
                 }
             }
         }
