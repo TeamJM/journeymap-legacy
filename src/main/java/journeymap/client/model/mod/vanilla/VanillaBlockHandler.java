@@ -17,6 +17,7 @@ import net.minecraft.init.Blocks;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static journeymap.client.model.BlockMD.Flag.*;
@@ -27,7 +28,7 @@ import static journeymap.client.model.BlockMD.Flag.*;
 public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHandler
 {
     private final HashMap<Material, ArrayList<BlockMD.Flag>> materialFlags = new HashMap<Material, ArrayList<BlockMD.Flag>>();
-    private final HashMap<Class<? extends Block>, ArrayList<BlockMD.Flag>> blockClassFlags = new HashMap<Class<? extends Block>, ArrayList<BlockMD.Flag>>();
+    private final HashMap<Class<? extends Block>, ArrayList<BlockMD.Flag>> blockClassFlags = new LinkedHashMap<Class<? extends Block>, ArrayList<BlockMD.Flag>>();
     private final HashMap<Block, ArrayList<BlockMD.Flag>> blockFlags = new HashMap<Block, ArrayList<BlockMD.Flag>>();
 
     private final HashMap<Material, Float> materialAlphas = new HashMap<Material, Float>();

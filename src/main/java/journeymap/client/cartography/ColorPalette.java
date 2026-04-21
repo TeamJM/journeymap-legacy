@@ -53,7 +53,7 @@ public class ColorPalette
 
     public static final int VERSION = 3;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).setPrettyPrinting().create();
-    private static final ExecutorService writeExecutor = Executors.newSingleThreadExecutor(new JMThreadFactory("ColorPaletteWrite"));
+    private static final JMThreadFactory writeThreadFactory = new JMThreadFactory("ColorPaletteWrite");
 
     @Since(3)
     int version;
@@ -202,8 +202,9 @@ public class ColorPalette
             }
 
             ColorPalette palette = new ColorPalette(resourcePackNames, modPackNames, baseColors);
+            palette.origin = standard ? getStandardPaletteFile() : getWorldPaletteFile();
             palette.setPermanent(permanent);
-            palette.writeToFileAsync(standard);
+            palette.writeToFileAsync();
             Journeymap.getLogger().info("Queued color palette file with {} colors for: {}", palette.size(), palette.getOrigin());
             return palette;
         }
@@ -280,37 +281,29 @@ public class ColorPalette
         return list;
     }
 
-    private boolean writeToFile(boolean standard)
+    private void writeToFile()
     {
-        File palleteFile = null;
-        try
+        // Write JSON
+        try (Writer out = Files.newWriter(origin, UTF8);
+             JsonWriter jsonWriter = new JsonWriter(out))
         {
-            // Write JSON
-            palleteFile = standard ? getStandardPaletteFile() : getWorldPaletteFile();
-            this.origin = palleteFile;
-
-            try (Writer out = Files.newWriter(palleteFile, UTF8);
-                 JsonWriter jsonWriter = new JsonWriter(out))
-            {
-                out.write(VARIABLE);
-                jsonWriter.setIndent("  ");
-                GSON.toJson(this, this.getClass(), jsonWriter);
-            }
-
-            // Write HTML
-            getOriginHtml(true, true);
-            return true;
+            out.write(VARIABLE);
+            jsonWriter.setIndent("  ");
+            GSON.toJson(this, this.getClass(), jsonWriter);
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error(String.format("Can't save color pallete file %s: %s", palleteFile, LogFormatter.toString(e)));
-            return false;
+            Journeymap.getLogger().error("Can't save color pallete file {}: {}", origin, LogFormatter.toString(e));
+            return;
         }
+
+        // Write HTML
+        getOriginHtml(true, true);
     }
 
-    private void writeToFileAsync(final boolean standard)
+    private void writeToFileAsync()
     {
-        writeExecutor.submit(() -> writeToFile(standard));
+        writeThreadFactory.newThread(this::writeToFile).start();
     }
 
     private HashMap<BlockMD, Integer> listToMap(ArrayList<BlockColor> list)

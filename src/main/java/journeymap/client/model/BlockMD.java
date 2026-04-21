@@ -19,7 +19,6 @@ import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -276,7 +275,7 @@ public class BlockMD
                 block.getSubBlocks(item, null, subBlocks);
                 for (ItemStack subBlockStack : subBlocks)
                 {
-                    metas.add(Items.feather.getDamage(subBlockStack));
+                    metas.add(subBlockStack.getItemDamage());
                 }
             }
         }
