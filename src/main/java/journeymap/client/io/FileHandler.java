@@ -20,7 +20,6 @@ import journeymap.client.log.JMLogger;
 import journeymap.client.log.LogFormatter;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.Util;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.Sys;
@@ -30,6 +29,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -572,7 +572,7 @@ public class FileHandler
             {
                 final String resourceDirString = resourceDir.toString();
                 final URL jarUrl = new URL(resourceDirString.substring(4, resourceDirString.lastIndexOf('!')));
-                fromPath = jarUrl.getPath();
+                fromPath = Paths.get(jarUrl.toURI()).toString();
                 FileHandler.copyFromZip(fromPath, assetsPath, setNames, targetDirectory, overwrite);
             }
             else
