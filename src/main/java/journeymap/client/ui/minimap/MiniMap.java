@@ -26,6 +26,7 @@ import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -661,7 +662,7 @@ public class MiniMap
         {
             if (mc.theWorld != null && mc.thePlayer != null)
             {
-                net.minecraft.world.biome.BiomeGenBase biome = mc.theWorld.getBiomeGenForCoords(
+                BiomeGenBase biome = mc.theWorld.getBiomeGenForCoords(
                     MathHelper.floor_double(mc.thePlayer.posX),
                     MathHelper.floor_double(mc.thePlayer.posZ)
                 );
