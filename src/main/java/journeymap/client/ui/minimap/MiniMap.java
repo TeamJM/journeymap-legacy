@@ -659,7 +659,14 @@ public class MiniMap
         // Biome key
         if (dv.showBiome)
         {
-            biomeLabelText = state.getPlayerBiome();
+            if (mc.theWorld != null && mc.thePlayer != null)
+            {
+                net.minecraft.world.biome.BiomeGenBase biome = mc.theWorld.getBiomeGenForCoords(
+                    MathHelper.floor_double(mc.thePlayer.posX),
+                    MathHelper.floor_double(mc.thePlayer.posZ)
+                );
+                biomeLabelText = biome != null ? biome.biomeName : "?";
+            }
         }
 
         // Time key
