@@ -26,6 +26,7 @@ import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -659,7 +660,14 @@ public class MiniMap
         // Biome key
         if (dv.showBiome)
         {
-            biomeLabelText = state.getPlayerBiome();
+            if (mc.theWorld != null && mc.thePlayer != null)
+            {
+                BiomeGenBase biome = mc.theWorld.getBiomeGenForCoords(
+                    MathHelper.floor_double(mc.thePlayer.posX),
+                    MathHelper.floor_double(mc.thePlayer.posZ)
+                );
+                biomeLabelText = biome != null ? biome.biomeName : "?";
+            }
         }
 
         // Time key
