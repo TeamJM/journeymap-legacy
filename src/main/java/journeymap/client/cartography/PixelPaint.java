@@ -5,13 +5,13 @@
 
 package journeymap.client.cartography;
 
-import sun.awt.image.IntegerComponentRaster;
-
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
+import java.awt.image.DataBufferInt;
 import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.util.Arrays;
 
 /**
@@ -21,7 +21,8 @@ import java.util.Arrays;
 class PixelPaint implements Paint, PaintContext
 {
     final ColorModel colorModel = ColorModel.getRGBdefault();
-    IntegerComponentRaster intRaster;
+    WritableRaster intRaster;
+    int[] rasterData;
     int rgbColor;
 
     /**
@@ -62,20 +63,23 @@ class PixelPaint implements Paint, PaintContext
     {
         synchronized (this)
         {
-            IntegerComponentRaster raster = this.intRaster;
+            WritableRaster raster = this.intRaster;
+            int[] data = this.rasterData;
 
             if (raster == null || w > raster.getWidth() || h > raster.getHeight())
             {
-                raster = (IntegerComponentRaster) getColorModel().createCompatibleWritableRaster(w, h);
+                raster = getColorModel().createCompatibleWritableRaster(w, h);
+                data = ((DataBufferInt) raster.getDataBuffer()).getData();
 
                 // Only reuse if the raster is for a single pixel
                 if (w == 1 && h == 1)
                 {
                     this.intRaster = raster;
+                    this.rasterData = data;
                 }
             }
 
-            Arrays.fill(raster.getDataStorage(), this.rgbColor);
+            Arrays.fill(data, this.rgbColor);
 
             return raster;
         }
