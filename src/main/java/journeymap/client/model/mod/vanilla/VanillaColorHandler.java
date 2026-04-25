@@ -106,7 +106,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
      */
     protected Integer getCustomBiomeColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
     {
-        Integer color = getBaseColor(chunkMD, blockMD, globalX, y, globalZ);
+        int color = getBaseColor(chunkMD, blockMD, globalX, y, globalZ);
         int tint = getTint(chunkMD, blockMD, globalX, y, globalZ);
 
         if (!RGB.isWhite(tint) && !RGB.isBlack(tint))
