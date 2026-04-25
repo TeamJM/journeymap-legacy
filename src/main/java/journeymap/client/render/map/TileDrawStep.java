@@ -187,7 +187,7 @@ public class TileDrawStep
         int glErr = GL11.glGetError();
         if (glErr != GL11.GL_NO_ERROR)
         {
-            Journeymap.getLogger().warn("GL Error in TileDrawStep: " + glErr);
+            Journeymap.getLogger().warn("GL Error in TileDrawStep: {}", glErr);
             clearTexture();
         }
 

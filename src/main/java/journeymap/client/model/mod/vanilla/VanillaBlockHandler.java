@@ -105,7 +105,7 @@ public final class VanillaBlockHandler implements ModBlockDelegate.IModBlockHand
 
         if(blockMD.isWater())
         {
-            Journeymap.getLogger().info("Water! " + blockMD);
+            Journeymap.getLogger().info("Water! {}", blockMD);
         }
 
         // Set flags based on material

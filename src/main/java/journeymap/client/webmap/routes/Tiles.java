@@ -73,7 +73,7 @@ public class Tiles
         }
         catch (IllegalArgumentException e)
         {
-            logger.warn("Invalid map type supplied during tiles request: " + mapTypeString);
+            logger.warn("Invalid map type supplied during tiles request: {}", mapTypeString);
             ctx.status(400);
             ctx.result("Invalid map type: " + mapTypeString);
         }

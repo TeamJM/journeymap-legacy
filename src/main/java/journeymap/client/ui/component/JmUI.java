@@ -209,7 +209,7 @@ public abstract class JmUI extends GuiScreen
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Error in UI: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Error in UI: {}", LogFormatter.toString(t));
             closeAndReturn();
         }
     }

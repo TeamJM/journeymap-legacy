@@ -315,7 +315,7 @@ public class MapPlayerTask extends BaseMapTask
                 }
                 else
                 {
-                    Journeymap.getLogger().warn("Unexpected task in batch: " + task);
+                    Journeymap.getLogger().warn("Unexpected task in batch: {}", task);
                 }
             }
             lastTaskAvgChunkTime = elapsedNs / Math.max(1, chunkCount) / 1000000D;

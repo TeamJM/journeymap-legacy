@@ -71,7 +71,7 @@ public class JmReader
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn(String.format("Can't delete waypoint file %s: %s", waypointFile, e.getMessage()));
+            Journeymap.getLogger().warn("Can't delete waypoint file {}: {}", waypointFile, e.getMessage());
             waypointFile.deleteOnExit();
         }
     }
@@ -88,7 +88,7 @@ public class JmReader
         }
         catch (Throwable e)
         {
-            Journeymap.getLogger().error(String.format("Can't load waypoint file %s with contents: %s because %s", waypointFile, waypointString, e.getMessage()));
+            Journeymap.getLogger().error("Can't load waypoint file {} with contents: {} because {}", waypointFile, waypointString, e.getMessage());
         }
         return waypoint;
     }

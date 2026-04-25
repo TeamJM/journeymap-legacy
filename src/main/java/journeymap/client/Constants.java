@@ -100,7 +100,7 @@ public class Constants
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn("Couldn't determine locale from game settings, defaulting to " + locale);
+            Journeymap.getLogger().warn("Couldn't determine locale from game settings, defaulting to {}", locale);
         }
         return locale;
     }
@@ -116,7 +116,7 @@ public class Constants
         String result = I18n.format(key);
         if (result.equals(key))
         {
-            Journeymap.getLogger().warn("Message key not found: " + key);
+            Journeymap.getLogger().warn("Message key not found: {}", key);
         }
         return result;
     }
@@ -133,7 +133,7 @@ public class Constants
         String result = I18n.format(key, params);
         if (result.equals(key))
         {
-            Journeymap.getLogger().warn("Message key not found: " + key);
+            Journeymap.getLogger().warn("Message key not found: {}", key);
         }
         return result;
     }
@@ -178,7 +178,7 @@ public class Constants
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().warn("Error checking whether keybinding.isPressed(): " + t);
+            Journeymap.getLogger().warn("Error checking whether keybinding.isPressed(): {}", String.valueOf(t));
             return false;
         }
     }
@@ -217,7 +217,7 @@ public class Constants
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error(String.format("Can't get resource pack names: %s", LogFormatter.toString(t)));
+            Journeymap.getLogger().error("Can't get resource pack names: {}", LogFormatter.toString(t));
         }
 
         String packs;

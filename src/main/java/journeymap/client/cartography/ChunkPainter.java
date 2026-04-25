@@ -78,9 +78,7 @@ public class ChunkPainter
         long count = badBlockCount.incrementAndGet();
         if (count == 1 || count % 10240 == 0)
         {
-            Journeymap.getLogger().warn(
-                    "Bad block at " + x + "," + y + "," + z + ". Total bad blocks: " + count
-            );
+            Journeymap.getLogger().warn("Bad block at {},{},{}. Total bad blocks: {}", x, y, z, count);
         }
     }
 

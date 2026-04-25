@@ -39,11 +39,11 @@ public class PacketHandler
             }
             catch (RuntimeException rte)
             {
-                Journeymap.getLogger().error(playerName + " is not a real player. WorldID:" + worldID + " Error: " + rte);
+                Journeymap.getLogger().error("{} is not a real player. WorldID:{} Error: {}", playerName, worldID, rte);
             }
             catch (Exception e)
             {
-                Journeymap.getLogger().error("Unknown Exception - PlayerName:" + playerName + " WorldID:" + worldID + " Exception " + e);
+                Journeymap.getLogger().error("Unknown Exception - PlayerName:{} WorldID:{} Exception {}", playerName, worldID, e);
             }
         }
 

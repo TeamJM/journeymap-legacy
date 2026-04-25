@@ -115,12 +115,12 @@ public class MapRegionTask extends BaseMapTask
 
         if (chunkCoords.size() - missing > 0)
         {
-            logger.info(String.format("Potential chunks to map in %s: %s (out of %s)", rCoord, chunkCoords.size() - missing, chunkCoords.size()));
+            logger.info("Potential chunks to map in {}: {} (out of {})", rCoord, chunkCoords.size() - missing, chunkCoords.size());
             super.performTask(mc, jm, jmWorldDir, threadLogging);
         }
         else
         {
-            logger.info(String.format("Skipping empty region: %s", rCoord));
+            logger.info("Skipping empty region: {}", rCoord);
         }
     }
 
@@ -138,7 +138,7 @@ public class MapRegionTask extends BaseMapTask
         }
         else
         {
-            logger.info(String.format("Actual chunks mapped in %s: %s ", rCoord, mappedChunks));
+            logger.info("Actual chunks mapped in {}: {} ", rCoord, mappedChunks);
         }
     }
 
@@ -230,7 +230,7 @@ public class MapRegionTask extends BaseMapTask
                 {
                     String error = "Couldn't Auto-Map: " + t.getMessage(); //$NON-NLS-1$
                     ChatLog.announceError(error);
-                    logger.error(error + ": " + LogFormatter.toString(t));
+                    logger.error("{}: {}", error, LogFormatter.toString(t));
                 }
             }
             return this.enabled;

@@ -380,7 +380,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         Float slope = slopes[x][z];
         if (slope == null || slope.isNaN())
         {
-            Journeymap.getLogger().warn(String.format("Bad slope for %s at %s,%s: %s", chunkMd, x, z, slope));
+            Journeymap.getLogger().warn("Bad slope for {} at {},{}: {}", chunkMd, x, z, slope);
             slope = 1f;
         }
         return slope;
@@ -478,7 +478,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn("Couldn't get safe surface block height at " + x + "," + z + ": " + e);
+            Journeymap.getLogger().warn("Couldn't get safe surface block height at {},{}: {}", x, z, e);
         }
 
         //why is height 4 set on a chunk to the left?

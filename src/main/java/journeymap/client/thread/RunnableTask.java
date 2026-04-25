@@ -48,7 +48,7 @@ public class RunnableTask implements Runnable
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().warn("Interrupted task that ran too long:" + task);
+            Journeymap.getLogger().warn("Interrupted task that ran too long:{}", task);
         }
     }
 

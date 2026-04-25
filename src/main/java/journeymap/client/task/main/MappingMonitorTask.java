@@ -105,7 +105,7 @@ public class MappingMonitorTask implements IMainThreadTask
         }
         catch (Throwable t)
         {
-            logger.error("Error in JourneyMap.performMainThreadTasks(): " + LogFormatter.toString(t));
+            logger.error("Error in JourneyMap.performMainThreadTasks(): {}", LogFormatter.toString(t));
         }
         return this;
     }
