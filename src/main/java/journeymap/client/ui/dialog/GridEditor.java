@@ -44,7 +44,7 @@ public class GridEditor extends JmUI
     private IntSliderButton buttonOpacity;
     private CheckBox checkDay, checkNight, checkUnderground;
     private ThemeToggle buttonDay, buttonNight, buttonUnderground;
-    private Integer activeColor;
+    private int activeColor;
     private MapType activeMapType;
 
     private Button buttonReset;
@@ -68,8 +68,7 @@ public class GridEditor extends JmUI
 
         this.gridSpecs = JourneymapClient.getCoreProperties().gridSpecs.clone();
 
-        MapType mapType = MapType.day(0);
-        activeMapType = mapType;
+        activeMapType = MapType.day(0);
         this.activeColor = this.gridSpecs.getSpec(activeMapType).getColor();
 
         Keyboard.enableRepeatEvents(true);

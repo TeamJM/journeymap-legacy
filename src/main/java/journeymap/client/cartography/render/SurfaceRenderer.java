@@ -45,7 +45,7 @@ public class SurfaceRenderer extends BaseRenderer implements IChunkRenderer
     protected void updateOptions()
     {
         super.updateOptions();
-        this.ambientColor = RGB.floats(tweakSurfaceAmbientColor);
+        this.ambientColor = tweakSurfaceAmbientColor;
     }
 
     /**

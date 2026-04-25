@@ -235,20 +235,19 @@ public class Waypoint implements Serializable
         setColor(RGB.toInteger(r, g, b));
     }
 
-    public Integer getColor()
+    public int getColor()
     {
         return RGB.toInteger(r, g, b);
     }
 
-    public void setColor(Integer color)
+    public void setColor(int rgb)
     {
-        int c[] = RGB.ints(color);
-        this.r = c[0];
-        this.g = c[1];
-        this.b = c[2];
+        this.r = (rgb >> 16) & 0xFF;
+        this.g = (rgb >> 8) & 0xFF;
+        this.b = (rgb) & 0xFF;
     }
 
-    public Integer getSafeColor()
+    public int getSafeColor()
     {
         if (r + g + b >= 100)
         {

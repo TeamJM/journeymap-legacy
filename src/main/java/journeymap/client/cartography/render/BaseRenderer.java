@@ -40,7 +40,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     protected static final AlphaComposite ALPHA_OPAQUE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F);
     protected static final int COLOR_BLACK = Color.black.getRGB();
     protected static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
-    protected static final float[] DEFAULT_FOG = new float[]{0, 0, .1f};
+    protected static final int DEFAULT_FOG = RGB.toInteger(0, 0, .1f);
     protected final DataCache dataCache = DataCache.instance();
     protected CoreProperties coreProperties;
     protected BlockColumnPropertiesCache columnPropertiesCache = null;
@@ -52,7 +52,7 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
     protected boolean mapCrops;
     protected boolean mapPlants;
     protected boolean mapPlantShadows;
-    protected float[] ambientColor;
+    protected int ambientColor;
 
 
     protected ArrayList<BlockCoordIntPair> primarySlopeOffsets = new ArrayList<BlockCoordIntPair>(3);
@@ -130,11 +130,11 @@ public abstract class BaseRenderer implements IChunkRenderer, RemovalListener<Ch
         mapCrops = coreProperties.mapCrops.get();
 
         // Subclasses should override
-        this.ambientColor = new float[]{0, 0, 0};
+        this.ambientColor = 0;
     }
 
     @Override
-    public float[] getAmbientColor()
+    public int getAmbientColor()
     {
         return DEFAULT_FOG;
     }

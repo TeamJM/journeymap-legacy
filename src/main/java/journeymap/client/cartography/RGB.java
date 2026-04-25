@@ -110,6 +110,11 @@ public final class RGB
                 ((b & 0xFF));
     }
 
+    public static int toRGBA(int rgb, int alpha)
+    {
+        return rgb << 8 | (alpha & 0xFF);
+    }
+
     @Deprecated // don't use arrays for colors
     public static int toInteger(int[] rgb)
     {
@@ -189,6 +194,7 @@ public final class RGB
     /**
      * Darken a color by a factor, add a fog tint.
      */
+    @Deprecated // don't use arrays for colors
     public static int darkenAmbient(int rgb, float factor, float[] ambient)
     {
         final float r = ((rgb >> 16) & 0xFF) / 255f;
@@ -200,6 +206,25 @@ public final class RGB
                 clampFloat(b * (factor + ambient[2]))
         );
     }
+
+    /**
+     * Darken a color by a factor, add a fog tint.
+     */
+    public static int darkenAmbient(int rgb, float factor, int ambient)
+    {
+        final float r = ((rgb >> 16) & 0xFF) / 255f;
+        final float g = ((rgb >> 8) & 0xFF) / 255f;
+        final float b = ((rgb) & 0xFF) / 255f;
+        final float ar = ((ambient >> 16) & 0xFF) / 255f;
+        final float ag = ((ambient >> 8) & 0xFF) / 255f;
+        final float ab = ((ambient) & 0xFF) / 255f;
+        return toInteger(
+                clampFloat(r * (factor + ar)),
+                clampFloat(g * (factor + ag)),
+                clampFloat(b * (factor + ab))
+        );
+    }
+
 
     /**
      * Creates an array with three elements [r,g,b]
