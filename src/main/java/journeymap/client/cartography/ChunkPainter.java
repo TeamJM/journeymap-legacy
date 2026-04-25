@@ -7,9 +7,7 @@ package journeymap.client.cartography;
 
 import journeymap.common.Journeymap;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.concurrent.atomic.AtomicLong;
@@ -26,20 +24,16 @@ public class ChunkPainter
     public static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
     protected static volatile AtomicLong badBlockCount = new AtomicLong(0);
 
-    private final int[][] colors = new int[16][16];
     private final Graphics2D g2D;
+    private final BufferedImage img;
+    private final int[] pixels;
 
     public ChunkPainter(Graphics2D g2D)
     {
         this.g2D = g2D;
-        for (int x = 0; x < 16; x++)
-        {
-            for (int z = 0; z < 16; z++)
-            {
-                colors[x][z] = Integer.MIN_VALUE;
-            }
-        }
         this.g2D.setComposite(ALPHA_OPAQUE);
+        this.img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        this.pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
     }
 
     /**
@@ -47,8 +41,8 @@ public class ChunkPainter
      */
     public void paintDimOverlay(int x, int z, float alpha)
     {
-        int color = colors[x][z];
-        if (color != Integer.MIN_VALUE)
+        final int color = pixels[z * 16 + x];
+        if (color != 0)
         {
             paintBlock(x, z, RGB.adjustBrightness(color, alpha));
         }
@@ -59,7 +53,7 @@ public class ChunkPainter
      */
     public void paintBlock(final int x, final int z, final int color)
     {
-        colors[x][z] = color;
+        pixels[z * 16 + x] = 0xFF000000 | color;
     }
 
     /**
@@ -99,19 +93,8 @@ public class ChunkPainter
     {
         try
         {
-            final BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-            final int[] data = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
-            for (int z = 0; z < 16; z++) {
-                for (int x = 0; x < 16; x++) {
-                    int c = colors[x][z];
-                    if (c != Integer.MIN_VALUE) {
-                        data[z * 16 + x] = 0xFF000000 | c;
-                    }
-                }
-            }
             g2D.drawImage(img, 0, 0, null);
-        }
-        finally
+        } finally
         {
             g2D.dispose();
         }
