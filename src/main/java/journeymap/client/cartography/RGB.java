@@ -93,6 +93,7 @@ public final class RGB
                 (((int) (b * 255 + 0.5) & 0xFF));
     }
 
+    @Deprecated // don't use arrays for colors
     public static int toInteger(float[] rgb)
     {
         return ((0xFF) << 24) |
@@ -109,6 +110,12 @@ public final class RGB
                 ((b & 0xFF));
     }
 
+    public static int toRGBA(int rgb, int alpha)
+    {
+        return rgb << 8 | (alpha & 0xFF);
+    }
+
+    @Deprecated // don't use arrays for colors
     public static int toInteger(int[] rgb)
     {
         return ((0xFF) << 24) |
@@ -128,14 +135,12 @@ public final class RGB
         {
             return "null";
         }
-        int[] ints = ints(rgb);
-        return String.format("r=%s,g=%s,b=%s", ints[0], ints[1], ints[2]);
+        return String.format("r=%s,g=%s,b=%s", (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb) & 0xFF);
     }
 
     public static String toHexString(Integer rgb)
     {
-        int[] ints = ints(rgb);
-        return String.format("#%02x%02x%02x", ints[0], ints[1], ints[2]);
+        return String.format("#%02x%02x%02x", (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb) & 0xFF);
     }
 
     /**
@@ -147,7 +152,14 @@ public final class RGB
         {
             return rgb;
         }
-        return toInteger(clampFloats(floats(rgb), factor));
+        final float r = ((rgb >> 16) & 0xFF) / 255f;
+        final float g = ((rgb >> 8) & 0xFF) / 255f;
+        final float b = ((rgb) & 0xFF) / 255f;
+        return toInteger(
+                clampFloat(r * factor),
+                clampFloat(g * factor),
+                clampFloat(b * factor)
+        );
     }
 
     /**
@@ -155,8 +167,10 @@ public final class RGB
      */
     public static int greyScale(int rgb)
     {
-        int[] ints = ints(rgb);
-        int avg = clampInt((ints[0] + ints[1] + ints[2]) / 3);
+        final int r = (rgb >> 16) & 0xFF;
+        final int g = (rgb >> 8) & 0xFF;
+        final int b = (rgb) & 0xFF;
+        int avg = clampInt(r + g + b / 3);
         return toInteger(avg, avg, avg);
     }
 
@@ -167,30 +181,58 @@ public final class RGB
     public static int bevelSlope(int rgb, float factor)
     {
         final float bluer = (factor < 1) ? .85f : 1f;
-        float[] floats = floats(rgb);
-        floats[0] = floats[0] * bluer * factor;
-        floats[1] = floats[1] * bluer * factor;
-        floats[2] = floats[2] * factor;
-        return toInteger(clampFloats(floats, 1f));
+        final float r = ((rgb >> 16) & 0xFF) / 255f;
+        final float g = ((rgb >> 8) & 0xFF) / 255f;
+        final float b = ((rgb) & 0xFF) / 255f;
+        return toInteger(
+                clampFloat(r * bluer * factor),
+                clampFloat(g * bluer * factor),
+                clampFloat(b * factor)
+        );
     }
 
     /**
      * Darken a color by a factor, add a fog tint.
      */
+    @Deprecated // don't use arrays for colors
     public static int darkenAmbient(int rgb, float factor, float[] ambient)
     {
-        float[] floats = floats(rgb);
-        floats[0] = floats[0] * (factor + ambient[0]);
-        floats[1] = floats[1] * (factor + ambient[1]);
-        floats[2] = floats[2] * (factor + ambient[2]);
-        return toInteger(clampFloats(floats, 1f));
+        final float r = ((rgb >> 16) & 0xFF) / 255f;
+        final float g = ((rgb >> 8) & 0xFF) / 255f;
+        final float b = ((rgb) & 0xFF) / 255f;
+        return toInteger(
+                clampFloat(r * (factor + ambient[0])),
+                clampFloat(g * (factor + ambient[1])),
+                clampFloat(b * (factor + ambient[2]))
+        );
     }
 
     /**
+     * Darken a color by a factor, add a fog tint.
+     */
+    public static int darkenAmbient(int rgb, float factor, int ambient)
+    {
+        final float r = ((rgb >> 16) & 0xFF) / 255f;
+        final float g = ((rgb >> 8) & 0xFF) / 255f;
+        final float b = ((rgb) & 0xFF) / 255f;
+        final float ar = ((ambient >> 16) & 0xFF) / 255f;
+        final float ag = ((ambient >> 8) & 0xFF) / 255f;
+        final float ab = ((ambient) & 0xFF) / 255f;
+        return toInteger(
+                clampFloat(r * (factor + ar)),
+                clampFloat(g * (factor + ag)),
+                clampFloat(b * (factor + ab))
+        );
+    }
+
+
+    /**
      * Creates an array with three elements [r,g,b]
+     *
      * @param rgb color integer
      * @return array
      */
+    @Deprecated // don't use arrays for colors
     public static int[] ints(int rgb)
     {
         return new int[]{(rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb) & 0xFF};
@@ -198,15 +240,18 @@ public final class RGB
 
     /**
      * Creates an array with four elements [r,g,b,a]
-     * @param rgb color integer
+     *
+     * @param rgb   color integer
      * @param alpha alpha (0-255)
      * @return array
      */
+    @Deprecated // don't use arrays for colors
     public static int[] ints(int rgb, int alpha)
     {
         return new int[]{(rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb) & 0xFF, alpha & 0xFF};
     }
 
+    @Deprecated // don't use arrays for colors
     public static float[] floats(int rgb)
     {
         return new float[]{((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, ((rgb) & 0xFF) / 255f};
@@ -226,14 +271,18 @@ public final class RGB
             return rgb;
         }
 
-        float[] floats = floats(rgb);
-        float[] otherFloats = floats(otherRgb);
+        final float r = ((rgb >> 16) & 0xFF) / 255f;
+        final float g = ((rgb >> 8) & 0xFF) / 255f;
+        final float b = ((rgb) & 0xFF) / 255f;
+        final float or = ((otherRgb >> 16) & 0xFF) / 255f;
+        final float og = ((otherRgb >> 8) & 0xFF) / 255f;
+        final float ob = ((otherRgb) & 0xFF) / 255f;
 
-        floats[0] = otherFloats[0] * otherAlpha / 1f + floats[0] * (1 - otherAlpha);
-        floats[1] = otherFloats[1] * otherAlpha / 1f + floats[1] * (1 - otherAlpha);
-        floats[2] = otherFloats[2] * otherAlpha / 1f + floats[2] * (1 - otherAlpha);
-
-        return toInteger(floats);
+        return toInteger(
+                or * otherAlpha + r * (1 - otherAlpha),
+                og * otherAlpha + g * (1 - otherAlpha),
+                ob * otherAlpha + b * (1 - otherAlpha)
+        );
     }
 
     /**
@@ -245,14 +294,33 @@ public final class RGB
      */
     public static int multiply(int rgb, int multiplier)
     {
-        float[] rgbFloats = floats(rgb);
-        float[] multFloats = floats(multiplier);
+        final float r = ((rgb >> 16) & 0xFF) / 255f;
+        final float g = ((rgb >> 8) & 0xFF) / 255f;
+        final float b = ((rgb) & 0xFF) / 255f;
+        final float mr = ((multiplier >> 16) & 0xFF) / 255f;
+        final float mg = ((multiplier >> 8) & 0xFF) / 255f;
+        final float mb = ((multiplier) & 0xFF) / 255f;
+        return toInteger(
+                r * mr,
+                g * mg,
+                b * mb
+        );
+    }
 
-        rgbFloats[0] = rgbFloats[0] * multFloats[0];
-        rgbFloats[1] = rgbFloats[1] * multFloats[1];
-        rgbFloats[2] = rgbFloats[2] * multFloats[2];
+    /**
+     * Returns an rgb array of floats clamped between 0 and 1 after a factor is applied.
+     */
+    @Deprecated // don't use arrays for colors
+    public static float[] clampFloats(float[] rgbFloats, float factor)
+    {
+        float r = rgbFloats[0] * factor;
+        float g = rgbFloats[1] * factor;
+        float b = rgbFloats[2] * factor;
+        rgbFloats[0] = clampFloat(r);
+        rgbFloats[1] = clampFloat(g);
+        rgbFloats[2] = clampFloat(b);
 
-        return toInteger(rgbFloats);
+        return rgbFloats;
     }
 
     /**
@@ -263,22 +331,7 @@ public final class RGB
      */
     public static float clampFloat(float value)
     {
-        return value < 0f ? 0f : (value > 1f ? 1f : value);
-    }
-
-    /**
-     * Returns an rgb array of floats clamped between 0 and 1 after a factor is applied.
-     */
-    public static float[] clampFloats(float[] rgbFloats, float factor)
-    {
-        float r = rgbFloats[0] * factor;
-        float g = rgbFloats[1] * factor;
-        float b = rgbFloats[2] * factor;
-        rgbFloats[0] = r < 0f ? 0f : (r > 1f ? 1f : r);
-        rgbFloats[1] = g < 0f ? 0f : (g > 1f ? 1f : g);
-        rgbFloats[2] = b < 0f ? 0f : (b > 1f ? 1f : b);
-
-        return rgbFloats;
+        return value < 0f ? 0f : value > 1f ? 1f : value;
     }
 
     /**
@@ -289,7 +342,7 @@ public final class RGB
      */
     public static int clampInt(int value)
     {
-        return value < 0 ? 0 : (value > 255 ? 255 : value);
+        return value < 0 ? 0 : value > 255 ? 255 : value;
     }
 
 }

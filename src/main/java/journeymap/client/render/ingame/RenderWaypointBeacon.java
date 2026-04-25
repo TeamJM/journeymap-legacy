@@ -358,7 +358,7 @@ public class RenderWaypointBeacon
             double d3 = (double) time * 0.025D * (1.0D - (double) (b0 & 1) * 2.5D);
             //double d3 = (double) time * 0.025D * -1.5D;
 
-            int[] rgba = RGB.ints(color, clampAlpha(Math.round(115.0F * alphaMultiplier)));
+            int rgba = RGB.toRGBA(color, clampAlpha(Math.round(115.0F * alphaMultiplier)));
             renderHelper.startDrawingQuads(true);
             renderHelper.glEnableBlend();
 
@@ -371,10 +371,10 @@ public class RenderWaypointBeacon
             double d10 = Math.sin(d3 + 3.9269908169872414D) * d4;
             double d11 = Math.cos(d3 + 5.497787143782138D) * d4;
             double d12 = Math.sin(d3 + 5.497787143782138D) * d4;
-            double d13 = (double) (256.0F * f1);
+            double d13 = 256.0F * f1;
             double d14 = 0.0D;
             double d15 = 1.0D;
-            double d16 = (double) (-1.0F + texOffset);
+            double d16 = -1.0F + texOffset;
             double d17 = (double) (256.0F * f1) * (0.5D / d4) + d16;
             renderHelper.addVertexWithUV(x + d5, y + d13, z + d6, d15, d17, rgba);
             renderHelper.addVertexWithUV(x + d5, y, z + d6, d15, d16, rgba);
@@ -410,7 +410,7 @@ public class RenderWaypointBeacon
             renderHelper.glBlendFunc(770, 771, 1, 0);
             renderHelper.glDepthMask(false);
 
-            int[] rgba = RGB.ints(color, clampAlpha(Math.round(40.0F * alphaMultiplier)));
+            int rgba = RGB.toRGBA(color, clampAlpha(Math.round(40.0F * alphaMultiplier)));
             renderHelper.startDrawingQuads(true);
             
             renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30, rgba);

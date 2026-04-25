@@ -33,10 +33,10 @@ public class GridSpec
     public GridSpec(Style style, Color color, float alpha)
     {
         this.style = style;
-        float[] rgb = RGB.floats(color.getRGB());
-        this.red = rgb[0];
-        this.green = rgb[1];
-        this.blue = rgb[2];
+        final int rgb = color.getRGB();
+        this.red = ((rgb >> 16) & 0xFF) / 255f;
+        this.green = ((rgb >> 8) & 0xFF) / 255f;
+        this.blue = ((rgb) & 0xFF) / 255f;
         if (alpha < 0)
         {
             alpha = 0f;
@@ -99,7 +99,7 @@ public class GridSpec
         renderHelper.glClearColor(1, 1, 1, 1f); // defensive against shaders
     }
 
-    public Integer getColor()
+    public int getColor()
     {
         return RGB.toInteger(red, green, blue);
     }

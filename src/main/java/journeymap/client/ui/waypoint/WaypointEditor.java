@@ -459,15 +459,14 @@ public class WaypointEditor extends JmUI
         }
     }
 
-    protected void setFormColor(Integer color)
+    protected void setFormColor(int color)
     {
         //if(color!=null && color.equals(currentColor)) return;
 
         currentColor = color;
-        int[] c = RGB.ints(color);
-        fieldR.setText(Integer.toString(c[0]));
-        fieldG.setText(Integer.toString(c[1]));
-        fieldB.setText(Integer.toString(c[2]));
+        fieldR.setText(Integer.toString((color >> 16) & 0xFF));
+        fieldG.setText(Integer.toString((color >> 8) & 0xFF));
+        fieldB.setText(Integer.toString((color) & 0xFF));
         updateWaypointFromForm();
     }
 

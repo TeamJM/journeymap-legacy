@@ -171,8 +171,8 @@ public class MapSaver
                 Matcher matcher = tilePattern.matcher(file.getName());
                 if (matcher.matches())
                 {
-                    Integer x = Integer.parseInt(matcher.group(1));
-                    Integer z = Integer.parseInt(matcher.group(2));
+                    int x = Integer.parseInt(matcher.group(1));
+                    int z = Integer.parseInt(matcher.group(2));
                     if (minX == null || x < minX)
                     {
                         minX = x;

@@ -31,7 +31,7 @@ public class EndRenderer extends SurfaceRenderer implements IChunkRenderer
     protected void updateOptions()
     {
         super.updateOptions();
-        this.ambientColor = RGB.floats(tweakEndAmbientColor);
+        this.ambientColor = tweakEndAmbientColor;
         this.tweakMoonlightLevel = 5f;
     }
 

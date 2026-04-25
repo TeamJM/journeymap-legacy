@@ -214,7 +214,7 @@ public class MapRegionTask extends BaseMapTask
                         mapType = (time < 13800) ? MapType.day(player) : MapType.night(player);
                     }
 
-                    Boolean mapAll = params == null ? false : (Boolean) params;
+                    boolean mapAll = params == null ? false : (boolean) params;
 
                     regionLoader = new RegionLoader(minecraft, mapType, mapAll);
                     if (regionLoader.getRegionsFound() == 0)

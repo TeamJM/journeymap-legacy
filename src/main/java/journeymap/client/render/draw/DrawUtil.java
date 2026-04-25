@@ -269,8 +269,12 @@ public class DrawUtil
 
             if (blend && color != null)
             {
-                float[] c = RGB.floats(color);
-                renderHelper.glColor4f(c[0], c[1], c[2], alpha);
+                renderHelper.glColor4f(
+                        ((color >> 16) & 0xFF) / 255f,
+                        ((color >> 8) & 0xFF) / 255f,
+                        ((color) & 0xFF) / 255f,
+                        alpha
+                );
             }
             else
             {
@@ -334,7 +338,7 @@ public class DrawUtil
         renderHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
 
         // Draw
-        int[] rgba = RGB.ints(color, alpha);
+        int rgba = RGB.toRGBA(color, alpha);
         renderHelper.startDrawingQuads(true);
         renderHelper.addVertexWithUV(x, height + y, zLevel, 0, 1, rgba);
         renderHelper.addVertexWithUV(x + width, height + y, zLevel, 1, 1, rgba);
@@ -355,8 +359,8 @@ public class DrawUtil
      */
     public static void drawGradientRect(double x, double y, double width, double height, Integer startColor, int startAlpha, Integer endColor, int endAlpha)
     {
-        int[] rgbaStart = RGB.ints(startColor, startAlpha);
-        int[] rgbaEnd = RGB.ints(endColor, endAlpha);
+        int rgbaStart = RGB.toRGBA(startColor, startAlpha);
+        int rgbaEnd = RGB.toRGBA(endColor, endAlpha);
 
         renderHelper.glDisableTexture2D();
         renderHelper.glEnableBlend();

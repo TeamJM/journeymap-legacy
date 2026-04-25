@@ -29,6 +29,9 @@ public class ChunkRenderController
     private final IChunkRenderer endRenderer;
     private final SurfaceRenderer overWorldSurfaceRenderer;
     private final IChunkRenderer overWorldCaveRenderer;
+    private final BufferedImage reusableBuffer1;
+    private final BufferedImage reusableBuffer2;
+    private final BufferedImage reusableBuffer3;
 
     public ChunkRenderController()
     {
@@ -38,6 +41,9 @@ public class ChunkRenderController
         overWorldSurfaceRenderer = surfaceRenderer;
         overWorldCaveRenderer = new CaveRenderer(surfaceRenderer);
         //standardRenderer = new ChunkTopoRenderer();
+        reusableBuffer1 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        reusableBuffer2 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        reusableBuffer3 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
     }
 
     public boolean renderChunk(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
@@ -60,7 +66,7 @@ public class ChunkRenderController
                 BufferedImage image = regionImageSet.getChunkImage(chunkMd, mapType);
                 if (image != null)
                 {
-                    undergroundG2D = new ChunkPainter(RegionImageHandler.initRenderingHints(image.createGraphics()));
+                    undergroundG2D = new ChunkPainter(reusableBuffer1, RegionImageHandler.initRenderingHints(image.createGraphics()));
                     switch (rCoord.dimension)
                     {
                         case -1:
@@ -92,12 +98,12 @@ public class ChunkRenderController
 
                 if (imageDay != null)
                 {
-                    dayG2D = new ChunkPainter(RegionImageHandler.initRenderingHints(imageDay.createGraphics()));
+                    dayG2D = new ChunkPainter(reusableBuffer2, RegionImageHandler.initRenderingHints(imageDay.createGraphics()));
                 }
 
                 if (imageNight != null)
                 {
-                    nightG2D = new ChunkPainter(RegionImageHandler.initRenderingHints(imageNight.createGraphics()));
+                    nightG2D = new ChunkPainter(reusableBuffer3, RegionImageHandler.initRenderingHints(imageNight.createGraphics()));
                 }
 
                 renderOkay = dayG2D != null && overWorldSurfaceRenderer.render(dayG2D, nightG2D, chunkMd);

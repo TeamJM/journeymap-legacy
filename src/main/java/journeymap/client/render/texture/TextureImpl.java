@@ -15,7 +15,9 @@ import net.minecraft.client.resources.IResourceManager;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class TextureImpl extends AbstractTexture
@@ -80,6 +82,8 @@ public class TextureImpl extends AbstractTexture
         }
     }
 
+    private int[] pixelBuffer;
+
     /**
      * Can be safely called without the OpenGL Context.
      */
@@ -102,27 +106,41 @@ public class TextureImpl extends AbstractTexture
 
             this.width = bufferedImage.getWidth();
             this.height = bufferedImage.getHeight();
-            int bufferSize = width * height * 4; // RGBA
+            final int pixelAmount = width * height;
+            final int bufferSize = pixelAmount * 4; // RGBA
 
-            if (buffer == null || (buffer.capacity() != bufferSize))
+            if (buffer == null || buffer.capacity() != bufferSize)
             {
                 buffer = ByteBuffer.allocateDirect(bufferSize);
             }
             buffer.clear();
 
-            int[] pixels = new int[width * height];
-            bufferedImage.getRGB(0, 0, width, height, pixels, 0, width);
-            int pixel;
-            for (int y = 0; y < height; y++)
+            final int[] pixels;
+
+            if (bufferedImage.getRaster().getDataBuffer() instanceof DataBufferInt)
             {
-                for (int x = 0; x < width; x++)
+                pixels = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();
+            }
+            else
+            {
+                if (pixelBuffer == null || pixelBuffer.length != pixelAmount)
                 {
-                    pixel = pixels[y * width + x];
-                    buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red
-                    buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green
-                    buffer.put((byte) ((pixel & 0xFF)));           // Blue
-                    buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha
+                    pixelBuffer = new int[pixelAmount];
                 }
+                else
+                {
+                    Arrays.fill(pixelBuffer, 0);
+                }
+
+                pixels = bufferedImage.getRGB(0, 0, width, height, pixelBuffer, 0, width);
+            }
+
+            final ByteBuffer buff = buffer;
+            for (int i = 0; i < pixelAmount; i++)
+            {
+                final int argb = pixels[i];
+                final int rgba = (argb << 8) | ((argb >> 24) & 0xFF);
+                buff.putInt(rgba);
             }
             buffer.flip();
             buffer.rewind();

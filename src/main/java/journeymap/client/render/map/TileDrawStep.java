@@ -95,7 +95,7 @@ public class TileDrawStep
         }
 
         //boolean scaledUpdatePending = !regionUpdatePending && highQuality && updateScaledTexture();
-        Integer textureId = -1;
+        int textureId = -1;
         boolean useScaled = false;
 
         if (highQuality && scaledTexture != null)

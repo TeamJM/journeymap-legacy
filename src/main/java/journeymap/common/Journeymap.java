@@ -39,6 +39,7 @@ public class Journeymap
 {
     public static final String MOD_ID = "journeymap";
     public static final String SHORT_MOD_NAME = "JourneyMap";
+    private static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static final Version JM_VERSION = Version.from(BuildInfo.MAJOR, BuildInfo.MINOR, BuildInfo.MICRO, BuildInfo.PATCH, new Version(5, 1, 4, "dev"));
     public static final String FORGE_VERSION = BuildInfo.FORGE_VERSION;
     public static final String WEBSITE_URL = "https://teamjm.github.io/journeymap-docs/";
@@ -56,7 +57,7 @@ public class Journeymap
      */
     public static Logger getLogger()
     {
-        return LogManager.getLogger(MOD_ID);
+        return LOGGER;
     }
 
     /**
