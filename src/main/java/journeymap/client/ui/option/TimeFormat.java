@@ -42,7 +42,7 @@ public class TimeFormat
         TimeFormatKeys timeTimeFormatKeys = idToFormat.get(id);
         if (timeTimeFormatKeys == null)
         {
-            Journeymap.getLogger().warn("Invalid time format id: " + id);
+            Journeymap.getLogger().warn("Invalid time format id: {}", id);
             timeTimeFormatKeys = idToFormat.get(timeFormatIds[0]);
         }
 

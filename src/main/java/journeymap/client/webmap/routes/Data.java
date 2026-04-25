@@ -28,7 +28,7 @@ public class Data
         String type = ctx.pathParam("type");
         if (dataTypesRequiringSince.contains(type) && since == null)
         {
-            logger.warn("Data type '" + type + "' requested without 'images.since' parameter");
+            logger.warn("Data type '{}' requested without 'images.since' parameter", type);
             ctx.status(400);
             ctx.result("Data type '" + type + "' requires 'images.since' parameter.");
             return;
@@ -79,7 +79,7 @@ public class Data
         }
         if (data == null)
         {
-            logger.warn("Unknown data type '" + type + "'");
+            logger.warn("Unknown data type '{}'", type);
             ctx.status(400);
             ctx.result("Unknown data type '" + type + "'");
         }

@@ -109,7 +109,7 @@ public class OnOffButton extends Button
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Error trying to toggle button '" + displayString + "': " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Error trying to toggle button '{}': {}", displayString, LogFormatter.toString(t));
             allowChange = false;
         }
 

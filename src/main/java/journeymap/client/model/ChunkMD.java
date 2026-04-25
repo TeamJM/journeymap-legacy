@@ -151,7 +151,7 @@ public class ChunkMD
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn(e + " at " + toWorldX(x) + "," + y + "," + toWorldX(x));
+            Journeymap.getLogger().warn("{} at {},{},{}", e, toWorldX(x), y, toWorldX(x));
         }
 
         return Math.max(0, y);

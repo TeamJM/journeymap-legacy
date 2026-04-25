@@ -51,7 +51,7 @@ public class ChatEventHandler implements EventHandlerManager.EventHandler
             }
             catch (Exception e)
             {
-                Journeymap.getLogger().warn("Unexpected exception on ClientChatReceivedEvent: " + LogFormatter.toString(e));
+                Journeymap.getLogger().warn("Unexpected exception on ClientChatReceivedEvent: {}", LogFormatter.toString(e));
             }
         }
     }

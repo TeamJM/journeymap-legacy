@@ -106,7 +106,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn("Error during performMainThreadTasks: " + e);
+            Journeymap.getLogger().warn("Error during performMainThreadTasks: {}", String.valueOf(e));
         }
         finally
         {
@@ -134,17 +134,16 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
                 WaypointStore.instance().save(deathpoint);
             }
 
-            Journeymap.getLogger().info(String.format("%s died at x:%s, y:%s, z:%s. Deathpoint created: %s",
+            Journeymap.getLogger().info("{} died at x:{}, y:{}, z:{}. Deathpoint created: {}",
                     ForgeHelper.INSTANCE.getEntityName(player),
                     MathHelper.floor_double(player.posX),
                     MathHelper.floor_double(player.posY),
-                    MathHelper.floor_double(player.posZ),
-                    doCreate));
+                    MathHelper.floor_double(player.posZ), doCreate);
 
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Unexpected Error in createDeathpoint(): " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Unexpected Error in createDeathpoint(): {}", LogFormatter.toString(t));
         }
     }
 

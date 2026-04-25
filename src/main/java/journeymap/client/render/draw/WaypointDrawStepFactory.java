@@ -66,7 +66,7 @@ public class WaypointDrawStepFactory
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Error during prepareSteps: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Error during prepareSteps: {}", LogFormatter.toString(t));
         }
 
         return drawStepList;

@@ -37,7 +37,7 @@ public class FileManager
             catch (IOException e)
             {
                 Journeymap.getLogger().error("Unable to read the JsonFile");
-                Journeymap.getLogger().error("Error" + e);
+                Journeymap.getLogger().error("Error{}", String.valueOf(e));
                 return null;
             }
 
@@ -45,7 +45,7 @@ public class FileManager
         }
         catch (FileNotFoundException e)
         {
-            Journeymap.getLogger().info(file + " not found!");
+            Journeymap.getLogger().info("{} not found!", file);
             return null;
         }
     }
@@ -72,8 +72,8 @@ public class FileManager
         }
         catch (IOException e)
         {
-            Journeymap.getLogger().error("Error creating file " + file);
-            Journeymap.getLogger().error("Error " + e);
+            Journeymap.getLogger().error("Error creating file {}", file);
+            Journeymap.getLogger().error("Error {}", String.valueOf(e));
             return false;
         }
     }

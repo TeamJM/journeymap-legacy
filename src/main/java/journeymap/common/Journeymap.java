@@ -119,6 +119,6 @@ public class Journeymap
     {
         MinecraftServer server = MinecraftServer.getServer();
         JourneymapServer.setWorldName(server.getEntityWorld().getWorldInfo().getWorldName());
-        getLogger().info("World ID: " + ConfigHandler.getConfigByWorldName(JourneymapServer.getWorldName()).getWorldID());
+        getLogger().info("World ID: {}", ConfigHandler.getConfigByWorldName(JourneymapServer.getWorldName()).getWorldID());
     }
 }

@@ -192,7 +192,7 @@ public class OptionSlotFactory
                 }
                 else
                 {
-                    Journeymap.getLogger().warn(String.format("Unable to create config gui for %s.%s using %s", properties.getClass().getSimpleName(), field.getName(), config));
+                    Journeymap.getLogger().warn("Unable to create config gui for {}.{} using {}", properties.getClass().getSimpleName(), field.getName(), config);
                 }
             }
         }
@@ -386,7 +386,7 @@ public class OptionSlotFactory
             }
             catch (Exception e)
             {
-                Journeymap.getLogger().warn("Bad enumeration value for " + name + " default: " + annotation.defaultEnum());
+                Journeymap.getLogger().warn("Bad enumeration value for {} default: {}", name, annotation.defaultEnum());
             }
             String defaultTip = Constants.getString("jm.config.default", defaultEnumValue);
             boolean advanced = annotation.category() == Config.Category.Advanced;

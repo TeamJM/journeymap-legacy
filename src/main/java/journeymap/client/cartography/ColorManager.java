@@ -66,13 +66,13 @@ public class ColorManager
 
         if (currentResourcePackNames.equals(lastResourcePackNames) && colorHelper != null)
         {
-            Journeymap.getLogger().debug("Resource Pack(s) unchanged: " + currentResourcePackNames);
+            Journeymap.getLogger().debug("Resource Pack(s) unchanged: {}", currentResourcePackNames);
             resourcePackSame = true;
         }
 
         if (currentModNames.equals(lastModNames))
         {
-            Journeymap.getLogger().debug("Mod Pack(s) unchanged: " + currentModNames);
+            Journeymap.getLogger().debug("Mod Pack(s) unchanged: {}", currentModNames);
             modPackSame = true;
         }
 
@@ -154,11 +154,11 @@ public class ColorManager
                             entry.getKey().setColor(entry.getValue());
                         }
                         long elapsed = System.currentTimeMillis() - start;
-                        Journeymap.getLogger().info(String.format("Loaded %d block colors from color palette file in %dms: %s", palette.size(), elapsed, palette.getOrigin()));
+                        Journeymap.getLogger().info("Loaded {} block colors from color palette file in {}ms: {}", palette.size(), elapsed, palette.getOrigin());
                     }
                     catch (Exception e)
                     {
-                        Journeymap.getLogger().warn("Could not load existing color palette, new one will be created: " + e);
+                        Journeymap.getLogger().warn("Could not load existing color palette, new one will be created: {}", String.valueOf(e));
                         palette = null;
                     }
                 }
@@ -178,13 +178,13 @@ public class ColorManager
 
             if (count > 0 || palette == null)
             {
-                Journeymap.getLogger().info(String.format("Initialized %s block colors from mods and resource packs in %sms", count, elapsed));
+                Journeymap.getLogger().info("Initialized {} block colors from mods and resource packs in {}ms", count, elapsed);
                 this.currentPalette = ColorPalette.create(standard, permanent);
             }
             else
             {
                 this.currentPalette = palette;
-                Journeymap.getLogger().info(String.format("Color palette was sufficient: %s", this.currentPalette.getOrigin()));
+                Journeymap.getLogger().info("Color palette was sufficient: {}", this.currentPalette.getOrigin());
             }
 
             // Remap around player
@@ -192,7 +192,7 @@ public class ColorManager
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("ColorManager.initBlockColors() encountered an unexpected error: " + LogFormatter.toPartialString(t));
+            Journeymap.getLogger().error("ColorManager.initBlockColors() encountered an unexpected error: {}", LogFormatter.toPartialString(t));
         }
     }
 

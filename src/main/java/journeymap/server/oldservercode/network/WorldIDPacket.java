@@ -56,7 +56,7 @@ public class WorldIDPacket implements IMessage
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("[toBytes]Failed to read message: " + t);
+            Journeymap.getLogger().error("[toBytes]Failed to read message: {}", String.valueOf(t));
         }
     }
 

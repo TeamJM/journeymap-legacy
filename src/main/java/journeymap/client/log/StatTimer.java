@@ -232,7 +232,7 @@ public class StatTimer
 
             if (started != null)
             {
-                logger.warn(name + " is already running, cancelling first");
+                logger.warn("{} is already running, cancelling first", name);
                 this.cancel();
             }
 
@@ -241,7 +241,7 @@ public class StatTimer
             if (counter.get() == MAX_COUNT)
             {
                 maxed = true;
-                logger.info(name + " hit max count, " + MAX_COUNT);
+                logger.info("{} hit max count, " + MAX_COUNT, name);
                 return this;
             }
 
@@ -255,7 +255,7 @@ public class StatTimer
                 totalTime.set(0);
                 if (logger.isTraceEnabled())
                 {
-                    logger.debug(name + " warmup done, " + warmupCount);
+                    logger.debug("{} warmup done, {}", name, warmupCount);
                 }
             }
 
@@ -282,7 +282,7 @@ public class StatTimer
                 // Otherwise it's being used improperly.
                 if (counter.get() > 0)
                 {
-                    logger.warn(name + " is not running.");
+                    logger.warn("{} is not running.", name);
                 }
                 return 0;
             }
@@ -326,7 +326,7 @@ public class StatTimer
             }
             catch (Throwable t)
             {
-                logger.error("Timer error: " + LogFormatter.toString(t));
+                logger.error("Timer error: {}", LogFormatter.toString(t));
                 reset();
                 return 0;
             }
