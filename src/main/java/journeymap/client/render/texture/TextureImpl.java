@@ -139,11 +139,9 @@ public class TextureImpl extends AbstractTexture
             {
                 for (int x = 0; x < width; x++)
                 {
-                    final int pixel = pixels[y * width + x];
-                    buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red
-                    buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green
-                    buffer.put((byte) ((pixel & 0xFF)));           // Blue
-                    buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha
+                    final int argb = pixels[y * width + x];
+                    final int rgba = (argb << 8) | ((argb >> 24) & 0xFF);
+                    buffer.putInt(rgba);
                 }
             }
             buffer.flip();
