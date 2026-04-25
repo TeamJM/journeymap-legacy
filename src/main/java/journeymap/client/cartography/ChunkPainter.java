@@ -10,6 +10,7 @@ import journeymap.common.Journeymap;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -28,12 +29,13 @@ public class ChunkPainter
     private final BufferedImage img;
     private final int[] pixels;
 
-    public ChunkPainter(Graphics2D g2D)
+    public ChunkPainter(BufferedImage buffer, Graphics2D g2D)
     {
         this.g2D = g2D;
         this.g2D.setComposite(ALPHA_OPAQUE);
-        this.img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        this.img = buffer;
         this.pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
+        Arrays.fill(this.pixels, 0);
     }
 
     /**
