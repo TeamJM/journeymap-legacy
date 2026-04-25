@@ -56,7 +56,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             }
             catch (Throwable t)
             {
-                Journeymap.getLogger().error("Unexpected error when checking existing keybinding : " + existing);
+                Journeymap.getLogger().error("Unexpected error when checking existing keybinding : {}", existing);
             }
         }
 
@@ -70,7 +70,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 }
                 else
                 {
-                    Journeymap.getLogger().warn("Avoided duplicate keybinding that was already registered: " + kb.getKeyDescription());
+                    Journeymap.getLogger().warn("Avoided duplicate keybinding that was already registered: {}", kb.getKeyDescription());
                 }
             }
             catch (Throwable t)

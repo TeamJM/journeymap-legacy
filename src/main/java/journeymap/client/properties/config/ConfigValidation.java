@@ -38,13 +38,13 @@ public class ConfigValidation
             boolean saveNeeded = validateConfigs(instance.getClass(), instance);
             if (saveNeeded)
             {
-                Journeymap.getLogger().warn(instance.getClass().getSimpleName() + " failed validation and has been corrected.");
+                Journeymap.getLogger().warn("{} failed validation and has been corrected.", instance.getClass().getSimpleName());
             }
             return saveNeeded;
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Unexpected error in ConfigValidation: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Unexpected error in ConfigValidation: {}", LogFormatter.toString(t));
             return false;
         }
     }
@@ -119,7 +119,7 @@ public class ConfigValidation
 
         if (config.minValue() == config.maxValue())
         {
-            Journeymap.getLogger().warn(String.format("@Config on %s.%s has no range", instance.getClass().getSimpleName(), field.getName()));
+            Journeymap.getLogger().warn("@Config on {}.{} has no range", instance.getClass().getSimpleName(), field.getName());
         }
         else
         {
@@ -128,7 +128,7 @@ public class ConfigValidation
             if (defaultValue < config.minValue() || defaultValue > config.maxValue())
             {
                 defaultValueUsable = false;
-                Journeymap.getLogger().warn(String.format("@Config on %s.%s defaultValue is out of range", instance.getClass().getSimpleName(), field.getName()));
+                Journeymap.getLogger().warn("@Config on {}.{} defaultValue is out of range", instance.getClass().getSimpleName(), field.getName());
             }
 
             AtomicInteger property = (AtomicInteger) field.get(instance);
@@ -164,8 +164,7 @@ public class ConfigValidation
 
         if (!slp.getStrings().contains(slp.getDefaultString()))
         {
-            Journeymap.getLogger().warn(String.format("@Config on %s.%s has an invalid default String: %s",
-                    instance.getClass().getSimpleName(), field.getName(), slp.getDefaultString()));
+            Journeymap.getLogger().warn("@Config on {}.{} has an invalid default String: {}", instance.getClass().getSimpleName(), field.getName(), slp.getDefaultString());
         }
 
         String value = property.get();
@@ -205,8 +204,7 @@ public class ConfigValidation
         catch (Exception e)
         {
             defaultValue = enumSet.iterator().next();
-            Journeymap.getLogger().warn(String.format("@Config on %s.%s has an invalid default Enum: %s",
-                    instance.getClass().getSimpleName(), field.getName(), config.defaultEnum()));
+            Journeymap.getLogger().warn("@Config on {}.{} has an invalid default Enum: {}", instance.getClass().getSimpleName(), field.getName(), config.defaultEnum());
         }
 
         Enum value = property.get();
@@ -227,7 +225,7 @@ public class ConfigValidation
      */
     private static void warnPropertyValue(Config config, Field field, Object oldValue, Object newValue)
     {
-        Journeymap.getLogger().warn(String.format("Property %s.%s invalid: %s . Changing to: %s", field.getDeclaringClass().getSimpleName(), field.getName(), oldValue, newValue));
+        Journeymap.getLogger().warn("Property {}.{} invalid: {} . Changing to: {}", field.getDeclaringClass().getSimpleName(), field.getName(), oldValue, newValue);
     }
 
     /**

@@ -217,7 +217,7 @@ public class GridRenderer
 
             if (debug)
             {
-                logger.debug("Centered on " + newCenterTile + " with pixel offsets of " + centerPixelOffset.x + "," + centerPixelOffset.y);
+                logger.debug("Centered on {} with pixel offsets of {},{}", newCenterTile, centerPixelOffset.x, centerPixelOffset.y);
                 Minecraft mc = ForgeHelper.INSTANCE.getClient();
                 BufferedImage tmp = new BufferedImage(mc.displayWidth, mc.displayHeight, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = tmp.createGraphics();
@@ -440,7 +440,7 @@ public class GridRenderer
                 glErrors++;
                 if (glErrors < maxGlErrors)
                 {
-                    logger.warn("GL Error occurred during JourneyMap draw: " + err);
+                    logger.warn("GL Error occurred during JourneyMap draw: {}", err);
                 }
                 else
                 {

@@ -89,9 +89,7 @@ public class ModBlockDelegate
             boolean specialHandling = handler.initialize(blockMD);
             if (specialHandling)
             {
-                logger.info(String.format("Registered IModBlockHandler %s for: '%s'.",
-                        handler.getClass().getName(),
-                        blockMD));
+                logger.info("Registered IModBlockHandler {} for: '{}'.", handler.getClass().getName(), blockMD);
             }
         }
         catch (Throwable t)

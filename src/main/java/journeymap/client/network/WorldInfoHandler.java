@@ -66,13 +66,13 @@ public class WorldInfoHandler
             if (channel != null)
             {
                 channel.registerMessage(WorldIdListener.class, WorldIDPacket.class, PACKET_WORLDID, Side.CLIENT);
-                Journeymap.getLogger().info(String.format("Registered channel: %s", WorldIDPacket.CHANNEL_NAME));
+                Journeymap.getLogger().info("Registered channel: {}", WorldIDPacket.CHANNEL_NAME);
                 MinecraftForge.EVENT_BUS.register(this);
             }
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error(String.format("Failed to register channel %s: %s", WorldIDPacket.CHANNEL_NAME, t));
+            Journeymap.getLogger().error("Failed to register channel {}: {}", WorldIDPacket.CHANNEL_NAME, t);
         }
     }
 
@@ -127,7 +127,7 @@ public class WorldInfoHandler
         public IMessage onMessage(WorldIDPacket message, MessageContext ctx)
         {
             lastResponse = System.currentTimeMillis();
-            Journeymap.getLogger().info(String.format("Got the World ID from server: %s", message.getWorldID()));
+            Journeymap.getLogger().info("Got the World ID from server: {}", message.getWorldID());
             Journeymap.proxy.handleWorldIdMessage(message.getWorldID(), null);
             return null;
         }

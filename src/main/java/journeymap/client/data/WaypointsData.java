@@ -80,7 +80,7 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
                 loaded = false;
                 Class.forName(name);
                 loaded = true;
-                Journeymap.getLogger().debug("Class found: " + name);
+                Journeymap.getLogger().debug("Class found: {}", name);
             }
             catch (NoClassDefFoundError e)
             {
@@ -88,7 +88,7 @@ public class WaypointsData extends CacheLoader<Class, Collection<Waypoint>>
             }
             catch (ClassNotFoundException e)
             {
-                Journeymap.getLogger().debug("Class not found: " + name);
+                Journeymap.getLogger().debug("Class not found: {}", name);
             }
             catch (VerifyError v)
             {

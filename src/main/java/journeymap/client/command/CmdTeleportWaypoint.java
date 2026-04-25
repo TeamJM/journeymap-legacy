@@ -56,12 +56,12 @@ public class CmdTeleportWaypoint
                     }
                     else
                     {
-                        Journeymap.getLogger().warn("Failed to check teleport permission both ways: " + LogFormatter.toString(e) + ", and profile or configManager were null.");
+                        Journeymap.getLogger().warn("Failed to check teleport permission both ways: {}, and profile or configManager were null.", LogFormatter.toString(e));
                     }
                 }
                 catch (Exception e2)
                 {
-                    Journeymap.getLogger().warn("Failed to check teleport permission. Both ways failed: " + LogFormatter.toString(e) + ", and " + LogFormatter.toString(e2));
+                    Journeymap.getLogger().warn("Failed to check teleport permission. Both ways failed: {}, and {}", LogFormatter.toString(e), LogFormatter.toString(e2));
                 }
             }
         }

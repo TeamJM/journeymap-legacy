@@ -81,7 +81,7 @@ public class EntityHelper
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().warn("Failed to " + timerName + ": " + LogFormatter.toString(t));
+            Journeymap.getLogger().warn("Failed to {}: {}", timerName, LogFormatter.toString(t));
         }
 
         timer.stop();

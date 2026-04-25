@@ -59,7 +59,7 @@ public class ConfigHandler
     private static Configuration addNewWorldConfig(String worldName)
     {
         worldName = parseWorldName(worldName);
-        Journeymap.getLogger().info("Attempting to create new config file for: " + worldName);
+        Journeymap.getLogger().info("Attempting to create new config file for: {}", worldName);
         Configuration config = generateDefaultConfig();
         saveWorld(config, worldName);
         return config;

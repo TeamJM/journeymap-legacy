@@ -97,7 +97,7 @@ public class ImageHolder implements IThreadedFileIO
             }
             else
             {
-                logger.warn(this + " can't partialImageUpdate without a texture.");
+                logger.warn("{} can't partialImageUpdate without a texture.", this);
             }
         }
         finally
@@ -217,23 +217,23 @@ public class ImageHolder implements IThreadedFileIO
                 {
                     try
                     {
-                        logger.error("IOException updating file, will delete and retry: " + this + ": " + LogFormatter.toPartialString(e));
+                        logger.error("IOException updating file, will delete and retry: {}: {}", this, LogFormatter.toPartialString(e));
                         imageFile.delete();
                         writeImageToFile();
                     }
                     catch (Throwable e2)
                     {
-                        logger.error("Exception after delete/retry: " + this + ": " + LogFormatter.toPartialString(e));
+                        logger.error("Exception after delete/retry: {}: {}", this, LogFormatter.toPartialString(e));
                     }
                 }
                 else
                 {
-                    logger.error("IOException creating file: " + this + ": " + LogFormatter.toPartialString(e));
+                    logger.error("IOException creating file: {}: {}", this, LogFormatter.toPartialString(e));
                 }
             }
             catch (Throwable e)
             {
-                logger.error("Exception writing to disk: " + this + ": " + LogFormatter.toPartialString(e));
+                logger.error("Exception writing to disk: {}: {}", this, LogFormatter.toPartialString(e));
             }
             finally
             {
@@ -246,7 +246,7 @@ public class ImageHolder implements IThreadedFileIO
         {
             if (debug)
             {
-                logger.warn("Couldn't get write lock for file: " + writeLock + " for " + this);
+                logger.warn("Couldn't get write lock for file: {} for {}", writeLock, this);
             }
             return true; // do retry
         }
@@ -269,7 +269,7 @@ public class ImageHolder implements IThreadedFileIO
 
             if (debug)
             {
-                logger.debug("Wrote to disk: " + imageFile);
+                logger.debug("Wrote to disk: {}", imageFile);
             }
         }
         dirty = false;

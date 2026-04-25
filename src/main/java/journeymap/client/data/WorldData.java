@@ -117,7 +117,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Couldn't get service name: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Couldn't get service name: {}", LogFormatter.toString(t));
             // Fallback
             return getLegacyServerName().replace(':', '_');
         }
@@ -140,7 +140,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Couldn't get server name: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Couldn't get server name: {}", LogFormatter.toString(t));
         }
         return "server";
     }
@@ -290,7 +290,7 @@ public class WorldData extends CacheLoader<Class, WorldData>
                 {
                     WorldProvider provider = new FakeDimensionProvider(dim);
                     dimProviders.put(dim, provider);
-                    Journeymap.getLogger().warn(String.format("Used FakeDimensionProvider for required dim: %s", dim));
+                    Journeymap.getLogger().warn("Used FakeDimensionProvider for required dim: {}", dim);
                 }
             }
 

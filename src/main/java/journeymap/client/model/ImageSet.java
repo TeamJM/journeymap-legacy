@@ -68,7 +68,7 @@ public abstract class ImageSet
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Error writing ImageSet to disk: " + t);
+            Journeymap.getLogger().error("Error writing ImageSet to disk: {}", String.valueOf(t));
         }
         return count;
     }
