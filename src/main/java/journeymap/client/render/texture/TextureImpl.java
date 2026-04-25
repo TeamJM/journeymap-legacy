@@ -135,14 +135,12 @@ public class TextureImpl extends AbstractTexture
                 pixels = bufferedImage.getRGB(0, 0, width, height, pixelBuffer, 0, width);
             }
 
-            for (int y = 0; y < height; y++)
+            final ByteBuffer buff = buffer;
+            for (int i = 0; i < pixelAmount; i++)
             {
-                for (int x = 0; x < width; x++)
-                {
-                    final int argb = pixels[y * width + x];
-                    final int rgba = (argb << 8) | ((argb >> 24) & 0xFF);
-                    buffer.putInt(rgba);
-                }
+                final int argb = pixels[i];
+                final int rgba = (argb << 8) | ((argb >> 24) & 0xFF);
+                buff.putInt(rgba);
             }
             buffer.flip();
             buffer.rewind();
