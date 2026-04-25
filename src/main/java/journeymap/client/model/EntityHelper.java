@@ -35,9 +35,9 @@ import java.util.*;
 
 public class EntityHelper
 {
-    public static EntityDistanceComparator entityDistanceComparator = new EntityDistanceComparator();
-    public static EntityDTODistanceComparator entityDTODistanceComparator = new EntityDTODistanceComparator();
-    public static EntityMapComparator entityMapComparator = new EntityMapComparator();
+    public static final EntityDistanceComparator entityDistanceComparator = new EntityDistanceComparator();
+    public static final EntityDTODistanceComparator entityDTODistanceComparator = new EntityDTODistanceComparator();
+    public static final EntityMapComparator entityMapComparator = new EntityMapComparator();
     //private static String[] horseVariantTextures = new String[] {"horse/horse_white.png", "horse/horse_creamy.png", "horse/horse_chestnut.png", "horse/horse_brown.png", "horse/horse_black.png", "horse/horse_gray.png", "/horse/horse_darkbrown.png"};
 
     public static List<EntityDTO> getEntitiesNearby(String timerName, int maxEntities, boolean hostile, Class... entityClasses)
@@ -73,9 +73,9 @@ public class EntityHelper
 
             if (list.size() > maxEntities)
             {
-                int before = list.size();
                 entityDTODistanceComparator.player = mc.thePlayer;
                 Collections.sort(list, entityDTODistanceComparator);
+                entityDTODistanceComparator.player = null;
                 list = list.subList(0, maxEntities);
             }
         }
@@ -142,6 +142,7 @@ public class EntityHelper
         {
             entityDistanceComparator.player = mc.thePlayer;
             Collections.sort(allPlayers, entityDistanceComparator);
+            entityDistanceComparator.player = null;
             allPlayers = allPlayers.subList(0, max);
         }
 
@@ -187,7 +188,7 @@ public class EntityHelper
         // Sort to keep named entities last.  (Why? display on top of others?)
         if (sort)
         {
-            Collections.sort(list, new EntityHelper.EntityMapComparator());
+            Collections.sort(list, entityMapComparator);
         }
 
         LinkedHashMap<String, EntityDTO> idMap = new LinkedHashMap<String, EntityDTO>(list.size());
