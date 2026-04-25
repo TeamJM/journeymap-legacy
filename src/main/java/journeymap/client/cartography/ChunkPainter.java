@@ -10,6 +10,8 @@ import journeymap.common.Journeymap;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -24,14 +26,20 @@ public class ChunkPainter
     public static final int COLOR_VOID = RGB.toInteger(17, 12, 25);
     protected static volatile AtomicLong badBlockCount = new AtomicLong(0);
 
-    int[][] colors = new int[16][16];
-    Graphics2D g2D;
+    private final int[][] colors = new int[16][16];
+    private final Graphics2D g2D;
 
     public ChunkPainter(Graphics2D g2D)
     {
         this.g2D = g2D;
-        initColorsArray();
-        g2D.setComposite(ALPHA_OPAQUE);
+        for (int x = 0; x < 16; x++)
+        {
+            for (int z = 0; z < 16; z++)
+            {
+                colors[x][z] = Integer.MIN_VALUE;
+            }
+        }
+        this.g2D.setComposite(ALPHA_OPAQUE);
     }
 
     /**
@@ -89,48 +97,24 @@ public class ChunkPainter
      */
     public void finishPainting()
     {
-        int color;
-        int lastColor = -1;
-
         try
         {
-            for (int z = 0; z < 16; z++)
-            {
-                for (int x = 0; x < 16; x++)
-                {
-                    color = colors[x][z];
-                    if (color == Integer.MIN_VALUE)
-                    {
-                        continue;
+            final BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+            final int[] data = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
+            for (int z = 0; z < 16; z++) {
+                for (int x = 0; x < 16; x++) {
+                    int c = colors[x][z];
+                    if (c != Integer.MIN_VALUE) {
+                        data[z * 16 + x] = 0xFF000000 | c;
                     }
-
-                    // Update color
-                    if (color != lastColor)
-                    {
-                        lastColor = color;
-                        g2D.setPaint(RGB.paintOf(color));
-                    }
-
-                    g2D.fillRect(x, z, 1, 1);
                 }
             }
+            g2D.drawImage(img, 0, 0, null);
         }
         finally
         {
             g2D.dispose();
-            g2D = null;
-            colors = null;
         }
     }
 
-    public void initColorsArray()
-    {
-        for (int x = 0; x < 16; x++)
-        {
-            for (int z = 0; z < 16; z++)
-            {
-                colors[x][z] = Integer.MIN_VALUE;
-            }
-        }
-    }
 }
