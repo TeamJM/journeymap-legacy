@@ -93,10 +93,20 @@ public class RenderWaypointBeacon
 
     static void doRender(Waypoint waypoint)
     {
-        doRender(waypoint, 1.0F);
+        doRender(waypoint, 1.0F, false);
+    }
+
+    static void doRenderNoFade(Waypoint waypoint)
+    {
+        doRender(waypoint, 1.0F, true);
     }
 
     static void doRender(Waypoint waypoint, float partialTicks)
+    {
+        doRender(waypoint, partialTicks, false);
+    }
+
+    static void doRender(Waypoint waypoint, float partialTicks, boolean skipFade)
     {
         if (renderManager.livingPlayer == null)
         {
@@ -122,11 +132,18 @@ public class RenderWaypointBeacon
             // Get view distance from waypoint
             final double actualDistance = playerVec.distanceTo(waypointVec);
 
-            final double fadeStartDistance = waypointProperties.beaconFadeStart.get();
-            final double fadeEndDistance = waypointProperties.beaconFadeEnd.get();
-
-            final double horizontalDistance = getHorizontalDistance(playerVec, waypointVec);
-            final float fadeAlpha = getFadeAlpha(horizontalDistance, fadeStartDistance, fadeEndDistance);
+            final float fadeAlpha;
+            if (skipFade)
+            {
+                fadeAlpha = 1.0F;
+            }
+            else
+            {
+                final double fadeStartDistance = waypointProperties.beaconFadeStart.get();
+                final double fadeEndDistance = waypointProperties.beaconFadeEnd.get();
+                final double horizontalDistance = getHorizontalDistance(playerVec, waypointVec);
+                fadeAlpha = getFadeAlpha(horizontalDistance, fadeStartDistance, fadeEndDistance);
+            }
             if (fadeAlpha <= MIN_VISIBLE_ALPHA)
             {
                 return;
