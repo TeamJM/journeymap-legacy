@@ -93,7 +93,10 @@ public final class RGB
                 (((int) (b * 255 + 0.5) & 0xFF));
     }
 
-    @Deprecated // don't use arrays for colors
+    /**
+     * @deprecated don't use arrays for colors
+     */
+    @Deprecated
     public static int toInteger(float[] rgb)
     {
         return ((0xFF) << 24) |
@@ -115,7 +118,10 @@ public final class RGB
         return rgb << 8 | (alpha & 0xFF);
     }
 
-    @Deprecated // don't use arrays for colors
+    /**
+     * @deprecated don't use arrays for colors
+     */
+    @Deprecated
     public static int toInteger(int[] rgb)
     {
         return ((0xFF) << 24) |
@@ -193,8 +199,9 @@ public final class RGB
 
     /**
      * Darken a color by a factor, add a fog tint.
+     * @deprecated don't use arrays for colors
      */
-    @Deprecated // don't use arrays for colors
+    @Deprecated
     public static int darkenAmbient(int rgb, float factor, float[] ambient)
     {
         final float r = ((rgb >> 16) & 0xFF) / 255f;
@@ -231,8 +238,9 @@ public final class RGB
      *
      * @param rgb color integer
      * @return array
+     * @deprecated don't use arrays for colors
      */
-    @Deprecated // don't use arrays for colors
+    @Deprecated
     public static int[] ints(int rgb)
     {
         return new int[]{(rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb) & 0xFF};
@@ -244,14 +252,18 @@ public final class RGB
      * @param rgb   color integer
      * @param alpha alpha (0-255)
      * @return array
+     * @deprecated don't use arrays for colors
      */
-    @Deprecated // don't use arrays for colors
+    @Deprecated
     public static int[] ints(int rgb, int alpha)
     {
         return new int[]{(rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb) & 0xFF, alpha & 0xFF};
     }
 
-    @Deprecated // don't use arrays for colors
+    /**
+     * @deprecated don't use arrays for colors
+     */
+    @Deprecated
     public static float[] floats(int rgb)
     {
         return new float[]{((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, ((rgb) & 0xFF) / 255f};
@@ -309,8 +321,9 @@ public final class RGB
 
     /**
      * Returns an rgb array of floats clamped between 0 and 1 after a factor is applied.
+     * @deprecated don't use arrays for colors
      */
-    @Deprecated // don't use arrays for colors
+    @Deprecated
     public static float[] clampFloats(float[] rgbFloats, float factor)
     {
         float r = rgbFloats[0] * factor;
