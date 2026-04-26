@@ -115,12 +115,12 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
             if (!blockMD.hasFlag(BlockMD.Flag.CustomBiomeColor))
             {
                 blockMD.addFlags(BlockMD.Flag.CustomBiomeColor);
-                Journeymap.getLogger().info("Custom biome tint set for " + blockMD);
+                Journeymap.getLogger().info("Custom biome tint set for {}", blockMD);
             }
         }
         else
         {
-            Journeymap.getLogger().debug("Custom biome tint not found for " + blockMD);
+            Journeymap.getLogger().debug("Custom biome tint not found for {}", blockMD);
         }
         return color;
     }
@@ -192,7 +192,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
                 if (!RGB.isWhite(tint) && !RGB.isBlack(tint))
                 {
                     blockMD.addFlags(BlockMD.Flag.CustomBiomeColor);
-                    Journeymap.getLogger().info("Custom biome color will be used with " + blockMD);
+                    Journeymap.getLogger().info("Custom biome color will be used with {}", blockMD);
                 }
                 else
                 {
@@ -201,7 +201,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
                     if (!RGB.isWhite(renderColor))
                     {
                         baseColor = RGB.multiply(baseColor, RGB.ALPHA_OPAQUE | renderColor); // Force opaque render color
-                        Journeymap.getLogger().info("Applied render color for " + blockMD);
+                        Journeymap.getLogger().info("Applied render color for {}", blockMD);
                     }
                 }
             }
@@ -213,15 +213,15 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
             if (blockMD.hasFlag(BlockMD.Flag.TileEntity))
             {
                 // TODO: What to do about this?
-                Journeymap.getLogger().info("Iconloader ignoring tile entity: " + blockMD);
+                Journeymap.getLogger().info("Iconloader ignoring tile entity: {}", blockMD);
             }
             else if (colorHelper.failedFor(blockMD))
             {
-                Journeymap.getLogger().warn("Iconloader failed to get base color for " + blockMD);
+                Journeymap.getLogger().warn("Iconloader failed to get base color for {}", blockMD);
             }
             else
             {
-                Journeymap.getLogger().warn("Unknown failure, could not get base color for " + blockMD);
+                Journeymap.getLogger().warn("Unknown failure, could not get base color for {}", blockMD);
             }
         }
         return baseColor;

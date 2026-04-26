@@ -123,13 +123,13 @@ public class RadarDrawStepFactory
                 }
                 catch (Exception e)
                 {
-                    Journeymap.getLogger().error("Exception during prepareSteps: " + LogFormatter.toString(e));
+                    Journeymap.getLogger().error("Exception during prepareSteps: {}", LogFormatter.toString(e));
                 }
             }
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Throwable during prepareSteps: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Throwable during prepareSteps: {}", LogFormatter.toString(t));
         }
 
         return drawStepList;

@@ -258,7 +258,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
             }
             catch (Throwable t)
             {
-                Journeymap.getLogger().error("Unable to get Realms server name: " + LogFormatter.toString(t));
+                Journeymap.getLogger().error("Unable to get Realms server name: {}", LogFormatter.toString(t));
             }
         }
 
@@ -388,7 +388,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         }
         catch (Throwable throwable)
         {
-            Journeymap.getLogger().error("Error in getBiome(): " + throwable);
+            Journeymap.getLogger().error("Error in getBiome(): {}", String.valueOf(throwable));
             return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(x, z);
         }
     }
@@ -524,7 +524,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
             }
             catch (Throwable throwable)
             {
-                Journeymap.getLogger().error("Error in getBiomeGenForCoords(): " + throwable);
+                Journeymap.getLogger().error("Error in getBiomeGenForCoords(): {}", String.valueOf(throwable));
                 return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(x, z);
             }
         }

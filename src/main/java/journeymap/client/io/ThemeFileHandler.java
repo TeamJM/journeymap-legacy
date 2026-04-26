@@ -181,7 +181,7 @@ public class ThemeFileHandler
                 return theme;
             }
         }
-        Journeymap.getLogger().warn(String.format("Theme '%s' not found, reverting to default", themeName));
+        Journeymap.getLogger().warn("Theme '{}' not found, reverting to default", themeName);
         return ThemePresets.THEME_VICTORIAN;
     }
 
@@ -197,7 +197,7 @@ public class ThemeFileHandler
             }
             else if (createIfMissing)
             {
-                Journeymap.getLogger().info("Generating Theme json file: " + themeFile);
+                Journeymap.getLogger().info("Generating Theme json file: {}", themeFile);
                 Theme theme = new Theme();
                 theme.name = themeFile.getName();
                 save(theme);
@@ -206,7 +206,7 @@ public class ThemeFileHandler
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Could not load Theme json file: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Could not load Theme json file: {}", LogFormatter.toString(t));
         }
         return null;
     }
@@ -229,7 +229,7 @@ public class ThemeFileHandler
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Could not save Theme json file: " + t);
+            Journeymap.getLogger().error("Could not save Theme json file: {}", String.valueOf(t));
         }
     }
 
@@ -249,7 +249,7 @@ public class ThemeFileHandler
             }
             catch (Throwable t)
             {
-                Journeymap.getLogger().error("Could not save DefaultTheme json file: " + t);
+                Journeymap.getLogger().error("Could not save DefaultTheme json file: {}", String.valueOf(t));
             }
         }
     }
@@ -307,7 +307,7 @@ public class ThemeFileHandler
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Could not load Theme.DefaultTheme json file: " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Could not load Theme.DefaultTheme json file: {}", LogFormatter.toString(t));
         }
         return null;
     }

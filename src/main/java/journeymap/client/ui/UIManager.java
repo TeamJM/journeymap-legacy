@@ -55,7 +55,7 @@ public class UIManager
     {
         if (minecraft.currentScreen != null && minecraft.currentScreen instanceof JmUI)
         {
-            logger.debug("Closing " + minecraft.currentScreen.getClass());
+            logger.debug("Closing {}", minecraft.currentScreen.getClass());
             ((JmUI) minecraft.currentScreen).close();
         }
         KeyBinding.unPressAllKeys();
@@ -84,8 +84,8 @@ public class UIManager
             }
             catch (Throwable e2)
             {
-                logger.log(Level.ERROR, "1st unexpected exception creating UI: " + LogFormatter.toString(e));
-                logger.log(Level.ERROR, "2nd unexpected exception creating UI: " + LogFormatter.toString(e2));
+                logger.error("1st unexpected exception creating UI: {}", LogFormatter.toString(e));
+                logger.error("2nd unexpected exception creating UI: {}", LogFormatter.toString(e2));
                 closeCurrent();
                 return null;
             }
@@ -101,7 +101,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            logger.log(Level.ERROR, "Unexpected exception creating UI: " + LogFormatter.toString(e)); //$NON-NLS-1$
+            logger.error("Unexpected exception creating UI: {}", LogFormatter.toString(e)); //$NON-NLS-1$
             closeCurrent();
             return null;
         }
@@ -110,7 +110,7 @@ public class UIManager
     public <T extends JmUI> T open(T ui)
     {
         closeCurrent();
-        logger.debug("Opening UI " + ui.getClass().getSimpleName());
+        logger.debug("Opening UI {}", ui.getClass().getSimpleName());
         try
         {
             minecraft.displayGuiScreen(ui);
@@ -118,7 +118,7 @@ public class UIManager
         }
         catch (Throwable t)
         {
-            logger.error(String.format("Unexpected exception opening UI %s: %s", ui.getClass(), LogFormatter.toString(t)));
+            logger.error("Unexpected exception opening UI {}: {}", ui.getClass(), LogFormatter.toString(t));
         }
         return ui;
     }
@@ -155,7 +155,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            Journeymap.getLogger().error("Error drawing minimap: " + LogFormatter.toString(e));
+            Journeymap.getLogger().error("Error drawing minimap: {}", LogFormatter.toString(e));
         }
     }
 
@@ -183,7 +183,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            Journeymap.getLogger().error("Error opening map on waypoint: " + LogFormatter.toString(e));
+            Journeymap.getLogger().error("Error opening map on waypoint: {}", LogFormatter.toString(e));
         }
     }
 
@@ -210,7 +210,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            logger.log(Level.ERROR, "Unexpected exception creating MasterOptions with return class: " + LogFormatter.toString(e));
+            logger.error("Unexpected exception creating MasterOptions with return class: {}", LogFormatter.toString(e));
         }
     }
 
@@ -235,7 +235,7 @@ public class UIManager
             }
             catch (Throwable e)
             {
-                Journeymap.getLogger().error("Error opening waypoint manager: " + LogFormatter.toString(e));
+                Journeymap.getLogger().error("Error opening waypoint manager: {}", LogFormatter.toString(e));
             }
         }
     }
@@ -251,7 +251,7 @@ public class UIManager
             }
             catch (Throwable e)
             {
-                Journeymap.getLogger().error("Error opening waypoint editor: " + LogFormatter.toString(e));
+                Journeymap.getLogger().error("Error opening waypoint editor: {}", LogFormatter.toString(e));
             }
         }
     }
@@ -265,7 +265,7 @@ public class UIManager
         }
         catch (Throwable e)
         {
-            Journeymap.getLogger().error("Error opening grid editor: " + LogFormatter.toString(e));
+            Journeymap.getLogger().error("Error opening grid editor: {}", LogFormatter.toString(e));
         }
     }
 

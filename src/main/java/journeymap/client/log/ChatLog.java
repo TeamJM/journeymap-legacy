@@ -76,7 +76,7 @@ public class ChatLog
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn("Couldn't build ClickEvent for file: " + LogFormatter.toString(e));
+            Journeymap.getLogger().warn("Couldn't build ClickEvent for file: {}", LogFormatter.toString(e));
         }
         queueAnnouncement(chat);
     }
@@ -136,7 +136,7 @@ public class ChatLog
                 }
                 catch (Exception e)
                 {
-                    Journeymap.getLogger().error("Could not display announcement in chat: " + LogFormatter.toString(e));
+                    Journeymap.getLogger().error("Could not display announcement in chat: {}", LogFormatter.toString(e));
                 }
                 finally
                 {
@@ -164,7 +164,7 @@ public class ChatLog
                 }
                 catch (Throwable t)
                 {
-                    Journeymap.getLogger().error("Couldn't check webserver: " + LogFormatter.toString(t));
+                    Journeymap.getLogger().error("Couldn't check webserver: {}", LogFormatter.toString(t));
                 }
             }
             else

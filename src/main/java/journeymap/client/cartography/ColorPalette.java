@@ -130,7 +130,7 @@ public class ColorPalette
             {
                 if (palette.version < VERSION)
                 {
-                    Journeymap.getLogger().warn(String.format("Existing world color palette is obsolete. Required version: %s.  Found version: %s", VERSION, palette.version));
+                    Journeymap.getLogger().warn("Existing world color palette is obsolete. Required version: {}.  Found version: {}", VERSION, palette.version);
                 }
                 else
                 {
@@ -145,7 +145,7 @@ public class ColorPalette
             ColorPalette palette = ColorPalette.loadFromFile(standardPaletteFile);
             if (palette != null && palette.version < VERSION)
             {
-                Journeymap.getLogger().warn(String.format("Existing color palette is obsolete. Required version: %s.  Found version: %s", VERSION, palette.version));
+                Journeymap.getLogger().warn("Existing color palette is obsolete. Required version: {}.  Found version: {}", VERSION, palette.version);
                 palette = null;
             }
 
@@ -167,13 +167,13 @@ public class ColorPalette
                     else
                     {
                         Journeymap.getLogger().warn("Existing color palette's mods no longer match current loadout.");
-                        Journeymap.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.modNames, modNames));
+                        Journeymap.getLogger().info("WAS: {}\nNOW: {}", palette.modNames, modNames);
                     }
                 }
                 else
                 {
                     Journeymap.getLogger().warn("Existing color palette's resource packs no longer match current loadout.");
-                    Journeymap.getLogger().info(String.format("WAS: %s\nNOW: %s", palette.resourcePacks, resourcePacks));
+                    Journeymap.getLogger().info("WAS: {}\nNOW: {}", palette.resourcePacks, resourcePacks);
                 }
             }
         }
@@ -210,7 +210,7 @@ public class ColorPalette
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error("Couldn't create ColorPalette: " + LogFormatter.toString(e));
+            Journeymap.getLogger().error("Couldn't create ColorPalette: {}", LogFormatter.toString(e));
         }
         return null;
     }
@@ -248,7 +248,7 @@ public class ColorPalette
             }
             catch (Exception e2)
             {
-                Journeymap.getLogger().error("Couldn't rename bad palette file: " + e2);
+                Journeymap.getLogger().error("Couldn't rename bad palette file: {}", String.valueOf(e2));
             }
             return null;
         }
@@ -270,7 +270,7 @@ public class ColorPalette
 
             if (blockMD.hasFlag(BlockMD.Flag.Error))
             {
-                Journeymap.getLogger().warn("Block with Error flag won't be saved to color palette: " + blockMD);
+                Journeymap.getLogger().warn("Block with Error flag won't be saved to color palette: {}", blockMD);
             }
             else
             {
@@ -318,7 +318,7 @@ public class ColorPalette
             //Block block = GameData.getBlockRegistry().getObject(new ResourceLocation(blockColor.uid));
             if (block == null)
             {
-                Journeymap.getLogger().warn("Block referenced in Color Palette is not registered: " + blockColor.uid);
+                Journeymap.getLogger().warn("Block referenced in Color Palette is not registered: {}", blockColor.uid);
                 continue;
             }
             BlockMD blockMD = BlockMD.get(block, blockColor.meta);
@@ -374,7 +374,7 @@ public class ColorPalette
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Can't get colorpalette.html: " + t);
+            Journeymap.getLogger().error("Can't get colorpalette.html: {}", String.valueOf(t));
         }
         return null;
     }

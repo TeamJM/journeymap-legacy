@@ -86,7 +86,7 @@ public class RegionLoader
         final File regionDir = new File(mcWorldDir, "region");
         if (!regionDir.exists() || regionDir.isFile())
         {
-            logger.warn("MC world region directory doesn't exist: " + regionDir);
+            logger.warn("MC world region directory doesn't exist: {}", regionDir);
             return null;
         }
 
@@ -141,7 +141,7 @@ public class RegionLoader
         }
         if (stack.isEmpty() && (validFileCount != existingImageCount))
         {
-            logger.warn("Anvil region files in " + regionDir + ": " + validFileCount + ", matching image files: " + existingImageCount + ", but found nothing to do for mapType " + mapType);
+            logger.warn("Anvil region files in {}: {}, matching image files: {}, but found nothing to do for mapType {}", regionDir, validFileCount, existingImageCount, mapType);
         }
 
         // Add player's current region

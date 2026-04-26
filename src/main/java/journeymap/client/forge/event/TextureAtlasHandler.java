@@ -44,7 +44,7 @@ public class TextureAtlasHandler implements EventHandlerManager.EventHandler
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn("Error queuing TextureAtlasHandlerTask: " + LogFormatter.toString(e));
+            Journeymap.getLogger().warn("Error queuing TextureAtlasHandlerTask: {}", LogFormatter.toString(e));
         }
     }
 }

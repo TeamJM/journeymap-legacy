@@ -62,14 +62,14 @@ public class AtomicReferenceSerializer implements JsonSerializer<AtomicReference
             }
             catch (Exception t)
             {
-                Journeymap.getLogger().warn("Could not get enum value for " + refClass + " using: " + value);
+                Journeymap.getLogger().warn("Could not get enum value for {} using: {}", refClass, value);
                 Enum enumValue = (Enum) EnumSet.allOf((Class<? extends Enum>) refClass).iterator().next();
                 return new AtomicReference<Enum>(enumValue);
             }
         }
         else
         {
-            Journeymap.getLogger().warn("Could not get AtomicReference type for " + refClass + " using: " + value);
+            Journeymap.getLogger().warn("Could not get AtomicReference type for {} using: {}", refClass, value);
             return new AtomicReference(null);
         }
     }

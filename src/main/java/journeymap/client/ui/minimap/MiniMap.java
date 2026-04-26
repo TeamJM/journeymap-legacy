@@ -29,7 +29,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
@@ -57,7 +56,6 @@ public class MiniMap
     private final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
     private TextureImpl playerLocatorTex;
     private MiniMapProperties miniMapProperties;
-    private EntityPlayer player;
     private StatTimer drawTimer;
     private StatTimer refreshStateTimer;
     private DisplayVars dv;
@@ -78,7 +76,6 @@ public class MiniMap
     public MiniMap(MiniMapProperties miniMapProperties)
     {
         initTime = System.currentTimeMillis();
-        player = mc.thePlayer;
         setMiniMapProperties(miniMapProperties);
     }
 
@@ -90,13 +87,13 @@ public class MiniMap
     private void initGridRenderer()
     {
         state.requireRefresh();
-        if (player == null || player.isDead)
+        if (mc.thePlayer == null || mc.thePlayer.isDead)
         {
             return;
         }
 
         boolean showCaves = shouldShowCaves();
-        state.refresh(mc, player, miniMapProperties);
+        state.refresh(mc, mc.thePlayer, miniMapProperties);
 
         MapType mapType = state.getMapType(showCaves);
 
@@ -133,7 +130,7 @@ public class MiniMap
 
     private boolean shouldShowCaves()
     {
-        return FeatureManager.isAllowed(Feature.MapCaves) && (forgeHelper.hasNoSky(player) || miniMapProperties.showCaves.get());
+        return FeatureManager.isAllowed(Feature.MapCaves) && (forgeHelper.hasNoSky(mc.thePlayer) || miniMapProperties.showCaves.get());
     }
 
     /**
@@ -148,8 +145,7 @@ public class MiniMap
         try
         {
             // Check player status
-            player = mc.thePlayer;
-            if (player == null || player.isDead)
+            if (mc.thePlayer == null || mc.thePlayer.isDead)
             {
                 return;
             }
@@ -167,7 +163,7 @@ public class MiniMap
                 gridRenderer.setContext(state.getWorldDir(), state.getCurrentMapType());
                 if (!preview)
                 {
-                    state.refresh(mc, player, miniMapProperties);
+                    state.refresh(mc, mc.thePlayer, miniMapProperties);
                 }
             }
             else
@@ -286,10 +282,10 @@ public class MiniMap
                     else
                     {
                         /***** BEGIN MATRIX: ROTATION *****/
-                        startMapRotation(player.rotationYawHead);
+                        startMapRotation(mc.thePlayer.rotationYawHead);
                         dv.minimapFrame.drawReticle();
                         /***** END MATRIX: ROTATION *****/
-                        stopMapRotation(player.rotationYawHead);
+                        stopMapRotation(mc.thePlayer.rotationYawHead);
                     }
                 }
 
@@ -651,9 +647,9 @@ public class MiniMap
         // Location key
         if (dv.showLocation)
         {
-            final int playerX = MathHelper.floor_double(player.posX);
-            final int playerZ = MathHelper.floor_double(player.posZ);
-            final int playerY = MathHelper.floor_double(forgeHelper.getEntityBoundingBox(player).minY);
+            final int playerX = MathHelper.floor_double(mc.thePlayer.posX);
+            final int playerZ = MathHelper.floor_double(mc.thePlayer.posZ);
+            final int playerY = MathHelper.floor_double(forgeHelper.getEntityBoundingBox(mc.thePlayer).minY);
             locationLabelText = dv.locationFormatKeys.format(dv.locationFormatVerbose, playerX, playerZ, playerY, mc.thePlayer.chunkCoordY);
         }
 

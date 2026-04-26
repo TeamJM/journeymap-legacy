@@ -120,7 +120,7 @@ public class FeatureManager
             controlCodeAltered = true;
             for (Feature feature : disableControlCodes.get(controlCode))
             {
-                Journeymap.getLogger().info("Feature disabled in multiplayer via control code: " + feature);
+                Journeymap.getLogger().info("Feature disabled in multiplayer via control code: {}", feature);
                 Holder.INSTANCE.policyMap.put(feature, new Policy(feature, true, false));
             }
 
@@ -142,7 +142,7 @@ public class FeatureManager
                 }
                 if (controlCodeAltered != null)
                 {
-                    Journeymap.getLogger().info("Returning to default " + getPolicyDetails());
+                    Journeymap.getLogger().info("Returning to default {}", getPolicyDetails());
                 }
                 controlCodeAltered = false;
             }
@@ -172,7 +172,7 @@ public class FeatureManager
             Class<?> policySetClass = Class.forName(className);
             if (!PolicySet.class.isAssignableFrom(policySetClass))
             {
-                Journeymap.getLogger().warn("Ignoring feature policy class that does not implement PolicySet: " + className);
+                Journeymap.getLogger().warn("Ignoring feature policy class that does not implement PolicySet: {}", className);
                 return null;
             }
             return (PolicySet) policySetClass.getDeclaredConstructor().newInstance();
@@ -183,7 +183,7 @@ public class FeatureManager
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().warn("Couldn't initialize feature policy class: " + className, t);
+            Journeymap.getLogger().warn("Couldn't initialize feature policy class: {}", className, t);
             return null;
         }
     }

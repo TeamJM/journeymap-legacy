@@ -82,7 +82,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
                 ok = surfaceRenderer.render(g2D, null, chunkMd, vSlice, true);
                 if (!ok)
                 {
-                    Journeymap.getLogger().debug("The surface chunk didn't paint: " + chunkMd.toString());
+                    Journeymap.getLogger().debug("The surface chunk didn't paint: {}", chunkMd.toString());
                 }
             }
         }
@@ -117,7 +117,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
 
             if (!ok)
             {
-                Journeymap.getLogger().debug("The underground chunk didn't paint: " + chunkMd.toString());
+                Journeymap.getLogger().debug("The underground chunk didn't paint: {}", chunkMd.toString());
             }
             return ok;
         }
@@ -436,7 +436,7 @@ public class CaveRenderer extends BaseRenderer implements IChunkRenderer
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().warn("Couldn't get safe slice block height at " + x + "," + z + ": " + e);
+            Journeymap.getLogger().warn("Couldn't get safe slice block height at {},{}: {}", x, z, e);
             y = sliceMaxY;
         }
 

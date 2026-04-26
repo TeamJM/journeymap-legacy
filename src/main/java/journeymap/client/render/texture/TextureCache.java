@@ -344,7 +344,7 @@ public class TextureCache
                 }
                 else
                 {
-                    Journeymap.getLogger().error("Unknown theme image: " + texName);
+                    Journeymap.getLogger().error("Unknown theme image: {}", texName);
                     return getUnknownEntity();
                 }
             }
@@ -384,7 +384,7 @@ public class TextureCache
                 }
                 else
                 {
-                    Journeymap.getLogger().error("Unable to get scaled image: " + texName);
+                    Journeymap.getLogger().error("Unable to get scaled image: {}", texName);
                     return getUnknownEntity();
                 }
             }
@@ -434,7 +434,7 @@ public class TextureCache
                 }
                 else
                 {
-                    Journeymap.getLogger().warn("Couldn't get a skin at all for " + username);
+                    Journeymap.getLogger().warn("Couldn't get a skin at all for {}", username);
                 }
                 return null;
             }
@@ -461,7 +461,7 @@ public class TextureCache
         }
         catch (Throwable e)
         {
-            Journeymap.getLogger().warn("Error getting skin image for " + username + ": " + e.getMessage());
+            Journeymap.getLogger().warn("Error getting skin image for {}: {}", username, e.getMessage());
         }
         return img;
     }
@@ -486,12 +486,12 @@ public class TextureCache
             }
             else
             {
-                Journeymap.getLogger().warn("Bad Response getting image: " + imageURL + " : " + conn.getResponseCode());
+                Journeymap.getLogger().warn("Bad Response getting image: {} : {}", imageURL, conn.getResponseCode());
             }
         }
         catch (Throwable e)
         {
-            Journeymap.getLogger().warn("Error getting skin image: " + imageURL + " : " + e.getMessage());
+            Journeymap.getLogger().warn("Error getting skin image: {} : {}", imageURL, e.getMessage());
         }
         finally
         {

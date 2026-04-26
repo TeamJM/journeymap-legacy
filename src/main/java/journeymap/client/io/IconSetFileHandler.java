@@ -66,7 +66,7 @@ public class IconSetFileHandler
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Could not prepare iconset directories for " + parentDir + ": " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Could not prepare iconset directories for {}: {}", parentDir, LogFormatter.toString(t));
         }
 
         // Create list of icon set names

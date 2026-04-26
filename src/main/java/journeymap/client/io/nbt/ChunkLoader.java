@@ -41,18 +41,18 @@ public class ChunkLoader
                     }
                     else
                     {
-                        logger.warn("AnvilChunkLoader returned null for chunk: " + coord);
+                        logger.warn("AnvilChunkLoader returned null for chunk: {}", coord);
                     }
                 }
             }
             else
             {
-                logger.warn("Region doesn't exist for chunk: " + coord);
+                logger.warn("Region doesn't exist for chunk: {}", coord);
             }
         }
         catch (Throwable e)
         {
-           logger.error("Error reading chunk: " + LogFormatter.toPartialString(e));
+            logger.error("Error reading chunk: {}", LogFormatter.toPartialString(e));
         }
         return null;
     }

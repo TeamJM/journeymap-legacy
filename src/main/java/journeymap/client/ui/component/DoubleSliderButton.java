@@ -123,8 +123,8 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
             sliderValue = 1.0F;
         }
 
-        int intVal = (int) Math.round(sliderValue * (maxValue - minValue) + minValue);
-        setValue(intVal);
+        double val = sliderValue * (maxValue - minValue) + minValue;
+        setValue(val);
     }
 
     public void updateLabel()

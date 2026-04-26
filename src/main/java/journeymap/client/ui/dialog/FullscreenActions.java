@@ -60,7 +60,7 @@ public class FullscreenActions extends JmUI
         }
         catch (IOException e)
         {
-            Journeymap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e));
+            Journeymap.getLogger().error("Could not launch browser with URL: {}: {}", url, LogFormatter.toString(e));
         }
     }
 
@@ -73,7 +73,7 @@ public class FullscreenActions extends JmUI
         }
         catch (IOException e)
         {
-            Journeymap.getLogger().log(Level.ERROR, "Could not launch browser with URL: " + url + ": " + LogFormatter.toString(e));
+            Journeymap.getLogger().error("Could not launch browser with URL: {}: {}", url, LogFormatter.toString(e));
         }
     }
 
@@ -89,7 +89,7 @@ public class FullscreenActions extends JmUI
         }
         catch (Throwable e)
         {
-            Journeymap.getLogger().error("Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
+            Journeymap.getLogger().error("Could not launch browser with URL: {}: {}", url, LogFormatter.toString(e)); //$NON-NLS-1$
         }
     }
 
@@ -105,7 +105,7 @@ public class FullscreenActions extends JmUI
         }
         catch (Throwable e)
         {
-            Journeymap.getLogger().error("Could not launch browser with URL: " + url, LogFormatter.toString(e)); //$NON-NLS-1$
+            Journeymap.getLogger().error("Could not launch browser with URL: {}: {}", url, LogFormatter.toString(e)); //$NON-NLS-1$
         }
     }
 

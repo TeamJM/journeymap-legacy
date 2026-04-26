@@ -83,7 +83,7 @@ public class RegionImageCache
                             int count = regionImageSet.writeToDisk(false, false);
                             if (count>0 && Journeymap.getLogger().isDebugEnabled())
                             {
-                                Journeymap.getLogger().debug("Wrote to disk before removal from cache: " + regionImageSet);
+                                Journeymap.getLogger().debug("Wrote to disk before removal from cache: {}", regionImageSet);
                             }
                             regionImageSet.clear();
                         }
@@ -216,7 +216,7 @@ public class RegionImageCache
         }
         if (logger.isEnabled(Level.DEBUG))
         {
-            logger.debug("Dirty regions: " + list.size() + " of " + regionImageSetsCache.size());
+            logger.debug("Dirty regions: {} of {}", list.size(), regionImageSetsCache.size());
         }
         return list;
     }
@@ -257,7 +257,7 @@ public class RegionImageCache
         File imageDir = RegionImageHandler.getImageDir(fakeRc, MapType.day(state.getDimension())).getParentFile();
         if (!imageDir.getName().startsWith("DIM"))
         {
-            logger.error("Expected DIM directory, got " + imageDir);
+            logger.error("Expected DIM directory, got {}", imageDir);
             return false;
         }
 
@@ -290,7 +290,7 @@ public class RegionImageCache
                 if (dir.exists())
                 {
                     FileHandler.delete(dir);
-                    logger.info(String.format("Deleted image directory %s: %s", dir, !dir.exists()));
+                    logger.info("Deleted image directory {}: {}", dir, !dir.exists());
                     if (dir.exists())
                     {
                         result = false;
@@ -303,7 +303,7 @@ public class RegionImageCache
         }
         else
         {
-            logger.info("Found no DIM directories in " + imageDir);
+            logger.info("Found no DIM directories in {}", imageDir);
             return true;
         }
     }

@@ -193,7 +193,7 @@ public class Fullscreen extends JmUI
         }
         catch (Throwable e)
         {
-            logger.log(Level.ERROR, "Unexpected exception in jm.fullscreen.drawScreen(): " + LogFormatter.toString(e));
+            logger.error("Unexpected exception in jm.fullscreen.drawScreen(): {}", LogFormatter.toString(e));
             UIManager.getInstance().closeAll();
         }
         finally
@@ -683,7 +683,7 @@ public class Fullscreen extends JmUI
                 }
                 catch (Exception e)
                 {
-                    logger.error("Error moving grid: " + e);
+                    logger.error("Error moving grid: {}", String.valueOf(e));
                 }
 
                 setFollow(false);
@@ -1115,7 +1115,7 @@ public class Fullscreen extends JmUI
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error("Could not load Theme: " + LogFormatter.toString(e));
+            Journeymap.getLogger().error("Could not load Theme: {}", LogFormatter.toString(e));
         }
     }
 }

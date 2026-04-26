@@ -52,7 +52,7 @@ public class Strata
         {
             int amount = stack.isEmpty() ? initialPoolSize : poolGrowthIncrement;
             growFreePool(amount);
-            Journeymap.getLogger().debug(String.format("Grew Strata pool for '%s' by '%s'. Free: %s, Used: %s", name, amount, unusedStack.size(), stack.size()));
+            Journeymap.getLogger().debug("Grew Strata pool for '{}' by '{}'. Free: {}, Used: {}", name, amount, unusedStack.size(), stack.size());
         }
 
         stack.push(unusedStack.pop());

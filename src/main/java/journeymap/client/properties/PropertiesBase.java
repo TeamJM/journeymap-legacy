@@ -80,13 +80,13 @@ public abstract class PropertiesBase
             boolean sourceChanged = (properties == null) || properties.isWorldConfig() != reloadedProperties.isWorldConfig();
             if (sourceChanged)
             {
-                Journeymap.getLogger().info("Loaded " + propertiesClass.getSimpleName() + " from " + reloadedProperties.getFile());
+                Journeymap.getLogger().info("Loaded {} from {}", propertiesClass.getSimpleName(), reloadedProperties.getFile());
             }
             return reloadedProperties;
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Failed to reload " + propertiesClass.getName() + ": " + LogFormatter.toString(t));
+            Journeymap.getLogger().error("Failed to reload {}: {}", propertiesClass.getName(), LogFormatter.toString(t));
             return (properties != null) ? properties : reloadedProperties;
         }
     }
@@ -199,7 +199,7 @@ public abstract class PropertiesBase
             }
             catch (IOException e)
             {
-                Journeymap.getLogger().error("Couldn't copy config to world config: " + LogFormatter.toString(e));
+                Journeymap.getLogger().error("Couldn't copy config to world config: {}", LogFormatter.toString(e));
             }
             return false;
         }
@@ -227,7 +227,7 @@ public abstract class PropertiesBase
             }
             catch (IOException e)
             {
-                Journeymap.getLogger().error("Couldn't copy config to world config: " + LogFormatter.toString(e));
+                Journeymap.getLogger().error("Couldn't copy config to world config: {}", LogFormatter.toString(e));
                 return false;
             }
         }
@@ -264,7 +264,7 @@ public abstract class PropertiesBase
 
                 if (!propFile.exists())
                 {
-                    Journeymap.getLogger().info(String.format("Creating config file: %s", propFile));
+                    Journeymap.getLogger().info("Creating config file: {}", propFile);
                     if (!propFile.getParentFile().exists())
                     {
                         propFile.getParentFile().mkdirs();
@@ -272,7 +272,7 @@ public abstract class PropertiesBase
                 }
                 else if (!isCurrent())
                 {
-                    Journeymap.getLogger().info(String.format("Updating config file from version \"%s\" to \"%s\": %s", configVersion, Journeymap.JM_VERSION, propFile));
+                    Journeymap.getLogger().info("Updating config file from version \"{}\" to \"{}\": {}", configVersion, Journeymap.JM_VERSION, propFile);
                     configVersion = Journeymap.JM_VERSION;
                 }
 
@@ -291,13 +291,13 @@ public abstract class PropertiesBase
                 // Write to file
                 Files.write(header + json, propFile, UTF8);
 
-                Journeymap.getLogger().debug("Saved " + getFileName());
+                Journeymap.getLogger().debug("Saved {}", getFileName());
 
                 return true;
             }
             catch (Exception e)
             {
-                Journeymap.getLogger().error(String.format("Can't save config file %s: %s", propFile, LogFormatter.toString(e)));
+                Journeymap.getLogger().error("Can't save config file {}: {}", propFile, LogFormatter.toString(e));
                 return false;
             }
         }
@@ -330,7 +330,7 @@ public abstract class PropertiesBase
                 saveNeeded = !instance.isCurrent();
                 if (saveNeeded)
                 {
-                    Journeymap.getLogger().info(String.format("Config file needs to be updated: %s", propFile.getName()));
+                    Journeymap.getLogger().info("Config file needs to be updated: {}", propFile.getName());
                 }
             }
             else
@@ -340,7 +340,7 @@ public abstract class PropertiesBase
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error(String.format("Can't load config file %s: %s", propFile, e.getMessage()));
+            Journeymap.getLogger().error("Can't load config file {}: {}", propFile, e.getMessage());
 
             try
             {
@@ -349,7 +349,7 @@ public abstract class PropertiesBase
             }
             catch (Exception e3)
             {
-                Journeymap.getLogger().error(String.format("Can't rename config file %s: %s", propFile, e3.getMessage()));
+                Journeymap.getLogger().error("Can't rename config file {}: {}", propFile, e3.getMessage());
             }
 
         }
@@ -406,7 +406,7 @@ public abstract class PropertiesBase
         {
             saveNeeded = true;
             configFormatChanged.set(false);
-            Journeymap.getLogger().info("File format will be updated for " + this.getFileName());
+            Journeymap.getLogger().info("File format will be updated for {}", this.getFileName());
         }
 
         return saveNeeded;

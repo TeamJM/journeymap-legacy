@@ -65,7 +65,7 @@ public class MapSaver
 
             if (!isValid())
             {
-                Journeymap.getLogger().warn("No images found in " + getImageDir());
+                Journeymap.getLogger().warn("No images found in {}", getImageDir());
                 return null;
             }
 
@@ -79,7 +79,7 @@ public class MapSaver
             PngjHelper.mergeFiles(fileArray, saveFile, outputColumns, 512);
 
             timer.stop();
-            Journeymap.getLogger().info("Map filesize:" + saveFile.length()); //$NON-NLS-1$ //$NON-NLS-2$
+            Journeymap.getLogger().info("Map filesize:{}", saveFile.length()); //$NON-NLS-1$ //$NON-NLS-2$
 
             String message = Constants.getString("jm.common.map_saved", saveFile);
             ChatLog.announceFile(message, saveFile);
@@ -194,7 +194,7 @@ public class MapSaver
 
             if (minX == null || maxX == null || minZ == null || maxZ == null)
             {
-                Journeymap.getLogger().warn("No region files to save in " + imageDir);
+                Journeymap.getLogger().warn("No region files to save in {}", imageDir);
                 return;
             }
             // Create blank

@@ -75,7 +75,7 @@ public class ExpireTextureTask implements IMainThreadTask
         if (!success && textures != null && !textures.isEmpty())
         {
             fails++;
-            LOGGER.warn("ExpireTextureTask.perform() couldn't delete textures: " + textures + ", fails: " + fails);
+            LOGGER.warn("ExpireTextureTask.perform() couldn't delete textures: {}, fails: {}", textures, fails);
             if (fails <= MAX_FAILS)
             {
                 return this;
@@ -134,7 +134,7 @@ public class ExpireTextureTask implements IMainThreadTask
             }
             catch (LWJGLException t)
             {
-                LOGGER.warn("Couldn't delete texture " + texture + ": " + t);
+                LOGGER.warn("Couldn't delete texture {}: {}", texture, t);
                 success = false;
             }
         }
@@ -159,7 +159,7 @@ public class ExpireTextureTask implements IMainThreadTask
         }
         catch (LWJGLException t)
         {
-            LOGGER.warn("Couldn't delete textureId " + textureId + ": " + t);
+            LOGGER.warn("Couldn't delete textureId {}: {}", textureId, t);
         }
         return false;
     }

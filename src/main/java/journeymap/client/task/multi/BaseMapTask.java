@@ -120,7 +120,7 @@ public abstract class BaseMapTask implements ITask
                     }
                     catch (Throwable t)
                     {
-                        logger.warn("Error rendering chunk " + chunkMd + ": " + t.getMessage());
+                        logger.warn("Error rendering chunk {}: {}", chunkMd, t.getMessage());
                     }
                 }
             }
@@ -150,7 +150,7 @@ public abstract class BaseMapTask implements ITask
         }
         catch (InterruptedException t)
         {
-            Journeymap.getLogger().warn("Task thread interrupted: " + this);
+            Journeymap.getLogger().warn("Task thread interrupted: {}", this);
             timer.cancel();
             throw t;
         }

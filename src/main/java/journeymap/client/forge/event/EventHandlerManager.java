@@ -57,7 +57,7 @@ public class EventHandlerManager
     {
         if (handlers.containsKey(handler.getClass()))
         {
-            Journeymap.getLogger().warn("Handler already registered: " + handler.getClass().getName());
+            Journeymap.getLogger().warn("Handler already registered: {}", handler.getClass().getName());
             return;
         }
 
@@ -69,11 +69,11 @@ public class EventHandlerManager
             {
                 busType.eventBus.register(handler);
                 registered = true;
-                Journeymap.getLogger().debug(name + " registered in " + busType);
+                Journeymap.getLogger().debug("{} registered in {}", name, busType);
             }
             catch (Throwable t)
             {
-                Journeymap.getLogger().error(name + " registration FAILED in " + busType + ": " + LogFormatter.toString(t));
+                Journeymap.getLogger().error("{} registration FAILED in {}: {}", name, busType, LogFormatter.toString(t));
             }
         }
 
@@ -83,7 +83,7 @@ public class EventHandlerManager
         }
         else
         {
-            Journeymap.getLogger().warn("Handler was not registered at all: " + handler.getClass().getName());
+            Journeymap.getLogger().warn("Handler was not registered at all: {}", handler.getClass().getName());
         }
     }
 
@@ -108,12 +108,12 @@ public class EventHandlerManager
                     }
                     if (unregistered)
                     {
-                        Journeymap.getLogger().debug(name + " unregistered from " + busType);
+                        Journeymap.getLogger().debug("{} unregistered from {}", name, busType);
                     }
                 }
                 catch (Throwable t)
                 {
-                    Journeymap.getLogger().error(name + " unregistration FAILED from " + busType + ": " + LogFormatter.toString(t));
+                    Journeymap.getLogger().error("{} unregistration FAILED from {}: {}", name, busType, LogFormatter.toString(t));
                 }
             }
         }

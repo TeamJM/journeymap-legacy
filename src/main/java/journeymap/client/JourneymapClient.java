@@ -259,7 +259,7 @@ public class JourneymapClient implements CommonProxy
             // Logging for thread debugging
             threadLogging = false;
 
-            logger.info("initialize EXIT, " + (timer == null ? "" : timer.getLogReportString()));
+            logger.info("initialize EXIT, {}", timer == null ? "" : timer.getLogReportString());
         }
         catch (Throwable t)
         {
@@ -327,7 +327,7 @@ public class JourneymapClient implements CommonProxy
         }
         finally
         {
-            logger.info("postInitialize EXIT, " + (timer == null ? "" : timer.stopAndReport()));
+            logger.info("postInitialize EXIT, {}", timer == null ? "" : timer.stopAndReport());
         }
 
         JMLogger.setLevelFromProperties();
@@ -456,10 +456,7 @@ public class JourneymapClient implements CommonProxy
             long totalMB = Runtime.getRuntime().totalMemory() / 1024 / 1024;
             long freeMB = Runtime.getRuntime().freeMemory() / 1024 / 1024;
             String memory = String.format("Memory: %sMB total, %sMB free", totalMB, freeMB);
-            logger.info(String.format("Mapping started in %s%sDIM%s. %s ", FileHandler.getJMWorldDir(mc, currentWorldId),
-                    File.separator,
-                    ForgeHelper.INSTANCE.getDimension(mc.theWorld),
-                    memory));
+            logger.info("Mapping started in {}{}DIM{}. {} ", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, ForgeHelper.INSTANCE.getDimension(mc.theWorld), memory);
         }
     }
 
@@ -473,7 +470,7 @@ public class JourneymapClient implements CommonProxy
             if ((isMapping()) && mc != null)
             {
                 RegionImageCache.instance().flushToDisk(false);
-                logger.info(String.format("Mapping halted in %s%sDIM%s", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, ForgeHelper.INSTANCE.getDimension(mc.theWorld)));
+                logger.info("Mapping halted in {}{}DIM{}", FileHandler.getJMWorldDir(mc, currentWorldId), File.separator, ForgeHelper.INSTANCE.getDimension(mc.theWorld));
             }
 
             if (multithreadTaskController != null)
@@ -617,7 +614,7 @@ public class JourneymapClient implements CommonProxy
 
             if (worldIdUnchanged && directoryUnchanged && worldId != null)
             {
-                Journeymap.getLogger().info("World UID hasn't changed: " + worldId);
+                Journeymap.getLogger().info("World UID hasn't changed: {}", worldId);
                 return;
             }
 
@@ -628,7 +625,7 @@ public class JourneymapClient implements CommonProxy
             }
 
             this.currentWorldId = worldId;
-            Journeymap.getLogger().info("World UID is set to: " + worldId);
+            Journeymap.getLogger().info("World UID is set to: {}", worldId);
         }
     }
 }

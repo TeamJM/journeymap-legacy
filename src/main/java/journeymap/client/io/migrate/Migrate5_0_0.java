@@ -55,8 +55,7 @@ public class Migrate5_0_0 implements Migration.Task
 
                         try
                         {
-                            logger.info(String.format("Renaming \"%s\" to \"%s\".",
-                                    legacyDir, FileHandler.JourneyMapDirectory));
+                            logger.info("Renaming \"{}\" to \"{}\".", legacyDir, FileHandler.JourneyMapDirectory);
                             File backupDir = new File(FileHandler.MinecraftDirectory, Constants.JOURNEYMAP_DIR_BACKUP);
                             legacyDir.renameTo(backupDir);
                             backupDir.renameTo(FileHandler.JourneyMapDirectory);
@@ -64,8 +63,7 @@ public class Migrate5_0_0 implements Migration.Task
                         }
                         catch (Throwable t)
                         {
-                            logger.error(String.format("Could not rename \"%s\" to \"%s\" ! Please shut down and rename it manually.",
-                                    legacyDir, FileHandler.JourneyMapDirectory), t);
+                            logger.error("Could not rename \"{}\" to \"{}\" ! Please shut down and rename it manually.", legacyDir, FileHandler.JourneyMapDirectory, t);
                             return false;
                         }
                     }
@@ -75,8 +73,7 @@ public class Migrate5_0_0 implements Migration.Task
         }
         catch (Throwable t)
         {
-            logger.error(String.format("Could not rename old directory to \"%s\" ! Please shut down and rename it manually.",
-                    FileHandler.JourneyMapDirectory), t);
+            logger.error("Could not rename old directory to \"{}\" ! Please shut down and rename it manually.", FileHandler.JourneyMapDirectory, t);
             return false;
         }
     }
@@ -98,7 +95,7 @@ public class Migrate5_0_0 implements Migration.Task
 
             if (legacyConfigDir.isFile())
             {
-                logger.warn("Found file instead of directory.  Attempting to rename it to " + legacyConfigDir.getName() + "_bak");
+                logger.warn("Found file instead of directory.  Attempting to rename it to {}_bak", legacyConfigDir.getName());
                 return legacyConfigDir.renameTo(new File(FileHandler.MinecraftDirectory, Constants.CONFIG_DIR_LEGACY + "_bak"));
             }
 
@@ -123,17 +120,17 @@ public class Migrate5_0_0 implements Migration.Task
                         boolean moved = old.renameTo(new File(backupDir, old.getName()));
                         if (moved)
                         {
-                            logger.info(String.format("Moved obsolete \"%s\" to \"%s\".", old, backupDir));
+                            logger.info("Moved obsolete \"{}\" to \"{}\".", old, backupDir);
                         }
                         else
                         {
-                            logger.warn(String.format("Failed to move obsolete \"%s\" to \"%s\".", old, backupDir));
+                            logger.warn("Failed to move obsolete \"{}\" to \"{}\".", old, backupDir);
                             success = false;
                         }
                     }
                     catch (Throwable t)
                     {
-                        logger.error(String.format("Failed to move obsolete \"%s\" to \"%s\": %s", old, backupDir, LogFormatter.toString(t)));
+                        logger.error("Failed to move obsolete \"{}\" to \"{}\": {}", old, backupDir, LogFormatter.toString(t));
                         success = false;
                     }
                 }
@@ -142,7 +139,7 @@ public class Migrate5_0_0 implements Migration.Task
         }
         catch (Throwable t)
         {
-            logger.error(String.format("Unexpected error in migrateConfigDir(): %s", LogFormatter.toString(t)));
+            logger.error("Unexpected error in migrateConfigDir(): {}", LogFormatter.toString(t));
             return false;
         }
     }

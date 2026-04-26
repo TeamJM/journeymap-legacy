@@ -182,7 +182,7 @@ public class TextureImpl extends AbstractTexture
                 int glErr = GL11.glGetError();
                 if (glErr != GL11.GL_NO_ERROR)
                 {
-                    Journeymap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: " + glErr);
+                    Journeymap.getLogger().warn("GL Error in TextureImpl after glTexImage2D: {}", glErr);
                 }
                 else
                 {
@@ -192,7 +192,7 @@ public class TextureImpl extends AbstractTexture
             }
             catch (Throwable t)
             {
-                Journeymap.getLogger().warn("Can't bind texture: " + t);
+                Journeymap.getLogger().warn("Can't bind texture: {}", String.valueOf(t));
                 buffer = null;
             }
             finally
@@ -348,7 +348,7 @@ public class TextureImpl extends AbstractTexture
     {
         if (isBound())
         {
-            Journeymap.getLogger().warn("TextureImpl disposed without deleting texture glID: " + this);
+            Journeymap.getLogger().warn("TextureImpl disposed without deleting texture glID: {}", this);
             ExpireTextureTask.queue(this.glTextureId);
         }
     }

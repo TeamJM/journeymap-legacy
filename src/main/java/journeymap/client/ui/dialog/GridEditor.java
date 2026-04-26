@@ -183,7 +183,7 @@ public class GridEditor extends JmUI
         }
         catch (Throwable t)
         {
-            logger.error("Error in GridEditor.layoutButtons: " + LogFormatter.toString(t));
+            logger.error("Error in GridEditor.layoutButtons: {}", LogFormatter.toString(t));
         }
     }
 
@@ -207,7 +207,7 @@ public class GridEditor extends JmUI
         }
         catch (Throwable t)
         {
-            logger.error("Error in GridEditor.drawScreen: " + LogFormatter.toString(t));
+            logger.error("Error in GridEditor.drawScreen: {}", LogFormatter.toString(t));
         }
     }
 
@@ -287,7 +287,7 @@ public class GridEditor extends JmUI
         }
         catch (Throwable t)
         {
-            logger.error("Error in GridEditor.keyTyped: " + LogFormatter.toString(t));
+            logger.error("Error in GridEditor.keyTyped: {}", LogFormatter.toString(t));
         }
     }
 
@@ -307,7 +307,7 @@ public class GridEditor extends JmUI
         }
         catch (Throwable t)
         {
-            logger.error("Error in GridEditor.mouseClickMove: " + LogFormatter.toString(t));
+            logger.error("Error in GridEditor.mouseClickMove: {}", LogFormatter.toString(t));
         }
     }
 
@@ -321,7 +321,7 @@ public class GridEditor extends JmUI
         }
         catch (Throwable t)
         {
-            logger.error("Error in GridEditor.mouseClicked: " + LogFormatter.toString(t));
+            logger.error("Error in GridEditor.mouseClicked: {}", LogFormatter.toString(t));
         }
     }
 
@@ -377,7 +377,7 @@ public class GridEditor extends JmUI
         }
         catch (Throwable t)
         {
-            logger.error("Error in GridEditor.actionPerformed: " + LogFormatter.toString(t));
+            logger.error("Error in GridEditor.actionPerformed: {}", LogFormatter.toString(t));
         }
     }
 
