@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GL11;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.nio.ByteOrder;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class TextureImpl extends AbstractTexture
@@ -111,7 +111,7 @@ public class TextureImpl extends AbstractTexture
 
             if (buffer == null || buffer.capacity() != bufferSize)
             {
-                buffer = ByteBuffer.allocateDirect(bufferSize);
+                buffer = ByteBuffer.allocateDirect(bufferSize).order(ByteOrder.BIG_ENDIAN);
             }
             buffer.clear();
 
@@ -126,10 +126,6 @@ public class TextureImpl extends AbstractTexture
                 if (pixelBuffer == null || pixelBuffer.length != pixelAmount)
                 {
                     pixelBuffer = new int[pixelAmount];
-                }
-                else
-                {
-                    Arrays.fill(pixelBuffer, 0);
                 }
 
                 pixels = bufferedImage.getRGB(0, 0, width, height, pixelBuffer, 0, width);

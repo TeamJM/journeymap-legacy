@@ -170,7 +170,7 @@ public final class RGB
         final int r = (rgb >> 16) & 0xFF;
         final int g = (rgb >> 8) & 0xFF;
         final int b = (rgb) & 0xFF;
-        int avg = clampInt(r + g + b / 3);
+        int avg = clampInt((r + g + b) / 3);
         return toInteger(avg, avg, avg);
     }
 
