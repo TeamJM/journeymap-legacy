@@ -62,7 +62,7 @@ public class Resource
         }
         catch (FileNotFoundException e)
         {
-            logger.warn("File at resource location not found: " + resource);
+            logger.warn("File at resource location not found: {}", resource);
             ctx.status(404);
             try
             {
@@ -81,7 +81,7 @@ public class Resource
         }
         catch (Exception e)
         {
-            logger.error("Exception thrown while retrieving resource at location: " + resource, e);
+            logger.error("Exception thrown while retrieving resource at location: {}", resource, e);
             ctx.status(500);
             try
             {

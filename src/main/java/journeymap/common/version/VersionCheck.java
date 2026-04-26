@@ -167,13 +167,13 @@ public class VersionCheck
                                         versionAvailable = fileVersion;
                                         versionIsCurrent = false;
                                         versionIsChecked = true;
-                                        Journeymap.getLogger().info(String.format("Newer version online: JourneyMap %s for Minecraft %s on %s", versionAvailable, Loader.MC_VERSION, downloadUrl));
+                                        Journeymap.getLogger().info("Newer version online: JourneyMap {} for Minecraft {} on {}", versionAvailable, Loader.MC_VERSION, downloadUrl);
                                         break;
                                     }
                                 }
                                 catch (Exception e)
                                 {
-                                    Journeymap.getLogger().error("Could not parse download info: " + file, e); //$NON-NLS-1$
+                                    Journeymap.getLogger().error("Could not parse download info: {}", file, e); //$NON-NLS-1$
                                 }
                             }
                         }

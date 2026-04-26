@@ -101,7 +101,7 @@ public class BlockMD
         VanillaColorHandler.INSTANCE.setExplicitColors();
 
         timer.stop();
-        Journeymap.getLogger().info(String.format("Built BlockMD cache (%s) : %s", all.size(), timer.getLogReportString()));
+        Journeymap.getLogger().info("Built BlockMD cache ({}) : {}", all.size(), timer.getLogReportString());
     }
 
     /**
@@ -160,7 +160,7 @@ public class BlockMD
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error(String.format("Can't get blockId/meta for chunk %s,%s block %s,%s,%s : %s", chunkMd.getChunk().xPosition, chunkMd.getChunk().zPosition, localX, y, localZ, LogFormatter.toString(e)));
+            Journeymap.getLogger().error("Can't get blockId/meta for chunk {},{} block {},{},{} : {}", chunkMd.getChunk().xPosition, chunkMd.getChunk().zPosition, localX, y, localZ, LogFormatter.toString(e));
             return AIRBLOCK;
         }
     }
@@ -214,7 +214,7 @@ public class BlockMD
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error(String.format("Can't get blockId/meta for block %s meta %s : %s", block, meta, LogFormatter.toString(e)));
+            Journeymap.getLogger().error("Can't get blockId/meta for block {} meta {} : {}", block, meta, LogFormatter.toString(e));
             return AIRBLOCK;
         }
     }
@@ -243,7 +243,7 @@ public class BlockMD
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().debug("Displayname not available for " + name);
+            Journeymap.getLogger().debug("Displayname not available for {}", name);
         }
 
         if (Strings.isNullOrEmpty(name))
@@ -283,7 +283,7 @@ public class BlockMD
         }
         catch (Exception e)
         {
-            Journeymap.getLogger().error("Couldn't get subblocks for block " + block + ": " + e);
+            Journeymap.getLogger().error("Couldn't get subblocks for block {}: {}", block, e);
         }
 
         blockMetaCache.put(block, metas);
@@ -318,7 +318,7 @@ public class BlockMD
         {
             blockMD.addFlags(flags);
         }
-        Journeymap.getLogger().debug(block.getUnlocalizedName() + " flags set: " + flags);
+        Journeymap.getLogger().debug("{} flags set: {}", block.getUnlocalizedName(), flags);
     }
 
     /**
@@ -330,7 +330,7 @@ public class BlockMD
         {
             blockMD.setAlpha(alpha);
         }
-        Journeymap.getLogger().debug(block.getUnlocalizedName() + " alpha set: " + alpha);
+        Journeymap.getLogger().debug("{} alpha set: {}", block.getUnlocalizedName(), alpha);
     }
 
     /**

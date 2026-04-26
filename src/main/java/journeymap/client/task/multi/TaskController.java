@@ -63,11 +63,11 @@ public class TaskController
             boolean enabled = manager.enableTask(minecraft, null);
             if (!enabled)
             {
-                logger.debug("Task not initially enabled: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Task not initially enabled: {}", manager.getTaskClass().getSimpleName());
             }
             else
             {
-                logger.debug("Task ready: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Task ready: {}", manager.getTaskClass().getSimpleName());
             }
         }
 
@@ -116,7 +116,7 @@ public class TaskController
         }
         else
         {
-            logger.warn("Couldn't toggle task; manager not in controller: " + managerClass.getClass().getName());
+            logger.warn("Couldn't toggle task; manager not in controller: {}", managerClass.getClass().getName());
             return false;
         }
     }
@@ -139,7 +139,7 @@ public class TaskController
         }
         else
         {
-            logger.warn("Couldn't toggle task; manager not in controller: " + managerClass.getClass().getName());
+            logger.warn("Couldn't toggle task; manager not in controller: {}", managerClass.getClass().getName());
         }
     }
 
@@ -150,24 +150,24 @@ public class TaskController
         {
             if (!enable)
             {
-                logger.debug("Disabling task: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Disabling task: {}", manager.getTaskClass().getSimpleName());
                 manager.disableTask(minecraft);
             }
             else
             {
-                logger.debug("Task already enabled: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Task already enabled: {}", manager.getTaskClass().getSimpleName());
             }
         }
         else
         {
             if (enable)
             {
-                logger.debug("Enabling task: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Enabling task: {}", manager.getTaskClass().getSimpleName());
                 manager.enableTask(minecraft, params);
             }
             else
             {
-                logger.debug("Task already disabled: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Task already disabled: {}", manager.getTaskClass().getSimpleName());
             }
         }
     }
@@ -179,7 +179,7 @@ public class TaskController
             if (manager.isEnabled(minecraft))
             {
                 manager.disableTask(minecraft);
-                logger.debug("Task disabled: " + manager.getTaskClass().getSimpleName());
+                logger.debug("Task disabled: {}", manager.getTaskClass().getSimpleName());
             }
         }
     }
@@ -247,7 +247,7 @@ public class TaskController
 
                             if (logger.isTraceEnabled())
                             {
-                                logger.debug("Scheduled " + manager.getTaskClass().getSimpleName());
+                                logger.debug("Scheduled {}", manager.getTaskClass().getSimpleName());
                             }
                         }
                         else

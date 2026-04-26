@@ -36,7 +36,7 @@ public class LocationFormat
         LocationFormatKeys locationLocationFormatKeys = idToFormat.get(id);
         if (locationLocationFormatKeys == null)
         {
-            Journeymap.getLogger().warn("Invalid location format id: " + id);
+            Journeymap.getLogger().warn("Invalid location format id: {}", id);
             locationLocationFormatKeys = idToFormat.get(locationFormatIds[0]);
         }
 

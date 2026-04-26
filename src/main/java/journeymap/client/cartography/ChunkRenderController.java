@@ -121,7 +121,7 @@ public class ChunkRenderController
         }
         catch (Throwable t)
         {
-            Journeymap.getLogger().error("Unexpected error in ChunkRenderController: " + (LogFormatter.toString(t)));
+            Journeymap.getLogger().error("Unexpected error in ChunkRenderController: {}", LogFormatter.toString(t));
         }
         finally
         {

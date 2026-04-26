@@ -223,7 +223,7 @@ public class RegionImageHandler
         if (Journeymap.getLogger().isEnabled(Level.DEBUG))
         {
             stop = System.currentTimeMillis();
-            Journeymap.getLogger().debug("getMergedChunks time: " + (stop - start) + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
+            Journeymap.getLogger().debug("getMergedChunks time: {}ms", stop - start); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         if (allowNullImage && !imageDrawn)
@@ -306,7 +306,7 @@ public class RegionImageHandler
             }
             catch (IOException e)
             {
-                Journeymap.getLogger().error("Could not create blank temp file " + tmpFile + ": " + LogFormatter.toString(e));
+                Journeymap.getLogger().error("Could not create blank temp file {}: {}", tmpFile, LogFormatter.toString(e));
             }
         }
         return tmpFile;

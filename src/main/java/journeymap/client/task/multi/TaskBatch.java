@@ -58,7 +58,7 @@ public class TaskBatch implements ITask
         {
             if (Thread.interrupted())
             {
-                Journeymap.getLogger().warn("TaskBatch thread interrupted: " + this);
+                Journeymap.getLogger().warn("TaskBatch thread interrupted: {}", this);
                 throw new InterruptedException();
             }
 
@@ -67,7 +67,7 @@ public class TaskBatch implements ITask
             {
                 if (threadLogging)
                 {
-                    Journeymap.getLogger().debug("Batching task: " + task);
+                    Journeymap.getLogger().debug("Batching task: {}", task);
                 }
                 task.performTask(mc, jm, jmWorldDir, threadLogging);
             }
@@ -77,7 +77,7 @@ public class TaskBatch implements ITask
             }
             catch (Throwable t)
             {
-                Journeymap.getLogger().error(String.format("Unexpected error during task batch: %s", LogFormatter.toString(t)));
+                Journeymap.getLogger().error("Unexpected error during task batch: {}", LogFormatter.toString(t));
             }
         }
 

@@ -60,7 +60,7 @@ public class JMLogger
         }
         catch (Exception e)
         {
-            logger.error("Error removing deprecated logfile: " + e.getMessage());
+            logger.error("Error removing deprecated logfile: {}", e.getMessage());
         }
 
         // File logging
@@ -105,11 +105,11 @@ public class JMLogger
         }
         catch (SecurityException e)
         {
-            logger.error("Error adding file handler: " + LogFormatter.toString(e));
+            logger.error("Error adding file handler: {}", LogFormatter.toString(e));
         }
         catch (Throwable e)
         {
-            logger.error("Error adding file handler: " + LogFormatter.toString(e));
+            logger.error("Error adding file handler: {}", LogFormatter.toString(e));
         }
 
         return logger;
@@ -211,7 +211,7 @@ public class JMLogger
         if (!singletonErrors.contains(text.hashCode()))
         {
             singletonErrors.add(text.hashCode());
-            Journeymap.getLogger().error(text + " (SUPPRESSED)");
+            Journeymap.getLogger().error("{} (SUPPRESSED)", text);
             if (throwable != null)
             {
                 Journeymap.getLogger().error(LogFormatter.toString(throwable));

@@ -86,7 +86,7 @@ public class SplashInfo
                     }
                     catch (Exception e)
                     {
-                        Journeymap.getLogger().warn("Couldn't perform action " + action + " on " + uiClass + ": " + e.getMessage());
+                        Journeymap.getLogger().warn("Couldn't perform action {} on {}: {}", action, uiClass, e.getMessage());
                     }
                 }
 
@@ -94,7 +94,7 @@ public class SplashInfo
             }
             catch (Throwable t)
             {
-                Journeymap.getLogger().error("Couldn't invoke action: " + action + ": " + LogFormatter.toString(t));
+                Journeymap.getLogger().error("Couldn't invoke action: {}: {}", action, LogFormatter.toString(t));
             }
         }
     }

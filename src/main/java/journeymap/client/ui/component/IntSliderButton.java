@@ -166,7 +166,7 @@ public class IntSliderButton extends Button implements IPropertyHolder<AtomicInt
 
     public boolean keyTyped(char c, int i)
     {
-        if (this.isEnabled())
+        if (this.isEnabled() && this.isMouseOver())
         {
             if (i == Keyboard.KEY_LEFT || i == Keyboard.KEY_DOWN || i == Keyboard.KEY_SUBTRACT)
             {
