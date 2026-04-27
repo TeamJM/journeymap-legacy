@@ -20,17 +20,27 @@ import journeymap.client.log.JMLogger;
 import journeymap.client.log.LogFormatter;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Util;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Level;
-import org.lwjgl.Sys;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.net.URI;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -507,55 +517,6 @@ public class FileHandler
         }
     }
 
-    public static void open(File file)
-    {
-
-        String path = file.getAbsolutePath();
-
-        if (Util.getOSType() == Util.EnumOS.OSX)
-        {
-            try
-            {
-                Runtime.getRuntime().exec(new String[]{"/usr/bin/open", path});
-                return;
-            }
-            catch (IOException e)
-            {
-                Journeymap.getLogger().error("Could not open path with /usr/bin/open: {} : {}", path, LogFormatter.toString(e));
-            }
-        }
-        else
-        {
-            if (Util.getOSType() == Util.EnumOS.WINDOWS)
-            {
-
-                String cmd = String.format("cmd.exe /C start \"Open file\" \"%s\"", new Object[]{path});
-
-                try
-                {
-                    Runtime.getRuntime().exec(cmd);
-                    return;
-                }
-                catch (IOException e)
-                {
-                    Journeymap.getLogger().error("Could not open path with cmd.exe: {} : {}", path, LogFormatter.toString(e));
-                }
-            }
-        }
-
-        try
-        {
-            Class desktopClass = Class.forName("java.awt.Desktop");
-            Object method = desktopClass.getMethod("getDesktop", new Class[0]).invoke((Object) null, new Object[0]);
-            desktopClass.getMethod("browse", new Class[]{URI.class}).invoke(method, new Object[]{file.toURI()});
-        }
-        catch (Throwable e)
-        {
-            Journeymap.getLogger().error("Could not open path with Desktop: {} : {}", path, LogFormatter.toString(e));
-            Sys.openURL("file://" + path);
-        }
-    }
-
     public static boolean copyResources(File targetDirectory, String assetsPath, String setName, boolean overwrite)
     {
         return copyResources(targetDirectory, assetsPath, Collections.singletonList(setName), overwrite);
@@ -675,43 +636,14 @@ public class FileHandler
         {
             return file.delete();
         }
-
-        String[] cmd = null;
-        String path = file.getAbsolutePath();
-        Util.EnumOS os = Util.getOSType();
-
-        switch (os)
+        else
         {
-            case WINDOWS:
+            try
             {
-                cmd = new String[]{String.format("cmd.exe /C RD /S /Q \"%s\"", path)};
-                break;
-            }
-            case OSX:
-            {
-                cmd = new String[]{"rm", "-rf", path};
-                break;
-            }
-            default:
-            {
-                cmd = new String[]{"rm", "-rf", path};
-                break;
-            }
+                FileUtils.deleteDirectory(file);
+            } catch (IOException e) {}
+            return !file.exists();
         }
-
-        try
-        {
-            ProcessBuilder pb = new ProcessBuilder(cmd);
-            pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-            Process p = pb.start();
-            p.waitFor();
-        }
-        catch (Throwable e)
-        {
-            Journeymap.getLogger().error("Could not delete using: {} : {}", Joiner.on(" ").join(cmd), LogFormatter.toString(e));
-        }
-        return file.exists();
     }
 
     public static BufferedImage getIconFromFile(File parentdir, String assetsPath, String setName, String iconPath, BufferedImage defaultImg)
