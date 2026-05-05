@@ -103,7 +103,7 @@ public class TextureCache
                     {
                         tex.queueForDeletion();
                     }
-                    tex = new TextureImpl(img, retain);
+                    tex = new TextureImpl(null, img, retain, false);
                     tex.setDescription(String.format("%s (%s)", name, filename));
                     namedTextures.put(name, tex);
                 }
@@ -293,7 +293,7 @@ public class TextureCache
                     {
                         tex.queueForDeletion();
                     }
-                    tex = new TextureImpl(img);
+                    tex = new TextureImpl(null, img, false, false);
                     entityIcons.put(texName, tex);
                 }
             }
