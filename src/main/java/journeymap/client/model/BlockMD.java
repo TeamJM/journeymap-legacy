@@ -30,25 +30,25 @@ import java.util.*;
  */
 public class BlockMD
 {
-    public static final EnumSet FlagsPlantAndCrop = EnumSet.of(Flag.Plant, Flag.Crop);
-    public static final EnumSet FlagsBiomeColored = EnumSet.of(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
-    private static final Map<Block, Map<Integer, BlockMD>> cache = new HashMap<Block, Map<Integer, BlockMD>>();
+    public static final EnumSet<Flag> FlagsPlantAndCrop = EnumSet.of(Flag.Plant, Flag.Crop);
+    public static final EnumSet<Flag> FlagsBiomeColored = EnumSet.of(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
+    private static final Map<Block, Map<Integer, BlockMD>> cache = new HashMap<>();
     private static final Map<Block, ArrayList<Integer>> blockMetaCache = new HashMap<>();
     public static BlockMD AIRBLOCK;
     public static BlockMD VOIDBLOCK;
     private static ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
+
     private final Block block;
     private final int meta;
     private final GameRegistry.UniqueIdentifier uid;
     private final String name;
-    private EnumSet<Flag> flags;
+    private final EnumSet<Flag> flags;
     private int textureSide;
     private Integer overrideMeta;
     private Integer color;
     private float alpha;
     private String iconName;
     private ModBlockDelegate.IModBlockColorHandler blockColorHandler;
-
     private ModBlockDelegate.IModBlockHandler modBlockHandler;
 
     /**
@@ -627,16 +627,6 @@ public class BlockMD
     }
 
     /**
-     * Has an override meta to use
-     *
-     * @return
-     */
-    public boolean hasOverrideMeta()
-    {
-        return overrideMeta != null;
-    }
-
-    /**
      * Is biome colored.
      *
      * @return the boolean
@@ -667,11 +657,19 @@ public class BlockMD
     }
 
     /**
-     * Returns the override meta to use when deriving color, or null if no override specified.
+     * Has an override meta to use
      *
      * @return
      */
-    public Integer getOverrideMeta()
+    public boolean hasOverrideMeta()
+    {
+        return overrideMeta != null;
+    }
+
+    /**
+     * Returns the override meta to use when deriving color.
+     */
+    public int getOverrideMeta()
     {
         return overrideMeta;
     }
@@ -681,7 +679,7 @@ public class BlockMD
      *
      * @param overrideMeta
      */
-    public void setOverrideMeta(Integer overrideMeta)
+    public void setOverrideMeta(int overrideMeta)
     {
         this.overrideMeta = overrideMeta;
     }

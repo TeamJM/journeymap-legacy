@@ -166,13 +166,8 @@ public class ColorHelper_1_7_10 implements IColorHelper
             return null;
         }
 
-        Block block = blockMD.getBlock();
-        Integer overrideMeta = null;
-        if (blockMD.hasOverrideMeta())
-        {
-            overrideMeta = blockMD.getOverrideMeta();
-        }
-        int meta = overrideMeta != null ? overrideMeta : blockMD.getMeta();
+        final Block block = blockMD.getBlock();
+        final int meta = blockMD.hasOverrideMeta() ? blockMD.getOverrideMeta() : blockMD.getMeta();
 
         IIcon icon = null;
 
