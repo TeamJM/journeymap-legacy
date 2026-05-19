@@ -146,11 +146,11 @@ public class ColorHelper_1_7_10 implements IColorHelper
             failed.add(blockMD);
             if (blockMD.getUid().modId.equals("minecraft"))
             {
-                logger.warn("Error getting block color. Plese report this exception to the JourneyMap mod author regarding {}: {}", blockMD.getUid(), LogFormatter.toPartialString(t));
+                logger.warn("Error getting block color. Please report this exception to the JourneyMap mod author regarding {}: {}", blockMD.getUid(), LogFormatter.toPartialString(t));
             }
             else
             {
-                logger.warn("Error getting block color from mod. Plese report this exception to the mod author of {}: {}", blockMD.getUid(), LogFormatter.toPartialString(t));
+                logger.warn("Error getting block color from mod. Please report this exception to the mod author of {}: {}", blockMD.getUid(), LogFormatter.toPartialString(t));
             }
 
             return null;
@@ -188,11 +188,11 @@ public class ColorHelper_1_7_10 implements IColorHelper
             {
                 if (blockMD.getUid().modId.equals("minecraft"))
                 {
-                    logger.warn("Error getting BlockDoublePlant icon. Plese report this exception to the JourneyMap mod author regarding {}: {}", blockMD.getUid(), LogFormatter.toPartialString(e));
+                    logger.warn("Error getting BlockDoublePlant icon. Please report this exception to the JourneyMap mod author regarding {}: {}", blockMD.getUid(), LogFormatter.toPartialString(e));
                 }
                 else
                 {
-                    logger.warn("Error getting BlockDoublePlant icon from mod. Plese report this exception to the mod author of {}: {}", blockMD.getUid(), LogFormatter.toPartialString(e));
+                    logger.warn("Error getting BlockDoublePlant icon from mod. Please report this exception to the mod author of {}: {}", blockMD.getUid(), LogFormatter.toPartialString(e));
                 }
             }
         }

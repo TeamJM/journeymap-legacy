@@ -40,7 +40,7 @@ public class ColorManager
     /**
      * Ensure the colors in the cache match the current resource packs.
      * Must be called on main Minecraft thread in case the blocks texture
-     * is stiched.
+     * is stitched.
      */
     public void ensureCurrent()
     {
