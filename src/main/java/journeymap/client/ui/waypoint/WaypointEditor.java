@@ -682,7 +682,7 @@ public class WaypointEditor extends JmUI
         }
     }
 
-    class DimensionButton extends OnOffButton
+    static class DimensionButton extends OnOffButton
     {
         public final int dimension;
 

@@ -39,7 +39,7 @@ public class ForgeEvents
     }
 
 
-    private class UserJoinWorldThread extends Thread
+    private static class UserJoinWorldThread extends Thread
     {
         private String worldID;
         private EntityPlayerMP player;

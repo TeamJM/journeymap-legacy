@@ -379,7 +379,7 @@ public class DisplayVars
     /**
      * Provides a one-time calculation of vars needed to show the MapPreset ID on the minimap
      */
-    class MapPresetStatus
+    static class MapPresetStatus
     {
         private int miniMapId;
         private int scale = 4;

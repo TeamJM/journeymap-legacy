@@ -445,7 +445,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         }
     }
 
-    class JmBlockAccess implements IBlockAccess
+    static class JmBlockAccess implements IBlockAccess
     {
         private Chunk getChunk(int x, int z)
         {
