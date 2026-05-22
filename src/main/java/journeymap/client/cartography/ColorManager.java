@@ -27,8 +27,7 @@ import java.util.Map;
 public class ColorManager
 {
     private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
-    private volatile IColorHelper colorHelper = forgeHelper.getColorHelper();
-    private volatile ColorPalette currentPalette;
+    private final IColorHelper colorHelper = forgeHelper.getColorHelper();
     private String lastResourcePackNames;
     private String lastModNames;
 
@@ -64,7 +63,7 @@ public class ColorManager
         boolean modPackSame = false;
         boolean blocksTextureChanged = false;
 
-        if (currentResourcePackNames.equals(lastResourcePackNames) && colorHelper != null)
+        if (currentResourcePackNames.equals(lastResourcePackNames))
         {
             Journeymap.getLogger().debug("Resource Pack(s) unchanged: {}", currentResourcePackNames);
             resourcePackSame = true;
@@ -114,20 +113,10 @@ public class ColorManager
     }
 
     /**
-     * Get the current palette.
-     *
-     * @return
-     */
-    public ColorPalette getCurrentPalette()
-    {
-        return currentPalette;
-    }
-
-    /**
      * Load color palette.  Needs to be called on the main thread
      * so the texture atlas can be loaded.
      */
-    private void initBlockColors(boolean currentPaletteInvalid)
+    private static void initBlockColors(boolean currentPaletteInvalid)
     {
         try
         {
@@ -179,12 +168,11 @@ public class ColorManager
             if (count > 0 || palette == null)
             {
                 Journeymap.getLogger().info("Initialized {} block colors from mods and resource packs in {}ms", count, elapsed);
-                this.currentPalette = ColorPalette.create(standard, permanent);
+                ColorPalette.create(standard, permanent);
             }
             else
             {
-                this.currentPalette = palette;
-                Journeymap.getLogger().info("Color palette was sufficient: {}", this.currentPalette.getOrigin());
+                Journeymap.getLogger().info("Color palette was sufficient: {}", palette.getOrigin());
             }
 
             // Remap around player
