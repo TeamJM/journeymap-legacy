@@ -38,10 +38,14 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     @Override
     public Integer getBlockColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
     {
-        Integer color = getBaseColor(chunkMD, blockMD, globalX, y, globalZ);
+        Integer color;
         if (blockMD.isBiomeColored())
         {
             color = getBiomeColor(chunkMD, blockMD, globalX, y, globalZ);
+        }
+        else
+        {
+            color = getBaseColor(chunkMD, blockMD, globalX, y, globalZ);
         }
 
         // Fallback to Minecraft's own map color
