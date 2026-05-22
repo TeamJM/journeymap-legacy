@@ -36,7 +36,7 @@ public class ColorHelper_1_7_10 implements IColorHelper
 {
     private static volatile ArgbImage blocksTexture;
     Logger logger = Journeymap.getLogger();
-    HashSet<BlockMD> failed = new HashSet<BlockMD>();
+    HashSet<BlockMD> failed = new HashSet<>();
 
     public ColorHelper_1_7_10()
     {
@@ -51,7 +51,7 @@ public class ColorHelper_1_7_10 implements IColorHelper
     @Override
     public boolean clearBlocksTexture()
     {
-        if(blocksTexture==null)
+        if (blocksTexture == null)
         {
             return false;
         }
@@ -96,15 +96,6 @@ public class ColorHelper_1_7_10 implements IColorHelper
     public Integer getTextureColor(BlockMD blockMD)
     {
 
-        Integer color = null;
-
-        boolean ok = blocksTexture != null || initBlocksTexture();
-        if (!ok)
-        {
-            logger.warn("BlocksTexture not yet loaded");
-            return null;
-        }
-
 //        if (failed.contains(blockMD))
 //        {
 //            return null;
@@ -112,8 +103,8 @@ public class ColorHelper_1_7_10 implements IColorHelper
 
         try
         {
-
-            TextureAtlasSprite blockIcon = getDirectIcon(blockMD);
+            final Integer color;
+            final TextureAtlasSprite blockIcon = getDirectIcon(blockMD);
 
             if (blockIcon == null)
             {
@@ -159,12 +150,6 @@ public class ColorHelper_1_7_10 implements IColorHelper
 
     private TextureAtlasSprite getDirectIcon(BlockMD blockMD)
     {
-        boolean ok = blocksTexture != null || initBlocksTexture();
-        if (!ok)
-        {
-            logger.warn("BlocksTexture not yet loaded");
-            return null;
-        }
 
         final Block block = blockMD.getBlock();
         final int meta = blockMD.hasOverrideMeta() ? blockMD.getOverrideMeta() : blockMD.getMeta();
@@ -211,7 +196,7 @@ public class ColorHelper_1_7_10 implements IColorHelper
 
     }
 
-    Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
+    private Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
     {
         boolean ok = blocksTexture != null || initBlocksTexture();
         if (!ok)
@@ -230,7 +215,7 @@ public class ColorHelper_1_7_10 implements IColorHelper
             int x = 0, y = 0;
 
             int xStart, yStart, xStop, yStop;
-            if(icon.getIconWidth() + icon.getOriginX() > blocksTexture.getWidth() || icon.getIconHeight() + icon.getOriginY() > blocksTexture.getHeight())
+            if (icon.getIconWidth() + icon.getOriginX() > blocksTexture.getWidth() || icon.getIconHeight() + icon.getOriginY() > blocksTexture.getHeight())
             {
                 logger.warn("Couldn't get texture for {} because of an error matching it within the stitched blocks atlas.", icon.getIconName());
                 return null;
