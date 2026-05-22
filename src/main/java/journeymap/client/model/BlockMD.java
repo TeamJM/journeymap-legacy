@@ -33,7 +33,7 @@ public class BlockMD
     public static final EnumSet<Flag> FlagsPlantAndCrop = EnumSet.of(Flag.Plant, Flag.Crop);
     public static final EnumSet<Flag> FlagsBiomeColored = EnumSet.of(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
     private static final Map<Block, Map<Integer, BlockMD>> cache = new HashMap<>();
-    private static final Map<Block, ArrayList<Integer>> blockMetaCache = new HashMap<>();
+    private static final Map<Block, int[]> blockMetaCache = new HashMap<>();
     public static BlockMD AIRBLOCK;
     public static BlockMD VOIDBLOCK;
     private static ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
@@ -114,10 +114,10 @@ public class BlockMD
         List<BlockMD> allBlockMDs = new ArrayList<BlockMD>(512);
         for (Block block : GameData.getBlockRegistry().typeSafeIterable())
         {
-            Collection<Integer> metas = BlockMD.getMetaValuesForBlock(block);
+            int[] metas = BlockMD.getMetaValuesForBlock(block);
             for (int meta : metas)
             {
-                allBlockMDs.add(get(block, meta, metas.size()));
+                allBlockMDs.add(get(block, meta, metas.length));
             }
         }
         return allBlockMDs;
@@ -191,10 +191,10 @@ public class BlockMD
             {
                 if (subBlocks == null)
                 {
-                    subBlocks = BlockMD.getMetaValuesForBlock(block).size();
+                    subBlocks = BlockMD.getMetaValuesForBlock(block).length;
                 }
                 int size = (int) Math.ceil(Math.max(1, subBlocks) * 1.25);
-                map = new HashMap<Integer, BlockMD>(size + (size / 2));
+                map = new HashMap<>(size + (size / 2));
                 cache.put(block, map);
             }
 
@@ -256,12 +256,12 @@ public class BlockMD
     /**
      * Gets the meta variants possible for a given Block.
      */
-    public static Collection<Integer> getMetaValuesForBlock(Block block)
+    public static int[] getMetaValuesForBlock(Block block)
     {
-        ArrayList<Integer> cached = blockMetaCache.get(block);
+        final int[] cached = blockMetaCache.get(block);
         if (cached != null) return cached;
 
-        ArrayList<Integer> metas = new ArrayList<Integer>();
+        Set<Integer> metas = new HashSet<>();
         try
         {
             Item item = Item.getItemFromBlock(block);
@@ -286,8 +286,14 @@ public class BlockMD
             Journeymap.getLogger().error("Couldn't get subblocks for block {}: {}", block, e);
         }
 
-        blockMetaCache.put(block, metas);
-        return metas;
+        int i = 0;
+        final int[] arr = new int[metas.size()];
+        for (Integer meta : metas)
+        {
+            arr[i++] = meta;
+        }
+        blockMetaCache.put(block, arr);
+        return arr;
     }
 
     /**
@@ -300,11 +306,11 @@ public class BlockMD
             reset();
         }
 
-        Collection<Integer> metas = BlockMD.getMetaValuesForBlock(block);
-        List<BlockMD> list = new ArrayList<BlockMD>(metas.size());
+        int[] metas = BlockMD.getMetaValuesForBlock(block);
+        List<BlockMD> list = new ArrayList<>(metas.length);
         for (int meta : metas)
         {
-            list.add(BlockMD.get(block, meta, metas.size()));
+            list.add(BlockMD.get(block, meta, metas.length));
         }
         return list;
     }
