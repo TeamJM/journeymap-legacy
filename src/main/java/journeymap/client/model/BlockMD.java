@@ -22,7 +22,15 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Block + meta = BlockMetaData.  Carries color, flags, and other
@@ -45,7 +53,8 @@ public class BlockMD
     private final EnumSet<Flag> flags;
     private int textureSide;
     private Integer overrideMeta;
-    private Integer color;
+    private boolean hasColor;
+    private int color;
     private float alpha;
     private String iconName;
     private ModBlockDelegate.IModBlockColorHandler blockColorHandler;
@@ -411,22 +420,41 @@ public class BlockMD
         return blockColorHandler.getBlockColor(chunkMD, this, globalX, y, globalZ);
     }
 
-    public Integer getColor()
+    public boolean hasColor()
+    {
+        return this.hasColor;
+    }
+
+    public int getColor()
     {
         return this.color;
     }
 
+    public void setColor(int baseColor)
+    {
+        this.hasColor = true;
+        this.color = baseColor;
+    }
+
     public void setColor(Integer baseColor)
     {
-        this.color = baseColor;
+        if (baseColor == null)
+        {
+            this.hasColor = false;
+        }
+        else
+        {
+            this.hasColor = true;
+            this.color = baseColor;
+        }
     }
 
     public boolean ensureColor()
     {
-        if (this.color == null)
+        if (!this.hasColor)
         {
-            this.color = this.blockColorHandler.getTextureColor(this);
-            return true;
+            this.setColor(this.blockColorHandler.getTextureColor(this));
+            return this.hasColor;
         }
         return false;
     }

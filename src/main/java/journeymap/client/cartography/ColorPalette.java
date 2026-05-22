@@ -194,10 +194,9 @@ public class ColorPalette
             HashMap<BlockMD, Integer> baseColors = new HashMap<BlockMD, Integer>();
             for (BlockMD blockMD : BlockMD.getAll())
             {
-                Integer baseColor = blockMD.getColor();
-                if (baseColor != null)
+                if (blockMD.hasColor())
                 {
-                    baseColors.put(blockMD, baseColor);
+                    baseColors.put(blockMD, blockMD.getColor());
                 }
             }
 
