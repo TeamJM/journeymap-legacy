@@ -12,7 +12,6 @@ import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import journeymap.client.data.DataCache;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
@@ -23,7 +22,6 @@ import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiPlayerInfo;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiScreenRealmsProxy;
 import net.minecraft.client.gui.ScaledResolution;
@@ -43,7 +41,11 @@ import net.minecraft.realms.RealmsScreen;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
-import net.minecraft.world.*;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -51,7 +53,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import java.net.SocketAddress;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -59,10 +60,8 @@ import java.util.Random;
  */
 public class ForgeHelper_1_7_10 implements IForgeHelper
 {
-    private IRenderHelper renderHelper = new RenderHelper_1_7_10();
-    private IBlockAccess blockAccess = new JmBlockAccess();
-
-    private static Minecraft mc = Minecraft.getMinecraft();
+    private final IRenderHelper renderHelper = new RenderHelper_1_7_10();
+    private final IBlockAccess blockAccess = new JmBlockAccess();
 
     @Override
     public IRenderHelper getRenderHelper()
@@ -228,7 +227,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     public String getRealmsServerName()
     {
         String serverName = null;
-        Minecraft mc = ForgeHelper.INSTANCE.getClient();
+        Minecraft mc = this.getClient();
         if (!mc.isSingleplayer())
         {
             try
@@ -293,7 +292,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         }
         else
         {
-            mc = ForgeHelper.INSTANCE.getClient();
+            mc = this.getClient();
             // mc.getCurrentServerData();
             ServerData serverData = mc.func_147104_D();
 
@@ -384,12 +383,12 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     {
         try
         {
-            return mc.theWorld.getBiomeGenForCoords(x,z);
+            return this.getClient().theWorld.getBiomeGenForCoords(x,z);
         }
         catch (Throwable throwable)
         {
             Journeymap.getLogger().error("Error in getBiome(): {}", String.valueOf(throwable));
-            return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(x, z);
+            return this.getWorld().getBiomeGenForCoords(x, z);
         }
     }
 
@@ -433,7 +432,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
     @Override
     public String getFPS()
     {
-        String fps = Minecraft.getMinecraft().debug;
+        String fps = this.getClient().debug;
         final int idx = fps != null ? fps.indexOf(',') : -1;
         if (idx > 0)
         {
@@ -445,7 +444,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         }
     }
 
-    static class JmBlockAccess implements IBlockAccess
+    class JmBlockAccess implements IBlockAccess
     {
         private Chunk getChunk(int x, int z)
         {
@@ -474,13 +473,13 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         @Override
         public TileEntity getTileEntity(int x, int y, int z)
         {
-            return ForgeHelper.INSTANCE.getWorld().getTileEntity(x, y, z);
+            return ForgeHelper_1_7_10.this.getWorld().getTileEntity(x, y, z);
         }
 
         @Override
         public int getLightBrightnessForSkyBlocks(int x, int y, int z, int min)
         {
-            return ForgeHelper.INSTANCE.getWorld().getLightBrightnessForSkyBlocks(x, y, z, min);
+            return ForgeHelper_1_7_10.this.getWorld().getLightBrightnessForSkyBlocks(x, y, z, min);
         }
 
         @Override
@@ -505,7 +504,7 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         @Override
         public int isBlockProvidingPowerTo(int x, int y, int z, int directionIn)
         {
-            return ForgeHelper.INSTANCE.getWorld().isBlockProvidingPowerTo(x, y, z, directionIn);
+            return ForgeHelper_1_7_10.this.getWorld().isBlockProvidingPowerTo(x, y, z, directionIn);
         }
 
         @Override
@@ -520,25 +519,25 @@ public class ForgeHelper_1_7_10 implements IForgeHelper
         {
             try
             {
-                return mc.theWorld.getBiomeGenForCoords(x,z);
+                return ForgeHelper_1_7_10.this.getClient().theWorld.getBiomeGenForCoords(x,z);
             }
             catch (Throwable throwable)
             {
                 Journeymap.getLogger().error("Error in getBiomeGenForCoords(): {}", String.valueOf(throwable));
-                return ForgeHelper.INSTANCE.getWorld().getBiomeGenForCoords(x, z);
+                return ForgeHelper_1_7_10.this.getWorld().getBiomeGenForCoords(x, z);
             }
         }
 
         @Override
         public int getHeight()
         {
-            return ForgeHelper.INSTANCE.getWorld().getHeight();
+            return ForgeHelper_1_7_10.this.getWorld().getHeight();
         }
 
         @Override
         public boolean extendedLevelsInChunkCache()
         {
-            return ForgeHelper.INSTANCE.getWorld().extendedLevelsInChunkCache();
+            return ForgeHelper_1_7_10.this.getWorld().extendedLevelsInChunkCache();
         }
 
         @Override
