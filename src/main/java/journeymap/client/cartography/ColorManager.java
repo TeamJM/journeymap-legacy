@@ -128,7 +128,7 @@ public class ColorManager
             long elapsed1 = System.currentTimeMillis() - start1;
             if (palette != null)
             {
-                Journeymap.getLogger().info("Loaded color palette file in {}ms: {}", elapsed1, palette.getOrigin());
+                Journeymap.getLogger().info("Loaded color palette from file in {}ms: {}", elapsed1, palette.getOrigin());
             }
 
             boolean standard = true;
