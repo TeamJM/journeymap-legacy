@@ -10,7 +10,6 @@ import journeymap.client.model.BlockMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.client.model.mod.vanilla.VanillaBlockHandler;
 import journeymap.common.Journeymap;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +20,6 @@ import java.util.List;
  */
 public class ModBlockDelegate
 {
-    private static Logger logger = Journeymap.getLogger();
     private final List<IModBlockHandler> handlers;
 
     /**
@@ -59,7 +57,7 @@ public class ModBlockDelegate
         catch (Throwable t)
         {
             String message = String.format("Error handling block '%s': %s", blockMD, LogFormatter.toString(t));
-            logger.error(message);
+            Journeymap.getLogger().error(message);
         }
         if (delegatedBlockMD == null)
         {
@@ -89,7 +87,7 @@ public class ModBlockDelegate
             boolean specialHandling = handler.initialize(blockMD);
             if (specialHandling)
             {
-                logger.info("Registered IModBlockHandler {} for: '{}'.", handler.getClass().getName(), blockMD);
+                Journeymap.getLogger().debug("Registered IModBlockHandler {} for: '{}'.", handler.getClass().getName(), blockMD);
             }
         }
         catch (Throwable t)
@@ -97,11 +95,8 @@ public class ModBlockDelegate
             String message = String.format("Couldn't initialize IModBlockHandler '%s': %s",
                     handler.getClass(),
                     LogFormatter.toString(t));
-            logger.error(message);
-            return;
+            Journeymap.getLogger().error(message);
         }
-
-
     }
 
     /**

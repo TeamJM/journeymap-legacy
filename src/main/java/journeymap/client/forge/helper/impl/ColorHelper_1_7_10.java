@@ -36,8 +36,8 @@ import java.util.HashSet;
 public class ColorHelper_1_7_10 implements IColorHelper
 {
     private static volatile ArgbImage blocksTexture;
-    Logger logger = Journeymap.getLogger();
-    HashSet<BlockMD> failed = new HashSet<>();
+    private final Logger logger = Journeymap.getLogger();
+    private final HashSet<BlockMD> failed = new HashSet<>();
 
     public ColorHelper_1_7_10()
     {
@@ -364,8 +364,7 @@ public class ColorHelper_1_7_10 implements IColorHelper
             blocksTexture = new ArgbImage(pixels, width, height);
 
             double time = timer.stop();
-            Journeymap.getLogger().info("Block atlas copy : {}x{} loaded in {}ms", width, height, time);
-
+            logger.info("Created block atlas copy {}x{} in {}ms", width, height, time);
         }
         catch (Throwable t)
         {

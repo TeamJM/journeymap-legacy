@@ -167,7 +167,7 @@ public class ColorPalette
                     else
                     {
                         Journeymap.getLogger().warn("Existing color palette's mods no longer match current loadout.");
-                        Journeymap.getLogger().info("WAS: {}\nNOW: {}", palette.modNames, modNames);
+                        Journeymap.getLogger().debug("WAS: {}\nNOW: {}", palette.modNames, modNames);
                     }
                 }
                 else
@@ -269,7 +269,7 @@ public class ColorPalette
 
             if (blockMD.hasFlag(BlockMD.Flag.Error))
             {
-                Journeymap.getLogger().warn("Block with Error flag won't be saved to color palette: {}", blockMD);
+                Journeymap.getLogger().debug("Block with Error flag won't be saved to color palette: {}", blockMD);
             }
             else
             {
