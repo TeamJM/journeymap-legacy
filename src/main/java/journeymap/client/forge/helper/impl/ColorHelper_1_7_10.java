@@ -11,6 +11,7 @@ import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
+import journeymap.client.model.BlockSpriteMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
@@ -43,20 +44,13 @@ public class ColorHelper_1_7_10 implements IColorHelper
     }
 
     @Override
-    public boolean hasBlocksTexture()
-    {
-        return blocksTexture != null;
-    }
-
-    @Override
-    public boolean clearBlocksTexture()
+    public void clearBlocksTexture()
     {
         if (blocksTexture == null)
         {
-            return false;
+            return;
         }
         blocksTexture = null;
-        return true;
     }
 
     @Override
@@ -148,6 +142,12 @@ public class ColorHelper_1_7_10 implements IColorHelper
         }
     }
 
+    @Override
+    public BlockSpriteMD getSprite(BlockMD blockMD)
+    {
+        return BlockSpriteMD.get(this.getDirectIcon(blockMD));
+    }
+
     private TextureAtlasSprite getDirectIcon(BlockMD blockMD)
     {
 
@@ -196,9 +196,9 @@ public class ColorHelper_1_7_10 implements IColorHelper
 
     }
 
-    private Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
+    @Override
+    public Integer getSpriteColor(BlockSpriteMD spriteMD)
     {
-
         final ArgbImage blockAtlas = blocksTexture;
 
         if (blockAtlas == null)
@@ -210,21 +210,68 @@ public class ColorHelper_1_7_10 implements IColorHelper
         try
         {
 
-            if (!blockAtlas.isSubImageWithinImage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight()))
+            if (!blockAtlas.isSubImageWithinImage(spriteMD.x, spriteMD.y, spriteMD.width, spriteMD.height))
             {
-                logger.warn("Couldn't get texture for {} because of an error matching it within the stitched blocks atlas.", icon.getIconName());
+                logger.warn("Couldn't get texture for {} because of an error matching it within the stitched blocks atlas.", spriteMD);
                 return null;
             }
 
-            int color = 0;
-
-            if (icon.getIconWidth() > 0)
+            if (spriteMD.width > 0)
             {
-                color = blockAtlas.getColorOfSubImage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight());
+                return blockAtlas.getColorOfSubImage(spriteMD.x, spriteMD.y, spriteMD.width, spriteMD.height);
             }
             else
             {
-                logger.warn("Couldn't get texture for {}, {}", blockMD, icon);
+                logger.warn("Couldn't get texture for {}", spriteMD);
+            }
+
+        }
+        catch (Throwable e1)
+        {
+            logger.warn("Error deriving color for {}: {}", spriteMD, LogFormatter.toString(e1));
+        }
+
+        return null;
+    }
+
+    private Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
+    {
+
+        try
+        {
+
+            final ArgbImage blockAtlas = blocksTexture;
+            int color = 0;
+
+            if (blockAtlas == null)
+            {
+                final BlockSpriteMD spriteMD = BlockSpriteMD.get(icon);
+                if (spriteMD.hasColor())
+                {
+                    color = spriteMD.getColor();
+                }
+                else
+                {
+                    logger.warn("Could not retrieve color from BlockSpriteMD cache for block {}", blockMD);
+                    return null;
+                }
+            }
+            else
+            {
+                if (!blockAtlas.isSubImageWithinImage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight()))
+                {
+                    logger.warn("Couldn't get texture for {} because of an error matching it within the stitched blocks atlas.", icon.getIconName());
+                    return null;
+                }
+
+                if (icon.getIconWidth() > 0)
+                {
+                    color = blockAtlas.getColorOfSubImage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight());
+                }
+                else
+                {
+                    logger.warn("Couldn't get texture for {}, {}", blockMD, icon);
+                }
             }
 
             final boolean unusable = color == 0;
@@ -288,7 +335,7 @@ public class ColorHelper_1_7_10 implements IColorHelper
     }
 
     @Override
-    public boolean initBlocksTexture()
+    public void initBlocksTexture()
     {
         StatTimer timer = StatTimer.get("ColorHelper.initBlocksTexture", 0);
 
@@ -296,7 +343,7 @@ public class ColorHelper_1_7_10 implements IColorHelper
         {
             if (!Display.isCurrent())
             {
-                return false;
+                return;
             }
             blocksTexture = null;
             timer.start();
@@ -319,13 +366,11 @@ public class ColorHelper_1_7_10 implements IColorHelper
             double time = timer.stop();
             Journeymap.getLogger().info("Block atlas copy : {}x{} loaded in {}ms", width, height, time);
 
-            return true;
         }
         catch (Throwable t)
         {
             logger.error("Could not load block atlas copy :{}", String.valueOf(t));
             timer.cancel();
-            return false;
         }
     }
 
