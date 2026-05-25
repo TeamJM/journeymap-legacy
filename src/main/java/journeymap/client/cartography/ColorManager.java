@@ -163,10 +163,10 @@ public class ColorManager
             }
 
             // Load textures for the others
-            long start3 = System.currentTimeMillis();
+            final Collection<BlockMD> allBlocks = BlockMD.getAll();
             int blockCount = 0;
             int spriteCount = 0;
-            final Collection<BlockMD> allBlocks = BlockMD.getAll();
+            long start3 = System.currentTimeMillis();
             for (BlockMD blockMD : allBlocks)
             {
                 if (blockMD.ensureColor())
@@ -175,9 +175,10 @@ public class ColorManager
                 }
             }
             long blocksTime = System.currentTimeMillis() - start3;
-            long start4 = System.currentTimeMillis();
             BlockSpriteMD.loadColorsFrom(allBlocks);
-            for (BlockSpriteMD spriteMD : BlockSpriteMD.getCached())
+            final Collection<BlockSpriteMD> allSprites = BlockSpriteMD.getCached();
+            long start4 = System.currentTimeMillis();
+            for (BlockSpriteMD spriteMD : allSprites)
             {
                 if (spriteMD.ensureColor())
                 {
