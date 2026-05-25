@@ -91,6 +91,9 @@ tasks.jar {
     filesMatching("mcmod.info") {
         expand("jm_edition" to unlimited)
     }
+    manifest {
+         attributes.remove("TweakClass")
+    }
 }
 
 // Main artifact

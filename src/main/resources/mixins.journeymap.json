@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8.5-GTNH",
+  "package": "journeymap.client.mixin.mixins",
+  "refmap": "mixins.journeymap.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [],
+  "client": [
+    "MixinTestMinecraft"
+  ],
+  "server": []
+}
