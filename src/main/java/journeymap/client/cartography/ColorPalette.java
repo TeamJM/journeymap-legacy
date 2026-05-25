@@ -24,7 +24,6 @@ import journeymap.common.thread.JMThreadFactory;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,9 +32,11 @@ import java.io.InputStreamReader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 
 /**
@@ -77,7 +78,7 @@ public class ColorPalette
     String modNames;
 
     @Since(1)
-    ArrayList<BlockColor> basicColors = new ArrayList<BlockColor>(0);
+    ArrayList<BlockColor> basicColors = new ArrayList<>();
 
     private transient File origin;
 
@@ -90,31 +91,32 @@ public class ColorPalette
 
     /**
      * Constructor invoked by static create() method/
+     *
      * @param resourcePacks
      * @param modNames
-     * @param basicColorMap
+     * @param basicColors
      */
-    private ColorPalette(String resourcePacks, String modNames, HashMap<BlockMD, Integer> basicColorMap)
+    private ColorPalette(String resourcePacks, String modNames, ArrayList<BlockColor> basicColors)
     {
         this.version = VERSION;
         this.name = Constants.getString("jm.colorpalette.file_title");
         this.generated = String.format("Generated using %s for %s on %s", JourneymapClient.MOD_NAME, Loader.MC_VERSION, new Date());
         this.resourcePacks = resourcePacks;
         this.modNames = modNames;
+        this.basicColors = basicColors;
 
-        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
         lines.add(Constants.getString("jm.colorpalette.file_header_1"));
         lines.add(Constants.getString("jm.colorpalette.file_header_2", HTML_FILENAME));
         lines.add(Constants.getString("jm.colorpalette.file_header_3", JSON_FILENAME, SAMPLE_WORLD_PATH));
         lines.add(Constants.getString("jm.colorpalette.file_header_4", JSON_FILENAME, SAMPLE_STANDARD_PATH));
         lines.add(Constants.getString("jm.config.file_header_5", HELP_PAGE));
         this.description = lines.toArray(new String[0]);
-
-        this.basicColors = toList(basicColorMap);
     }
 
     /**
      * Returns the active pallete.
+     *
      * @return
      */
     public static ColorPalette getActiveColorPalette()
@@ -190,16 +192,7 @@ public class ColorPalette
         {
             String resourcePackNames = Constants.getResourcePackNames();
             String modPackNames = Constants.getModNames();
-
-            HashMap<BlockMD, Integer> baseColors = new HashMap<BlockMD, Integer>();
-            for (BlockMD blockMD : BlockMD.getAll())
-            {
-                if (blockMD.hasColor())
-                {
-                    baseColors.put(blockMD, blockMD.getColor());
-                }
-            }
-
+            ArrayList<BlockColor> baseColors = getColorsFromBlockMD();
             ColorPalette palette = new ColorPalette(resourcePackNames, modPackNames, baseColors);
             palette.origin = standard ? getStandardPaletteFile() : getWorldPaletteFile();
             palette.setPermanent(permanent);
@@ -212,6 +205,28 @@ public class ColorPalette
             Journeymap.getLogger().error("Couldn't create ColorPalette: {}", LogFormatter.toString(e));
         }
         return null;
+    }
+
+    private static ArrayList<BlockColor> getColorsFromBlockMD()
+    {
+        final Collection<BlockMD> allBlocks = BlockMD.getAll();
+        ArrayList<BlockColor> list = new ArrayList<>(allBlocks.size());
+        for (BlockMD blockMD : allBlocks)
+        {
+            if (blockMD.hasColor())
+            {
+                if (blockMD.hasFlag(BlockMD.Flag.Error))
+                {
+                    Journeymap.getLogger().debug("Block with Error flag won't be saved to color palette: {}", blockMD);
+                }
+                else
+                {
+                    list.add(new BlockColor(blockMD, blockMD.getColor()));
+                }
+            }
+        }
+        Collections.sort(list);
+        return list;
     }
 
     private static File getWorldPaletteFile()
@@ -259,27 +274,6 @@ public class ColorPalette
         return contents.replaceAll(token, Matcher.quoteReplacement(Constants.getString(key, params)));
     }
 
-    private ArrayList<BlockColor> toList(HashMap<BlockMD, Integer> map)
-    {
-        ArrayList<BlockColor> list = new ArrayList<BlockColor>(map.size());
-        for (Map.Entry<BlockMD, Integer> entry : map.entrySet())
-        {
-            BlockMD blockMD = entry.getKey();
-            Integer color = entry.getValue();
-
-            if (blockMD.hasFlag(BlockMD.Flag.Error))
-            {
-                Journeymap.getLogger().debug("Block with Error flag won't be saved to color palette: {}", blockMD);
-            }
-            else
-            {
-                list.add(new BlockColor(blockMD, color));
-            }
-        }
-        Collections.sort(list);
-        return list;
-    }
-
     private void writeToFile()
     {
         // Write JSON
@@ -305,10 +299,10 @@ public class ColorPalette
         writeThreadFactory.newThread(this::writeToFile).start();
     }
 
-    private HashMap<BlockMD, Integer> listToMap(ArrayList<BlockColor> list)
+    public HashMap<BlockMD, Integer> getBasicColorMap()
     {
-        HashMap<BlockMD, Integer> map = new HashMap<BlockMD, Integer>(list.size());
-        for (BlockColor blockColor : list)
+        HashMap<BlockMD, Integer> map = new HashMap<>(this.basicColors.size());
+        for (BlockColor blockColor : this.basicColors)
         {
             // 1.7.10 and 1.8
             Block block = GameData.getBlockRegistry().getObject(blockColor.uid);
@@ -331,11 +325,6 @@ public class ColorPalette
             map.put(blockMD, color);
         }
         return map;
-    }
-
-    public HashMap<BlockMD, Integer> getBasicColorMap()
-    {
-        return listToMap(this.basicColors);
     }
 
     public File getOrigin() throws IOException
@@ -426,7 +415,7 @@ public class ColorPalette
         {
             this.name = blockMD.getName();
             // 1.8 needs the cast
-            this.uid = GameData.getBlockRegistry().getNameForObject(blockMD.getBlock()).toString();
+            this.uid = GameData.getBlockRegistry().getNameForObject(blockMD.getBlock());
             this.meta = blockMD.getMeta();
 
             String hex = Integer.toHexString(intColor & 0xFFFFFF);
