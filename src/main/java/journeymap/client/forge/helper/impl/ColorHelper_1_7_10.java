@@ -482,5 +482,54 @@ public class ColorHelper_1_7_10 implements IColorHelper
             }
             return new ArgbImage(pixels, w, h, stride, offset + y * stride + x);
         }
+
+        public boolean isSubImageWithinImage(int x, int y, int w, int h)
+        {
+            return x >= 0 && y >= 0 && w >= 0 && h >= 0 && x + w <= width && y + h <= height;
+        }
+
+        public int getColorOfSubImage(int x, int y, int w, int h)
+        {
+            final int off = y * stride + x;
+            int count = 0;
+            int a = 0, r = 0, g = 0, b = 0;
+            for (int i = 0; i < w; i++)
+            {
+                for (int j = 0; j < h; j++)
+                {
+                    final int argb = pixels[off + j * stride + i];
+                    final int alpha = (argb >> 24) & 0xFF;
+                    if (alpha > 0)
+                    {
+                        count++;
+                        a += alpha;
+                        r += (argb >> 16) & 0xFF;
+                        g += (argb >> 8) & 0xFF;
+                        b += (argb) & 0xFF;
+                    }
+                }
+            }
+
+            if (count > 0)
+            {
+                if (a > 0)
+                {
+                    a = a / count;
+                }
+                if (r > 0)
+                {
+                    r = r / count;
+                }
+                if (g > 0)
+                {
+                    g = g / count;
+                }
+                if (b > 0)
+                {
+                    b = b / count;
+                }
+            }
+            return RGB.toInteger(a, r, g, b);
+        }
     }
 }
