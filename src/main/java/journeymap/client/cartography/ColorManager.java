@@ -123,7 +123,14 @@ public class ColorManager
         try
         {
             // Start with existing palette colors and set them on the corresponding BlockMDs
+            long start1 = System.currentTimeMillis();
             ColorPalette palette = ColorPalette.getActiveColorPalette();
+            long elapsed1 = System.currentTimeMillis() - start1;
+            if (palette != null)
+            {
+                Journeymap.getLogger().info("Loaded color palette file in {}ms: {}", elapsed1, palette.getOrigin());
+            }
+
             boolean standard = true;
             boolean permanent = false;
             if (palette != null)
@@ -139,13 +146,13 @@ public class ColorManager
                 {
                     try
                     {
-                        long start = System.currentTimeMillis();
+                        long start2 = System.currentTimeMillis();
                         for (Map.Entry<BlockMD, Integer> entry : palette.getBasicColorMap().entrySet())
                         {
                             entry.getKey().setColor(entry.getValue());
                         }
-                        long elapsed = System.currentTimeMillis() - start;
-                        Journeymap.getLogger().info("Loaded {} block colors from color palette file in {}ms: {}", palette.size(), elapsed, palette.getOrigin());
+                        long elapsed2 = System.currentTimeMillis() - start2;
+                        Journeymap.getLogger().info("Loaded {} block colors from color palette in {}ms", palette.size(), elapsed2);
                     }
                     catch (Exception e)
                     {
@@ -156,7 +163,7 @@ public class ColorManager
             }
 
             // Load textures for the others
-            long start1 = System.currentTimeMillis();
+            long start3 = System.currentTimeMillis();
             int blockCount = 0;
             int spriteCount = 0;
             final Collection<BlockMD> allBlocks = BlockMD.getAll();
@@ -167,8 +174,8 @@ public class ColorManager
                     blockCount++;
                 }
             }
-            long blocksTime = System.currentTimeMillis() - start1;
-            long start2 = System.currentTimeMillis();
+            long blocksTime = System.currentTimeMillis() - start3;
+            long start4 = System.currentTimeMillis();
             BlockSpriteMD.loadColorsFrom(allBlocks);
             for (BlockSpriteMD spriteMD : BlockSpriteMD.getCached())
             {
@@ -177,7 +184,7 @@ public class ColorManager
                     spriteCount++;
                 }
             }
-            long spritesTime = System.currentTimeMillis() - start2;
+            long spritesTime = System.currentTimeMillis() - start4;
             Journeymap.getLogger().info("Initialized {} block colors ({}ms) and {} sprite colors ({}ms) from mods and resource packs", blockCount, blocksTime, spriteCount, spritesTime);
 
             if (blockCount > 0 || palette == null)
