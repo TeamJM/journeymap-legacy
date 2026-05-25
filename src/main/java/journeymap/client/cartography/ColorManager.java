@@ -156,7 +156,7 @@ public class ColorManager
             }
 
             // Load textures for the others
-            long start = System.currentTimeMillis();
+            long start1 = System.currentTimeMillis();
             int blockCount = 0;
             int spriteCount = 0;
             final Collection<BlockMD> allBlocks = BlockMD.getAll();
@@ -167,6 +167,8 @@ public class ColorManager
                     blockCount++;
                 }
             }
+            long blocksTime = System.currentTimeMillis() - start1;
+            long start2 = System.currentTimeMillis();
             BlockSpriteMD.loadColorsFrom(allBlocks);
             for (BlockSpriteMD spriteMD : BlockSpriteMD.getCached())
             {
@@ -175,11 +177,11 @@ public class ColorManager
                     spriteCount++;
                 }
             }
-            long elapsed = System.currentTimeMillis() - start;
+            long spritesTime = System.currentTimeMillis() - start2;
+            Journeymap.getLogger().info("Initialized {} block colors ({}ms) and {} sprite colors ({}ms) from mods and resource packs", blockCount, blocksTime, spriteCount, spritesTime);
 
-            if (blockCount + spriteCount > 0 || palette == null)
+            if (blockCount > 0 || palette == null)
             {
-                Journeymap.getLogger().info("Initialized {} block colors and {} sprite colors from mods and resource packs in {}ms", blockCount, spriteCount, elapsed);
                 ColorPalette.create(standard, permanent);
             }
             else
