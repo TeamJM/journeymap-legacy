@@ -210,19 +210,21 @@ public class ColorHelper_1_7_10 implements IColorHelper
         try
         {
 
-            if (!blockAtlas.isSubImageWithinImage(spriteMD.x, spriteMD.y, spriteMD.width, spriteMD.height))
+            if (blockAtlas.isSubImageWithinImage(spriteMD.x, spriteMD.y, spriteMD.width, spriteMD.height))
             {
-                logger.warn("Couldn't get texture for {} because of an error matching it within the stitched blocks atlas.", spriteMD);
-                return null;
-            }
-
-            if (spriteMD.width > 0)
-            {
-                return blockAtlas.getColorOfSubImage(spriteMD.x, spriteMD.y, spriteMD.width, spriteMD.height);
+                if (spriteMD.width > 0)
+                {
+                    return blockAtlas.getColorOfSubImage(spriteMD.x, spriteMD.y, spriteMD.width, spriteMD.height);
+                }
+                else
+                {
+                    logger.warn("Couldn't get texture for {}", spriteMD);
+                }
             }
             else
             {
-                logger.warn("Couldn't get texture for {}", spriteMD);
+                logger.warn("Couldn't get texture for {} because of an error matching it within the stitched blocks atlas.", spriteMD);
+                return null;
             }
 
         }
@@ -258,19 +260,21 @@ public class ColorHelper_1_7_10 implements IColorHelper
             }
             else
             {
-                if (!blockAtlas.isSubImageWithinImage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight()))
+                if (blockAtlas.isSubImageWithinImage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight()))
                 {
-                    logger.warn("Couldn't get texture for {} because of an error matching it within the stitched blocks atlas.", icon.getIconName());
-                    return null;
-                }
-
-                if (icon.getIconWidth() > 0)
-                {
-                    color = blockAtlas.getColorOfSubImage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight());
+                    if (icon.getIconWidth() > 0)
+                    {
+                        color = blockAtlas.getColorOfSubImage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight());
+                    }
+                    else
+                    {
+                        logger.warn("Couldn't get texture for {}, {}", blockMD, icon);
+                    }
                 }
                 else
                 {
-                    logger.warn("Couldn't get texture for {}, {}", blockMD, icon);
+                    logger.warn("Couldn't get texture for {} because of an error matching it within the stitched blocks atlas.", icon.getIconName());
+                    return null;
                 }
             }
 
