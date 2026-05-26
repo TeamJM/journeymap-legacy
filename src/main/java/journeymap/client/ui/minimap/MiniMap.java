@@ -69,6 +69,8 @@ public class MiniMap
     private Rectangle2D.Double centerRect;
 
     private long initTime;
+    private long lastRotationTime = 0;
+    private double smoothedRotation = Double.NaN;
 
     /**
      * Default constructor
@@ -125,7 +127,12 @@ public class MiniMap
      */
     public void drawMap()
     {
-        drawMap(false);
+        drawMap(false, 1f);
+    }
+
+    public void drawMap(float partialTicks)
+    {
+        drawMap(false, partialTicks);
     }
 
     private boolean shouldShowCaves()
@@ -137,6 +144,11 @@ public class MiniMap
      * Called in the render loop.
      */
     public void drawMap(boolean preview)
+    {
+        drawMap(preview, 1f);
+    }
+
+    public void drawMap(boolean preview, float partialTicks)
     {
         StatTimer timer = drawTimer;
 
@@ -214,6 +226,7 @@ public class MiniMap
 
             // Rotatate around player heading
             double rotation = 0;
+            float playerHeading = getPlayerHeadingForRender(partialTicks);
             switch (dv.orientation)
             {
                 case North:
@@ -230,7 +243,7 @@ public class MiniMap
                 {
                     if (dv.shape == Shape.Circle)
                     {
-                        rotation = (180 - mc.thePlayer.rotationYawHead);
+                        rotation = smoothRotation(180 - playerHeading);
                     }
                     break;
                 }
@@ -263,7 +276,7 @@ public class MiniMap
                 {
                     if (centerPoint != null)
                     {
-                        DrawUtil.drawEntity(centerPoint.getX(), centerPoint.getY(), mc.thePlayer.rotationYawHead, false, playerLocatorTex, dv.drawScale, rotation);
+                        DrawUtil.drawEntity(centerPoint.getX(), centerPoint.getY(), playerHeading, false, playerLocatorTex, dv.drawScale, rotation);
                     }
                 }
 
@@ -282,10 +295,10 @@ public class MiniMap
                     else
                     {
                         /***** BEGIN MATRIX: ROTATION *****/
-                        startMapRotation(mc.thePlayer.rotationYawHead);
+                        startMapRotation(playerHeading);
                         dv.minimapFrame.drawReticle();
                         /***** END MATRIX: ROTATION *****/
-                        stopMapRotation(mc.thePlayer.rotationYawHead);
+                        stopMapRotation(playerHeading);
                     }
                 }
 
@@ -449,6 +462,64 @@ public class MiniMap
         gridRenderer.updateRotation(rotation);
     }
 
+    private double smoothRotation(double targetRotation)
+    {
+        int smoothingMs = Math.max(0, miniMapProperties.rotationSmoothing.get());
+        if (smoothingMs == 0)
+        {
+            smoothedRotation = normalizeAngle(targetRotation);
+            lastRotationTime = System.currentTimeMillis();
+            return smoothedRotation;
+        }
+
+        long now = System.currentTimeMillis();
+        if (Double.isNaN(smoothedRotation) || lastRotationTime == 0)
+        {
+            smoothedRotation = normalizeAngle(targetRotation);
+            lastRotationTime = now;
+            return smoothedRotation;
+        }
+
+        long deltaMs = Math.max(1, now - lastRotationTime);
+        double alpha = Math.min(1d, deltaMs / (double) smoothingMs);
+        smoothedRotation = normalizeAngle(smoothedRotation + normalizeAngle(targetRotation - smoothedRotation) * alpha);
+        lastRotationTime = now;
+        return smoothedRotation;
+    }
+
+    private float getInterpolatedPlayerYawHead(float partialTicks)
+    {
+        float clampedPartial = Math.max(0f, Math.min(1f, partialTicks));
+        float prev = mc.thePlayer.prevRotationYawHead;
+        float current = mc.thePlayer.rotationYawHead;
+        float delta = MathHelper.wrapAngleTo180_float(current - prev);
+        return prev + delta * clampedPartial;
+    }
+
+    private float getPlayerHeadingForRender(float partialTicks)
+    {
+        if (miniMapProperties.rotationSmoothing.get() <= 0)
+        {
+            // Legacy behavior: use the raw, non-interpolated head yaw.
+            return mc.thePlayer.rotationYawHead;
+        }
+        return getInterpolatedPlayerYawHead(partialTicks);
+    }
+
+    private static double normalizeAngle(double angle)
+    {
+        angle = angle % 360.0;
+        if (angle > 180.0)
+        {
+            angle -= 360.0;
+        }
+        else if (angle <= -180.0)
+        {
+            angle += 360.0;
+        }
+        return angle;
+    }
+
     private void stopMapRotation(double rotation)
     {
         GL11.glPopMatrix();
@@ -573,6 +644,8 @@ public class MiniMap
     public void reset()
     {
         initTime = System.currentTimeMillis();
+        lastRotationTime = 0;
+        smoothedRotation = Double.NaN;
         initGridRenderer();
         updateDisplayVars(miniMapProperties.shape.get(), miniMapProperties.position.get(), true);
         MiniMapOverlayHandler.checkEventConfig();

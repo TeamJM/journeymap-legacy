@@ -22,7 +22,15 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Block + meta = BlockMetaData.  Carries color, flags, and other
@@ -30,25 +38,26 @@ import java.util.*;
  */
 public class BlockMD
 {
-    public static final EnumSet FlagsPlantAndCrop = EnumSet.of(Flag.Plant, Flag.Crop);
-    public static final EnumSet FlagsBiomeColored = EnumSet.of(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
-    private static final Map<Block, Map<Integer, BlockMD>> cache = new HashMap<Block, Map<Integer, BlockMD>>();
-    private static final Map<Block, ArrayList<Integer>> blockMetaCache = new HashMap<>();
+    public static final EnumSet<Flag> FlagsPlantAndCrop = EnumSet.of(Flag.Plant, Flag.Crop);
+    public static final EnumSet<Flag> FlagsBiomeColored = EnumSet.of(Flag.Grass, Flag.Foliage, Flag.Water, Flag.CustomBiomeColor);
+    private static final Map<Block, Map<Integer, BlockMD>> cache = new HashMap<>();
+    private static final Map<Block, int[]> blockMetaCache = new HashMap<>();
     public static BlockMD AIRBLOCK;
     public static BlockMD VOIDBLOCK;
     private static ModBlockDelegate modBlockDelegate = new ModBlockDelegate();
+
     private final Block block;
     private final int meta;
     private final GameRegistry.UniqueIdentifier uid;
     private final String name;
-    private EnumSet<Flag> flags;
+    private final EnumSet<Flag> flags;
     private int textureSide;
     private Integer overrideMeta;
-    private Integer color;
+    private boolean hasColor;
+    private int color;
     private float alpha;
     private String iconName;
     private ModBlockDelegate.IModBlockColorHandler blockColorHandler;
-
     private ModBlockDelegate.IModBlockHandler modBlockHandler;
 
     /**
@@ -114,10 +123,10 @@ public class BlockMD
         List<BlockMD> allBlockMDs = new ArrayList<BlockMD>(512);
         for (Block block : GameData.getBlockRegistry().typeSafeIterable())
         {
-            Collection<Integer> metas = BlockMD.getMetaValuesForBlock(block);
+            int[] metas = BlockMD.getMetaValuesForBlock(block);
             for (int meta : metas)
             {
-                allBlockMDs.add(get(block, meta, metas.size()));
+                allBlockMDs.add(get(block, meta, metas.length));
             }
         }
         return allBlockMDs;
@@ -191,10 +200,10 @@ public class BlockMD
             {
                 if (subBlocks == null)
                 {
-                    subBlocks = BlockMD.getMetaValuesForBlock(block).size();
+                    subBlocks = BlockMD.getMetaValuesForBlock(block).length;
                 }
                 int size = (int) Math.ceil(Math.max(1, subBlocks) * 1.25);
-                map = new HashMap<Integer, BlockMD>(size + (size / 2));
+                map = new HashMap<>(size + (size / 2));
                 cache.put(block, map);
             }
 
@@ -256,12 +265,12 @@ public class BlockMD
     /**
      * Gets the meta variants possible for a given Block.
      */
-    public static Collection<Integer> getMetaValuesForBlock(Block block)
+    public static int[] getMetaValuesForBlock(Block block)
     {
-        ArrayList<Integer> cached = blockMetaCache.get(block);
+        final int[] cached = blockMetaCache.get(block);
         if (cached != null) return cached;
 
-        ArrayList<Integer> metas = new ArrayList<Integer>();
+        Set<Integer> metas = new HashSet<>();
         try
         {
             Item item = Item.getItemFromBlock(block);
@@ -286,8 +295,14 @@ public class BlockMD
             Journeymap.getLogger().error("Couldn't get subblocks for block {}: {}", block, e);
         }
 
-        blockMetaCache.put(block, metas);
-        return metas;
+        int i = 0;
+        final int[] arr = new int[metas.size()];
+        for (Integer meta : metas)
+        {
+            arr[i++] = meta;
+        }
+        blockMetaCache.put(block, arr);
+        return arr;
     }
 
     /**
@@ -300,11 +315,11 @@ public class BlockMD
             reset();
         }
 
-        Collection<Integer> metas = BlockMD.getMetaValuesForBlock(block);
-        List<BlockMD> list = new ArrayList<BlockMD>(metas.size());
+        int[] metas = BlockMD.getMetaValuesForBlock(block);
+        List<BlockMD> list = new ArrayList<>(metas.length);
         for (int meta : metas)
         {
-            list.add(BlockMD.get(block, meta, metas.size()));
+            list.add(BlockMD.get(block, meta, metas.length));
         }
         return list;
     }
@@ -405,22 +420,41 @@ public class BlockMD
         return blockColorHandler.getBlockColor(chunkMD, this, globalX, y, globalZ);
     }
 
-    public Integer getColor()
+    public boolean hasColor()
+    {
+        return this.hasColor;
+    }
+
+    public int getColor()
     {
         return this.color;
     }
 
+    public void setColor(int baseColor)
+    {
+        this.hasColor = true;
+        this.color = baseColor;
+    }
+
     public void setColor(Integer baseColor)
     {
-        this.color = baseColor;
+        if (baseColor == null)
+        {
+            this.hasColor = false;
+        }
+        else
+        {
+            this.hasColor = true;
+            this.color = baseColor;
+        }
     }
 
     public boolean ensureColor()
     {
-        if (this.color == null)
+        if (!this.hasColor)
         {
-            this.color = this.blockColorHandler.getTextureColor(this);
-            return true;
+            this.setColor(this.blockColorHandler.getTextureColor(this));
+            return this.hasColor;
         }
         return false;
     }
@@ -627,16 +661,6 @@ public class BlockMD
     }
 
     /**
-     * Has an override meta to use
-     *
-     * @return
-     */
-    public boolean hasOverrideMeta()
-    {
-        return overrideMeta != null;
-    }
-
-    /**
      * Is biome colored.
      *
      * @return the boolean
@@ -667,11 +691,19 @@ public class BlockMD
     }
 
     /**
-     * Returns the override meta to use when deriving color, or null if no override specified.
+     * Has an override meta to use
      *
      * @return
      */
-    public Integer getOverrideMeta()
+    public boolean hasOverrideMeta()
+    {
+        return overrideMeta != null;
+    }
+
+    /**
+     * Returns the override meta to use when deriving color.
+     */
+    public int getOverrideMeta()
     {
         return overrideMeta;
     }
@@ -681,7 +713,7 @@ public class BlockMD
      *
      * @param overrideMeta
      */
-    public void setOverrideMeta(Integer overrideMeta)
+    public void setOverrideMeta(int overrideMeta)
     {
         this.overrideMeta = overrideMeta;
     }

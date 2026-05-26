@@ -77,7 +77,7 @@ public class TerraFirmaCraft
     public static class TfcWaterColorHandler extends VanillaColorHandler
     {
         @Override
-        protected Integer loadTextureColor(BlockMD blockMD, int globalX, int y, int globalZ)
+        protected int loadTextureColor(BlockMD blockMD, int globalX, int y, int globalZ)
         {
             return WATER_COLOR;
         }

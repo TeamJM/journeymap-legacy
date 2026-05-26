@@ -12,11 +12,13 @@ import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.forge.helper.IForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockMD;
+import journeymap.client.model.BlockSpriteMD;
 import journeymap.client.task.multi.MapPlayerTask;
 import journeymap.common.Journeymap;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -27,8 +29,7 @@ import java.util.Map;
 public class ColorManager
 {
     private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
-    private volatile IColorHelper colorHelper = forgeHelper.getColorHelper();
-    private volatile ColorPalette currentPalette;
+    private final IColorHelper colorHelper = forgeHelper.getColorHelper();
     private String lastResourcePackNames;
     private String lastModNames;
 
@@ -40,7 +41,7 @@ public class ColorManager
     /**
      * Ensure the colors in the cache match the current resource packs.
      * Must be called on main Minecraft thread in case the blocks texture
-     * is stiched.
+     * is stitched.
      */
     public void ensureCurrent()
     {
@@ -62,9 +63,8 @@ public class ColorManager
 
         boolean resourcePackSame = false;
         boolean modPackSame = false;
-        boolean blocksTextureChanged = false;
 
-        if (currentResourcePackNames.equals(lastResourcePackNames) && colorHelper != null)
+        if (currentResourcePackNames.equals(lastResourcePackNames))
         {
             Journeymap.getLogger().debug("Resource Pack(s) unchanged: {}", currentResourcePackNames);
             resourcePackSame = true;
@@ -78,31 +78,32 @@ public class ColorManager
 
         if (!resourcePackSame || !modPackSame)
         {
+            boolean isFirstLoad = lastResourcePackNames == null && lastModNames == null;
             lastResourcePackNames = currentResourcePackNames;
             lastModNames = currentModNames;
-            blocksTextureChanged = colorHelper.clearBlocksTexture();
-        }
 
-        if (!colorHelper.hasBlocksTexture())
-        {
             Journeymap.getLogger().info("Loading blocks and textures...");
 
             boolean isMapping = JourneymapClient.getInstance().isMapping();
-            if(isMapping)
+            if (isMapping)
             {
                 JourneymapClient.getInstance().stopMapping();
             }
 
-            // Reload all BlockMDs
+            // Reload all BlockMDs and BlockSpriteMD
             BlockMD.reset();
+            BlockSpriteMD.reset();
 
             // Ensure blocks texture initialized
             colorHelper.initBlocksTexture();
 
             // Init colors
-            initBlockColors(blocksTextureChanged);
+            initBlockColors(!isFirstLoad);
 
-            if(isMapping)
+            // Free memory once colors are loaded into BlockMDs and BlockSpriteMD
+            colorHelper.clearBlocksTexture();
+
+            if (isMapping)
             {
                 JourneymapClient.getInstance().startMapping();
             }
@@ -114,25 +115,22 @@ public class ColorManager
     }
 
     /**
-     * Get the current palette.
-     *
-     * @return
-     */
-    public ColorPalette getCurrentPalette()
-    {
-        return currentPalette;
-    }
-
-    /**
      * Load color palette.  Needs to be called on the main thread
      * so the texture atlas can be loaded.
      */
-    private void initBlockColors(boolean currentPaletteInvalid)
+    private static void initBlockColors(boolean currentPaletteInvalid)
     {
         try
         {
             // Start with existing palette colors and set them on the corresponding BlockMDs
+            long start1 = System.currentTimeMillis();
             ColorPalette palette = ColorPalette.getActiveColorPalette();
+            long elapsed1 = System.currentTimeMillis() - start1;
+            if (palette != null)
+            {
+                Journeymap.getLogger().info("Loaded color palette from file in {}ms: {}", elapsed1, palette.getOrigin());
+            }
+
             boolean standard = true;
             boolean permanent = false;
             if (palette != null)
@@ -148,13 +146,13 @@ public class ColorManager
                 {
                     try
                     {
-                        long start = System.currentTimeMillis();
+                        long start2 = System.currentTimeMillis();
                         for (Map.Entry<BlockMD, Integer> entry : palette.getBasicColorMap().entrySet())
                         {
                             entry.getKey().setColor(entry.getValue());
                         }
-                        long elapsed = System.currentTimeMillis() - start;
-                        Journeymap.getLogger().info("Loaded {} block colors from color palette file in {}ms: {}", palette.size(), elapsed, palette.getOrigin());
+                        long elapsed2 = System.currentTimeMillis() - start2;
+                        Journeymap.getLogger().info("Loaded {} block colors from color palette in {}ms", palette.size(), elapsed2);
                     }
                     catch (Exception e)
                     {
@@ -165,26 +163,37 @@ public class ColorManager
             }
 
             // Load textures for the others
-            long start = System.currentTimeMillis();
-            int count = 0;
-            for (BlockMD blockMD : BlockMD.getAll())
+            final Collection<BlockMD> allBlocks = BlockMD.getAll();
+            int blockCount = 0;
+            int spriteCount = 0;
+            long start3 = System.currentTimeMillis();
+            for (BlockMD blockMD : allBlocks)
             {
                 if (blockMD.ensureColor())
                 {
-                    count++;
+                    blockCount++;
                 }
             }
-            long elapsed = System.currentTimeMillis() - start;
-
-            if (count > 0 || palette == null)
+            long blocksTime = System.currentTimeMillis() - start3;
+            BlockSpriteMD.loadColorsFrom(allBlocks);
+            long start4 = System.currentTimeMillis();
+            for (BlockSpriteMD spriteMD : BlockSpriteMD.getCached())
             {
-                Journeymap.getLogger().info("Initialized {} block colors from mods and resource packs in {}ms", count, elapsed);
-                this.currentPalette = ColorPalette.create(standard, permanent);
+                if (spriteMD.ensureColor())
+                {
+                    spriteCount++;
+                }
+            }
+            long spritesTime = System.currentTimeMillis() - start4;
+            Journeymap.getLogger().info("Initialized {} block colors ({}ms) and {} sprite colors ({}ms) from mods and resource packs", blockCount, blocksTime, spriteCount, spritesTime);
+
+            if (blockCount > 0 || palette == null)
+            {
+                ColorPalette.create(standard, permanent);
             }
             else
             {
-                this.currentPalette = palette;
-                Journeymap.getLogger().info("Color palette was sufficient: {}", this.currentPalette.getOrigin());
+                Journeymap.getLogger().info("Color palette was sufficient: {}", palette.getOrigin());
             }
 
             // Remap around player
