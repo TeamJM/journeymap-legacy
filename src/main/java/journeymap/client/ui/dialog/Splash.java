@@ -32,27 +32,26 @@ import java.util.List;
 
 public class Splash extends JmUI
 {
-    private static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
-    protected TextureImpl patreonLogo = TextureCache.instance().getPatreonLogo();
-    Button buttonClose, buttonOptions, buttonDonate;
+    private static final IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
+    Button buttonClose, buttonOptions;
     ButtonList peopleButtons;
     ButtonList devButtons;
     ButtonList bottomButtons;
     ButtonList infoButtons;
 
-    private List<SplashPerson> people = Arrays.asList(
+    private final List<SplashPerson> people = Arrays.asList(
             new SplashPerson("AlexDurrani", "Sikandar Durrani", "jm.common.splash_patreon"),
             new SplashPerson("bmangt2", "Opzon", "jm.common.splash_patreon"),
             new SplashPerson("_cache_", "Shaila Gray", "jm.common.splash_patreon")
     );
 
-    private List<SplashPerson> devs = Arrays.asList(
+    private final List<SplashPerson> devs = Arrays.asList(
             new SplashPerson("mysticdrew", "mysticdrew", "jm.common.splash_developer"),
             new SplashPerson("techbrew", "techbrew", "jm.common.splash_developer")
     );
 
-    private SplashInfo info;
-    private TextureImpl brickTex;
+    private final SplashInfo info;
+    private final TextureImpl brickTex;
 
     public Splash(JmUI returnDisplay)
     {
@@ -104,19 +103,12 @@ public class Splash extends JmUI
         infoButtons.equalizeWidths(fr);
         buttonList.addAll(infoButtons);
 
-        buttonDonate = new Button("");
-        buttonDonate.setDefaultStyle(false);
-        buttonDonate.setDrawBackground(false);
-        buttonDonate.setDrawFrame(false);
-        buttonDonate.setTooltip(Constants.getString("jm.webmap.donate_text"));
-
         buttonClose = new Button(Constants.getString("jm.common.close"));
         buttonOptions = new Button(Constants.getString("jm.common.options_button"));
 
-        bottomButtons = new ButtonList(buttonOptions, buttonDonate, buttonClose);
+        bottomButtons = new ButtonList(buttonOptions, buttonClose);
         bottomButtons.equalizeWidths(getFontRenderer());
         bottomButtons.setWidths(Math.max(100, buttonOptions.getWidth()));
-        buttonDonate.setWidth(50);
         buttonList.addAll(bottomButtons);
 
     }
@@ -241,7 +233,6 @@ public class Splash extends JmUI
         by = this.height - 25;
 
         bottomButtons.layoutCenteredHorizontal(bx, by, true, hgap);
-        DrawUtil.drawImage(patreonLogo, buttonDonate.getCenterX() - 8, buttonDonate.getY() + 2, false, .5f, 0);
     }
 
     protected int drawPerson(int by, int lineHeight, SplashPerson person)
@@ -294,10 +285,6 @@ public class Splash extends JmUI
         {
             closeAndReturn();
         }
-        if (guibutton == buttonDonate)
-        {
-            FullscreenActions.launchPatreon();
-        }
         if (guibutton == buttonOptions)
         {
             UIManager.getInstance().openOptionsManager(this);
@@ -307,12 +294,9 @@ public class Splash extends JmUI
     @Override
     protected void keyTyped(char c, int i)
     {
-        switch (i)
+        if (i == Keyboard.KEY_ESCAPE)
         {
-            case Keyboard.KEY_ESCAPE:
-            {
-                closeAndReturn();
-            }
+            closeAndReturn();
         }
     }
 
