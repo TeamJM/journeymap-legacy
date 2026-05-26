@@ -13,17 +13,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-public final class BlockSpriteMD
+public class BlockSpriteMD
 {
 
     private static final Map<BlockSpriteMD, BlockSpriteMD> cache = new HashMap<>(256);
-    private static final BlockSpriteMD NULL_SPRITE = new BlockSpriteMD(0, 0, 0, 0);
     private static final IColorHelper colorHelper = ForgeHelper.INSTANCE.getColorHelper();
 
-    static
+    private static final BlockSpriteMD NULL_SPRITE = new BlockSpriteMD(0, 0, 0, 0)
     {
-        NULL_SPRITE.hasColor = true;
-    }
+        @Override public boolean ensureColor() { return false; }
+
+        @Override public void setColor(int color) {}
+
+        @Override public void setColor(Integer color) {}
+
+        @Override public boolean hasColor() { return true; }
+    };
 
     public final int x;
     public final int y;
