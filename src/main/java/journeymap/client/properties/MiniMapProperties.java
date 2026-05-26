@@ -61,6 +61,9 @@ public class MiniMapProperties extends InGameMapProperties
     @Config(category = Inherit, key = "jm.minimap.orientation.button", defaultEnum = "PlayerHeading")
     public final AtomicReference<Orientation> orientation = new AtomicReference<Orientation>(Orientation.North);
 
+    @Config(category = Inherit, key = "jm.minimap.rotation_smoothing", minValue = 0, maxValue = 100, defaultValue = 0)
+    public final AtomicInteger rotationSmoothing = new AtomicInteger(0);
+
     @Config(category = Inherit, key = "jm.minimap.compass_font_scale", minValue = 1, maxValue = 4, defaultValue = 1)
     public final AtomicInteger compassFontScale = new AtomicInteger(1);
 
@@ -179,6 +182,7 @@ public class MiniMapProperties extends InGameMapProperties
         result = 31 * result + frameAlpha.hashCode();
         result = 31 * result + terrainAlpha.hashCode();
         result = 31 * result + orientation.hashCode();
+        result = 31 * result + rotationSmoothing.hashCode();
         result = 31 * result + compassFontScale.hashCode();
         result = 31 * result + showCompass.hashCode();
         result = 31 * result + showReticle.hashCode();
@@ -199,6 +203,7 @@ public class MiniMapProperties extends InGameMapProperties
                 .add("frameAlpha", frameAlpha)
                 .add("name", name)
                 .add("orientation", orientation)
+                .add("rotationSmoothing", rotationSmoothing)
                 .add("position", position)
                 .add("preferredMapType", preferredMapType)
                 .add("reticleOrientation", reticleOrientation)

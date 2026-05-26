@@ -141,6 +141,11 @@ public class UIManager
 
     public void drawMiniMap()
     {
+        drawMiniMap(1f);
+    }
+
+    public void drawMiniMap(float partialTicks)
+    {
         try
         {
             if (miniMap.getCurrentMinimapProperties().enabled.get())
@@ -149,7 +154,7 @@ public class UIManager
                 final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat;
                 if (doDraw)
                 {
-                    miniMap.drawMap();
+                    miniMap.drawMap(partialTicks);
                 }
             }
         }
