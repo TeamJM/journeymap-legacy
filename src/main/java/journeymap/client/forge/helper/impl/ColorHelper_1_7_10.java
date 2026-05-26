@@ -247,6 +247,8 @@ public class ColorHelper_1_7_10 implements IColorHelper
 
             if (blockAtlas == null)
             {
+                // if we need to look up a color when the block atlas copy
+                // is null we look up our precomputed TextureAtlasSprite color cache
                 final BlockSpriteMD spriteMD = BlockSpriteMD.get(icon);
                 if (spriteMD.hasColor())
                 {
