@@ -6,7 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-@IFMLLoadingPlugin.Name("Journeymap loading plugin")
+@IFMLLoadingPlugin.Name("Journeymap")
 @IFMLLoadingPlugin.MCVersion("1.7.10")
 public class MixinLoadingPlugin implements IFMLLoadingPlugin
 {
