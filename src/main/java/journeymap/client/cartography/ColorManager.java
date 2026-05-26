@@ -176,9 +176,8 @@ public class ColorManager
             }
             long blocksTime = System.currentTimeMillis() - start3;
             BlockSpriteMD.loadColorsFrom(allBlocks);
-            final Collection<BlockSpriteMD> allSprites = BlockSpriteMD.getCached();
             long start4 = System.currentTimeMillis();
-            for (BlockSpriteMD spriteMD : allSprites)
+            for (BlockSpriteMD spriteMD : BlockSpriteMD.getCached())
             {
                 if (spriteMD.ensureColor())
                 {

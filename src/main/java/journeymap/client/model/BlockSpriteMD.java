@@ -6,8 +6,8 @@ import journeymap.client.log.StatTimer;
 import journeymap.common.Journeymap;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -76,7 +76,7 @@ public final class BlockSpriteMD
 
     public static Collection<BlockSpriteMD> getCached()
     {
-        return new ArrayList<>(cache.values());
+        return Collections.unmodifiableCollection(cache.values());
     }
 
     public boolean ensureColor()
