@@ -29,14 +29,14 @@ public abstract class MixinGuiYesNo extends GuiScreen
     {
         if (this.parentScreen instanceof GuiSelectWorldExt)
         {
-            boolean initial = ((GuiSelectWorldExt) this.parentScreen).jm$shouldDeleteJmData();
             this.jm$checkbox = new GuiCheckBox(
                     -164816186,
                     this.width / 2 - 80,
                     110,
                     " " + EnumChatFormatting.RED + Constants.getString("jm.common.deleteworld_text"),
-                    initial
+                    true
             );
+            ((GuiSelectWorldExt) this.parentScreen).jm$setShouldDeleteJmData(true);
             this.buttonList.add(this.jm$checkbox);
         }
     }

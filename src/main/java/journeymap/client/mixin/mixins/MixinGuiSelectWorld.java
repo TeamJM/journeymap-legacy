@@ -24,12 +24,6 @@ public abstract class MixinGuiSelectWorld extends GuiScreen implements GuiSelect
     private boolean jm$deleteJmData = true;
 
     @Override
-    public boolean jm$shouldDeleteJmData()
-    {
-        return this.jm$deleteJmData;
-    }
-
-    @Override
     public void jm$setShouldDeleteJmData(boolean value)
     {
         this.jm$deleteJmData = value;
