@@ -68,6 +68,7 @@ jm.common.deletemap_status_done=Map deleted.
 jm.common.deletemap_status_error=Unable to delete map. See journeymap.log for details.
 jm.common.deletemap_text=Delete map in one or more dimensions
 jm.common.deletemap_title=Delete Map...
+jm.common.deleteworld_text=Delete JourneyMap World Data
 jm.common.dimension=Dimension %1$s
 jm.common.disabled_feature=Feature not available
 jm.common.enable=Enabled

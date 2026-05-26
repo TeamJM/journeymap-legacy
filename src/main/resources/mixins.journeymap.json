@@ -7,7 +7,8 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [],
   "client": [
-    "MixinTestMinecraft"
+    "MixinGuiSelectWorld",
+    "MixinGuiYesNo"
   ],
   "server": []
 }
