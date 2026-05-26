@@ -11,6 +11,7 @@ import journeymap.client.forge.helper.IColorHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockMD;
+import journeymap.client.model.BlockSpriteMD;
 import journeymap.client.model.ChunkMD;
 import journeymap.common.Journeymap;
 import net.minecraft.block.Block;
@@ -35,28 +36,21 @@ import java.util.HashSet;
 public class ColorHelper_1_7_10 implements IColorHelper
 {
     private static volatile ArgbImage blocksTexture;
-    Logger logger = Journeymap.getLogger();
-    HashSet<BlockMD> failed = new HashSet<BlockMD>();
+    private final Logger logger = Journeymap.getLogger();
+    private final HashSet<BlockMD> failed = new HashSet<>();
 
     public ColorHelper_1_7_10()
     {
     }
 
     @Override
-    public boolean hasBlocksTexture()
+    public void clearBlocksTexture()
     {
-        return blocksTexture != null;
-    }
-
-    @Override
-    public boolean clearBlocksTexture()
-    {
-        if(blocksTexture==null)
+        if (blocksTexture == null)
         {
-            return false;
+            return;
         }
         blocksTexture = null;
-        return true;
     }
 
     @Override
@@ -96,15 +90,6 @@ public class ColorHelper_1_7_10 implements IColorHelper
     public Integer getTextureColor(BlockMD blockMD)
     {
 
-        Integer color = null;
-
-        boolean ok = blocksTexture != null || initBlocksTexture();
-        if (!ok)
-        {
-            logger.warn("BlocksTexture not yet loaded");
-            return null;
-        }
-
 //        if (failed.contains(blockMD))
 //        {
 //            return null;
@@ -112,8 +97,8 @@ public class ColorHelper_1_7_10 implements IColorHelper
 
         try
         {
-
-            TextureAtlasSprite blockIcon = getDirectIcon(blockMD);
+            final Integer color;
+            final TextureAtlasSprite blockIcon = getDirectIcon(blockMD);
 
             if (blockIcon == null)
             {
@@ -146,33 +131,28 @@ public class ColorHelper_1_7_10 implements IColorHelper
             failed.add(blockMD);
             if (blockMD.getUid().modId.equals("minecraft"))
             {
-                logger.warn("Error getting block color. Plese report this exception to the JourneyMap mod author regarding {}: {}", blockMD.getUid(), LogFormatter.toPartialString(t));
+                logger.warn("Error getting block color. Please report this exception to the JourneyMap mod author regarding {}: {}", blockMD.getUid(), LogFormatter.toPartialString(t));
             }
             else
             {
-                logger.warn("Error getting block color from mod. Plese report this exception to the mod author of {}: {}", blockMD.getUid(), LogFormatter.toPartialString(t));
+                logger.warn("Error getting block color from mod. Please report this exception to the mod author of {}: {}", blockMD.getUid(), LogFormatter.toPartialString(t));
             }
 
             return null;
         }
     }
 
+    @Override
+    public BlockSpriteMD getSprite(BlockMD blockMD)
+    {
+        return BlockSpriteMD.get(this.getDirectIcon(blockMD));
+    }
+
     private TextureAtlasSprite getDirectIcon(BlockMD blockMD)
     {
-        boolean ok = blocksTexture != null || initBlocksTexture();
-        if (!ok)
-        {
-            logger.warn("BlocksTexture not yet loaded");
-            return null;
-        }
 
-        Block block = blockMD.getBlock();
-        Integer overrideMeta = null;
-        if (blockMD.hasOverrideMeta())
-        {
-            overrideMeta = blockMD.getOverrideMeta();
-        }
-        int meta = overrideMeta != null ? overrideMeta : blockMD.getMeta();
+        final Block block = blockMD.getBlock();
+        final int meta = blockMD.hasOverrideMeta() ? blockMD.getOverrideMeta() : blockMD.getMeta();
 
         IIcon icon = null;
 
@@ -188,11 +168,11 @@ public class ColorHelper_1_7_10 implements IColorHelper
             {
                 if (blockMD.getUid().modId.equals("minecraft"))
                 {
-                    logger.warn("Error getting BlockDoublePlant icon. Plese report this exception to the JourneyMap mod author regarding {}: {}", blockMD.getUid(), LogFormatter.toPartialString(e));
+                    logger.warn("Error getting BlockDoublePlant icon. Please report this exception to the JourneyMap mod author regarding {}: {}", blockMD.getUid(), LogFormatter.toPartialString(e));
                 }
                 else
                 {
-                    logger.warn("Error getting BlockDoublePlant icon from mod. Plese report this exception to the mod author of {}: {}", blockMD.getUid(), LogFormatter.toPartialString(e));
+                    logger.warn("Error getting BlockDoublePlant icon from mod. Please report this exception to the mod author of {}: {}", blockMD.getUid(), LogFormatter.toPartialString(e));
                 }
             }
         }
@@ -216,106 +196,101 @@ public class ColorHelper_1_7_10 implements IColorHelper
 
     }
 
-    Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
+    @Override
+    public Integer getSpriteColor(BlockSpriteMD spriteMD)
     {
-        boolean ok = blocksTexture != null || initBlocksTexture();
-        if (!ok)
+        final ArgbImage blockAtlas = blocksTexture;
+
+        if (blockAtlas == null)
         {
             logger.warn("BlocksTexture not yet loaded");
             return null;
         }
 
-        Integer color = null;
-
         try
         {
-            int count = 0;
-            int argb, alpha;
-            int a = 0, r = 0, g = 0, b = 0;
-            int x = 0, y = 0;
 
-            int xStart, yStart, xStop, yStop;
-            if(icon.getIconWidth() + icon.getOriginX() > blocksTexture.getWidth() || icon.getIconHeight() + icon.getOriginY() > blocksTexture.getHeight())
+            if (blockAtlas.isSubImageWithinImage(spriteMD.x, spriteMD.y, spriteMD.width, spriteMD.height))
             {
-                logger.warn("Couldn't get texture for {} because of an error matching it within the stitched blocks atlas.", icon.getIconName());
-                return null;
-            }
-            ArgbImage textureImg = blocksTexture.getSubimage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight());
-            xStart = yStart = 0;
-            xStop = textureImg.getWidth();
-            yStop = textureImg.getHeight();
-
-            boolean unusable = true;
-            if (textureImg.getWidth() > 0)
-            {
-                outer:
-                for (x = xStart; x < xStop; x++)
+                if (spriteMD.width > 0)
                 {
-                    inner:
-                    for (y = yStart; y < yStop; y++)
-                    {
-                        try
-                        {
-                            argb = textureImg.getRGB(x, y);
-                        }
-                        catch (ArrayIndexOutOfBoundsException e)
-                        {
-                            logger.warn("Bad index at {},{} for {}: {}", x, y, blockMD, e.getMessage());
-                            continue; // Bugfix for some texturepacks that may not be reporting correct size?
-                        }
-                        catch (Throwable e)
-                        {
-                            logger.warn("Couldn't get RGB from BlocksTexture at {},{} for {}: {}", x, y, blockMD, e.getMessage());
-                            break outer;
-                        }
-                        alpha = (argb >> 24) & 0xFF;
-                        if (alpha > 0)
-                        {
-                            count++;
-                            a += alpha;
-                            r += (argb >> 16) & 0xFF;
-                            g += (argb >> 8) & 0xFF;
-                            b += (argb) & 0xFF;
-                        }
-                    }
+                    return blockAtlas.getColorOfSubImage(spriteMD.x, spriteMD.y, spriteMD.width, spriteMD.height);
                 }
-
-                if (count > 0)
+                else
                 {
-                    unusable = false;
-                    if (a > 0)
-                    {
-                        a = a / count;
-                    }
-                    if (r > 0)
-                    {
-                        r = r / count;
-                    }
-                    if (g > 0)
-                    {
-                        g = g / count;
-                    }
-                    if (b > 0)
-                    {
-                        b = b / count;
-                    }
+                    logger.warn("Couldn't get texture for {}", spriteMD);
                 }
             }
             else
             {
-                logger.warn("Couldn't get texture for {} using blockid ", icon.getIconName());
+                logger.warn("Couldn't get texture for {} because of an error matching it within the stitched blocks atlas.", spriteMD);
+                return null;
             }
+
+        }
+        catch (Throwable e1)
+        {
+            logger.warn("Error deriving color for {}: {}", spriteMD, LogFormatter.toString(e1));
+        }
+
+        return null;
+    }
+
+    private Integer getColorForIcon(BlockMD blockMD, TextureAtlasSprite icon)
+    {
+
+        try
+        {
+
+            final ArgbImage blockAtlas = blocksTexture;
+            int color = 0;
+
+            if (blockAtlas == null)
+            {
+                // if we need to look up a color when the block atlas copy
+                // is null we look up our precomputed TextureAtlasSprite color cache
+                final BlockSpriteMD spriteMD = BlockSpriteMD.get(icon);
+                if (spriteMD.hasColor())
+                {
+                    color = spriteMD.getColor();
+                }
+                else
+                {
+                    logger.warn("Could not retrieve color from BlockSpriteMD cache for block {}", blockMD);
+                    return null;
+                }
+            }
+            else
+            {
+                if (blockAtlas.isSubImageWithinImage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight()))
+                {
+                    if (icon.getIconWidth() > 0)
+                    {
+                        color = blockAtlas.getColorOfSubImage(icon.getOriginX(), icon.getOriginY(), icon.getIconWidth(), icon.getIconHeight());
+                    }
+                    else
+                    {
+                        logger.warn("Couldn't get texture for {}, {}", blockMD, icon);
+                    }
+                }
+                else
+                {
+                    logger.warn("Couldn't get texture for {} because of an error matching it within the stitched blocks atlas.", icon.getIconName());
+                    return null;
+                }
+            }
+
+            final boolean unusable = color == 0;
 
             if (unusable)
             {
                 blockMD.addFlags(BlockMD.Flag.Error);
-                logger.debug("Unusable texture for {}, icon={},texture coords {},{} - {},{}", blockMD, icon.getIconName(), xStart, yStart, xStop, yStop);
-                r = g = b = 0;
+                logger.debug("Unusable texture for {}, {}", blockMD, icon);
             }
 
-
-            // Set color
-            color = RGB.toInteger(r, g, b);
+            // extract alpha and set to the max for the color
+            final int alpha = (color >> 24) & 0xFF;
+            color = color | 0xFF000000;
 
             // Determine alpha
             Block block = blockMD.getBlock();
@@ -341,32 +316,32 @@ public class ColorHelper_1_7_10 implements IColorHelper
                     // try to use texture alpha
                     if (blockAlpha == 0 || blockAlpha == 1)
                     {
-                        blockAlpha = a * 1.0f / 255;
+                        blockAlpha = alpha * 1.0f / 255;
                     }
                 }
             }
             //dataCache.getBlockMetadata().setAllAlpha(block, blockAlpha);
             blockMD.setAlpha(blockAlpha);
             blockMD.setIconName(icon.getIconName());
+
+            if (logger.isTraceEnabled())
+            {
+                logger.debug("Derived color for {}: {}", blockMD, Integer.toHexString(color));
+            }
+
+            return color;
+
         }
         catch (Throwable e1)
         {
             logger.warn("Error deriving color for {}: {}", blockMD, LogFormatter.toString(e1));
         }
 
-        if (color != null)
-        {
-            if (logger.isTraceEnabled())
-            {
-                logger.debug("Derived color for {}: {}", blockMD, Integer.toHexString(color));
-            }
-        }
-
-        return color;
+        return null;
     }
 
     @Override
-    public boolean initBlocksTexture()
+    public void initBlocksTexture()
     {
         StatTimer timer = StatTimer.get("ColorHelper.initBlocksTexture", 0);
 
@@ -374,7 +349,7 @@ public class ColorHelper_1_7_10 implements IColorHelper
         {
             if (!Display.isCurrent())
             {
-                return false;
+                return;
             }
             blocksTexture = null;
             timer.start();
@@ -384,28 +359,23 @@ public class ColorHelper_1_7_10 implements IColorHelper
             GL11.glPixelStorei(GL11.GL_PACK_ALIGNMENT, 1);
             GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
 
-            int miplevel = 0;
-            int width = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, miplevel, GL11.GL_TEXTURE_WIDTH);
-            int height = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, miplevel, GL11.GL_TEXTURE_HEIGHT);
-            IntBuffer intbuffer = BufferUtils.createIntBuffer(width * height);
-            int[] aint = new int[width * height];
+            final int miplevel = 0;
+            final int width = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, miplevel, GL11.GL_TEXTURE_WIDTH);
+            final int height = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, miplevel, GL11.GL_TEXTURE_HEIGHT);
+            final IntBuffer intbuffer = BufferUtils.createIntBuffer(width * height);
             GL11.glGetTexImage(GL11.GL_TEXTURE_2D, miplevel, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, intbuffer);
-            intbuffer.get(aint);
+            final int[] pixels = new int[width * height];
+            intbuffer.get(pixels);
 
-            ArgbImage argbImage = new ArgbImage(width, height);
-            argbImage.setRGB(0, 0, width, height, aint, 0, width);
-            blocksTexture = argbImage;
+            blocksTexture = new ArgbImage(pixels, width, height);
 
             double time = timer.stop();
-            Journeymap.getLogger().info("initBlocksTexture: {}x{} loaded in {}ms", width, height, time);
-
-            return true;
+            logger.info("Created block atlas copy {}x{} in {}ms", width, height, time);
         }
         catch (Throwable t)
         {
-            logger.error("Could not load blocksTexture :{}", String.valueOf(t));
+            logger.error("Could not load block atlas copy :{}", String.valueOf(t));
             timer.cancel();
-            return false;
         }
     }
 
@@ -451,65 +421,67 @@ public class ColorHelper_1_7_10 implements IColorHelper
      * Minimal ARGB image implementation for fast pixel access.
      * Avoids overhead of {@link BufferedImage#setRGB} since we store and use ARGB pixels only.
      */
-    private static final class ArgbImage {
+    private static final class ArgbImage
+    {
         public final int[] pixels;
         public final int width;
         public final int height;
-        public final int stride;
-        public final int offset;
 
-        public ArgbImage(int width, int height) {
-            this(new int[width * height], width, height, width, 0);
-        }
-
-        public ArgbImage(int[] pixels, int width, int height, int stride, int offset) {
+        public ArgbImage(int[] pixels, int width, int height)
+        {
             this.pixels = pixels;
             this.width = width;
             this.height = height;
-            this.stride = stride;
-            this.offset = offset;
         }
 
-        public int getWidth() {
-            return width;
-        }
-        public int getHeight() {
-            return height;
+        public boolean isSubImageWithinImage(int x, int y, int w, int h)
+        {
+            return x >= 0 && y >= 0 && w >= 0 && h >= 0 && x + w <= width && y + h <= height;
         }
 
-        public int getRGB(int x, int y) {
-            return pixels[offset + y * stride + x];
-        }
-
-        public void setRGB(int x, int y, int argb) {
-            pixels[offset + y * stride + x] = argb;
-        }
-
-        public void setRGB(int x, int y, int w, int h, int[] srcPixels, int srcOffset, int srcStride) {
-            if (x < 0 || y < 0 || w < 0 || h < 0 || x + w > width || y + h > height) {
-                throw new IllegalArgumentException("Region out of bounds");
-            }
-            if (w == 0 || h == 0) {
-                return;
-            }
-
-            // Fast path: both source and destination are tightly packed
-            if (x == 0 && y == 0 && w == width && h == height && srcStride == width && stride == width) {
-                System.arraycopy(srcPixels, srcOffset, pixels, offset, width * height);
-                return;
+        public int getColorOfSubImage(int x, int y, int w, int h)
+        {
+            final int off = y * width + x;
+            int count = 0;
+            int a = 0, r = 0, g = 0, b = 0;
+            for (int i = 0; i < h; i++)
+            {
+                final int row = off + i * width;
+                for (int j = 0; j < w; j++)
+                {
+                    final int argb = pixels[row + j];
+                    final int alpha = (argb >> 24) & 0xFF;
+                    if (alpha > 0)
+                    {
+                        count++;
+                        a += alpha;
+                        r += (argb >> 16) & 0xFF;
+                        g += (argb >> 8) & 0xFF;
+                        b += (argb) & 0xFF;
+                    }
+                }
             }
 
-            int dst = offset + y * stride + x;
-            for (int row = 0; row < h; row++) {
-                System.arraycopy(srcPixels, srcOffset + row * srcStride, pixels, dst + row * stride, w);
+            if (count > 0)
+            {
+                if (a > 0)
+                {
+                    a = a / count;
+                }
+                if (r > 0)
+                {
+                    r = r / count;
+                }
+                if (g > 0)
+                {
+                    g = g / count;
+                }
+                if (b > 0)
+                {
+                    b = b / count;
+                }
             }
-        }
-
-        public ArgbImage getSubimage(int x, int y, int w, int h) {
-            if (x < 0 || y < 0 || w < 0 || h < 0 || x + w > width || y + h > height) {
-                throw new IllegalArgumentException("Subimage out of bounds");
-            }
-            return new ArgbImage(pixels, w, h, stride, offset + y * stride + x);
+            return RGB.toInteger(a, r, g, b);
         }
     }
 }

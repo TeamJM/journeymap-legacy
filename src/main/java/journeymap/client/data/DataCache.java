@@ -589,7 +589,7 @@ public class DataCache
         private static final DataCache INSTANCE = new DataCache();
     }
 
-    class ProxyRemovalListener<K, V> implements RemovalListener<K, V>
+    static class ProxyRemovalListener<K, V> implements RemovalListener<K, V>
     {
         final Map<RemovalListener<K, V>, Void> delegates = Collections.synchronizedMap(new WeakHashMap<RemovalListener<K, V>, Void>());
 

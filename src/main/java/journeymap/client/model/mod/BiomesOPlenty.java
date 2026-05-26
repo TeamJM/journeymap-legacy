@@ -78,7 +78,7 @@ public class BiomesOPlenty implements ModBlockDelegate.IModBlockHandler
     public static class BoPGrassColorHandler extends VanillaColorHandler
     {
         @Override
-        protected Integer loadTextureColor(BlockMD blockMD, int globalX, int y, int globalZ)
+        protected int loadTextureColor(BlockMD blockMD, int globalX, int y, int globalZ)
         {
             System.out.println("Loading Tex Color: " + blockMD);
             return RGB.RED_RGB;

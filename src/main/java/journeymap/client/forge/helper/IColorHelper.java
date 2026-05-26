@@ -6,6 +6,7 @@
 package journeymap.client.forge.helper;
 
 import journeymap.client.model.BlockMD;
+import journeymap.client.model.BlockSpriteMD;
 import journeymap.client.model.ChunkMD;
 import net.minecraft.block.Block;
 
@@ -15,15 +16,17 @@ import net.minecraft.block.Block;
  */
 public interface IColorHelper
 {
-    boolean clearBlocksTexture();
+    void clearBlocksTexture();
 
-    boolean hasBlocksTexture();
-
-    boolean initBlocksTexture();
+    void initBlocksTexture();
 
     boolean failedFor(BlockMD blockMD);
 
     Integer getTextureColor(BlockMD blockMD);
+
+    Integer getSpriteColor(BlockSpriteMD spriteMD);
+
+    BlockSpriteMD getSprite(BlockMD blockMD);
 
     int getColorMultiplier(ChunkMD chunkMD, Block block, int x, int y, int z);
 

@@ -6,6 +6,7 @@
 package journeymap.client.forge.helper;
 
 import journeymap.client.model.BlockMD;
+import journeymap.client.model.BlockSpriteMD;
 import journeymap.client.model.ChunkMD;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -29,6 +30,7 @@ import net.minecraft.world.chunk.Chunk;
 
 import java.net.SocketAddress;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Interface used to encapsulate compile-time differences between Minecraft/Forge versions.
@@ -112,4 +114,6 @@ public interface IForgeHelper
     public SocketAddress getSocketAddress(NetworkManager netManager);
 
     public String getFPS();
+
+    public Set<BlockSpriteMD> getAllRegisteredBlockSprites();
 }

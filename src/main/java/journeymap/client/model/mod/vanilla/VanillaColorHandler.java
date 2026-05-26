@@ -38,10 +38,14 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
     @Override
     public Integer getBlockColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
     {
-        Integer color = getBaseColor(chunkMD, blockMD, globalX, y, globalZ);
+        Integer color;
         if (blockMD.isBiomeColored())
         {
             color = getBiomeColor(chunkMD, blockMD, globalX, y, globalZ);
+        }
+        else
+        {
+            color = getBaseColor(chunkMD, blockMD, globalX, y, globalZ);
         }
 
         // Fallback to Minecraft's own map color
@@ -82,8 +86,12 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
      */
     protected int getBaseColor(ChunkMD chunkMD, BlockMD blockMD, int globalX, int y, int globalZ)
     {
-        Integer color = blockMD.getColor();
-        if (color == null)
+        final int color;
+        if (blockMD.hasColor())
+        {
+            color = blockMD.getColor();
+        }
+        else
         {
             if (blockMD.isAir())
             {
@@ -174,17 +182,18 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
      *
      * @return
      */
-    protected Integer loadTextureColor(BlockMD blockMD, int globalX, int y, int globalZ)
+    protected int loadTextureColor(BlockMD blockMD, int globalX, int y, int globalZ)
     {
-        Integer baseColor = null;
 
         // Get the color from the texture
-        baseColor = getTextureColor(blockMD);
+        final Integer baseColor = getTextureColor(blockMD);
+        int color;
 
         // Non-biome block colors get multiplied by their render color.
         // Some blocks may have custom biome-based tints as well.
         if (baseColor != null)
         {
+            color = baseColor;
             if (!blockMD.isBiomeColored())
             {
                 // Check for custom biome-based color multiplier
@@ -200,16 +209,15 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
                     int renderColor = colorHelper.getRenderColor(blockMD);
                     if (!RGB.isWhite(renderColor))
                     {
-                        baseColor = RGB.multiply(baseColor, RGB.ALPHA_OPAQUE | renderColor); // Force opaque render color
+                        color = RGB.multiply(color, RGB.ALPHA_OPAQUE | renderColor); // Force opaque render color
                         Journeymap.getLogger().info("Applied render color for {}", blockMD);
                     }
                 }
             }
         }
-
-        if (baseColor == null)
+        else
         {
-            baseColor = RGB.BLACK_ARGB;
+            color = RGB.BLACK_ARGB;
             if (blockMD.hasFlag(BlockMD.Flag.TileEntity))
             {
                 // TODO: What to do about this?
@@ -224,7 +232,7 @@ public class VanillaColorHandler implements ModBlockDelegate.IModBlockColorHandl
                 Journeymap.getLogger().warn("Unknown failure, could not get base color for {}", blockMD);
             }
         }
-        return baseColor;
+        return color;
     }
 
     /**
