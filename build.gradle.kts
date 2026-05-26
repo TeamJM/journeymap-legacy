@@ -91,6 +91,14 @@ tasks.jar {
     filesMatching("mcmod.info") {
         expand("jm_edition" to unlimited)
     }
+    manifest {
+         // since we enabled mixins and we want it to be a soft dep
+         // we need to remove the mixins tweaker from the manifest
+         // file that gets automatically added by the buildscript
+         // otherwise the game will crash on startup with a
+         // class not found error when mixins are not present
+         attributes.remove("TweakClass")
+    }
 }
 
 // Main artifact
