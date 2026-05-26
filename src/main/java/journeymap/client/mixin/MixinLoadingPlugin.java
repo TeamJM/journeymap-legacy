@@ -34,6 +34,8 @@ public class MixinLoadingPlugin implements IFMLLoadingPlugin
     {
         try
         {
+            // we manually register our mixin config using
+            // reflection to keep mixins as a soft dep
             Class.forName("org.spongepowered.asm.mixin.Mixins")
                     .getDeclaredMethod("addConfiguration", String.class)
                     .invoke(null, "mixins.journeymap.json");
