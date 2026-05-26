@@ -187,13 +187,16 @@ public class ColorManager
             long spritesTime = System.currentTimeMillis() - start4;
             Journeymap.getLogger().info("Initialized {} block colors ({}ms) and {} sprite colors ({}ms) from mods and resource packs", blockCount, blocksTime, spriteCount, spritesTime);
 
-            if (blockCount > 0 || palette == null)
+            if (palette != null)
             {
-                ColorPalette.create(standard, permanent);
-            }
-            else
-            {
-                Journeymap.getLogger().info("Color palette was sufficient: {}", palette.getOrigin());
+                if (blockCount > 0)
+                {
+                    ColorPalette.create(standard, permanent, false);
+                }
+                else
+                {
+                    Journeymap.getLogger().info("Color palette was sufficient: {}", palette.getOrigin());
+                }
             }
 
             // Remap around player
