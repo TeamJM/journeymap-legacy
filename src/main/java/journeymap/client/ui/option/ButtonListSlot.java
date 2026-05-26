@@ -84,8 +84,9 @@ public class ButtonListSlot implements ScrollListPane.ISlot, Comparable<ButtonLi
         int margin = 0;
         if (parent.getCurrentColumnWidth() > 0)
         {
-            int cols = listWidth / parent.currentColumnWidth;
-            margin = (listWidth - ((hgap * cols - 1) + cols * parent.getCurrentColumnWidth())) / 2;
+            int cols = parent.getCurrentColumns();
+            int totalWidth = cols * parent.getCurrentColumnWidth() + Math.max(0, cols - 1) * hgap;
+            margin = (listWidth - totalWidth) / 2;
 
             x += margin;
             listWidth -= (margin * 2);
