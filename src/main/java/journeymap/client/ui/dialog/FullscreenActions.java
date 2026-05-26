@@ -13,9 +13,6 @@ import journeymap.client.log.ChatLog;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
-import journeymap.client.render.draw.DrawUtil;
-import journeymap.client.render.texture.TextureCache;
-import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.task.multi.MapRegionTask;
 import journeymap.client.task.multi.SaveMapTask;
 import journeymap.client.ui.UIManager;
@@ -27,7 +24,6 @@ import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.common.Journeymap;
 import journeymap.common.version.VersionCheck;
 import net.minecraft.client.gui.GuiButton;
-import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
@@ -35,9 +31,7 @@ import java.io.IOException;
 
 public class FullscreenActions extends JmUI
 {
-    protected TextureImpl patreonLogo = TextureCache.instance().getPatreonLogo();
-
-    Button buttonAutomap, buttonSave, buttonAbout, buttonClose, buttonBrowser, buttonCheck, buttonDonate, buttonDeleteMap;
+    Button buttonAutomap, buttonSave, buttonAbout, buttonClose, buttonBrowser, buttonCheck, buttonDeleteMap;
     BooleanPropertyButton buttonEnableMapping;
 
     public FullscreenActions()
@@ -54,19 +48,6 @@ public class FullscreenActions extends JmUI
     public static void launchLocalhost()
     {
         String url = "http://localhost:" + JourneymapClient.getWebMapProperties().port.get();
-        try
-        {
-            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
-        }
-        catch (IOException e)
-        {
-            Journeymap.getLogger().error("Could not launch browser with URL: {}: {}", url, LogFormatter.toString(e));
-        }
-    }
-
-    public static void launchPatreon()
-    {
-        String url = "http://patreon.com/techbrew";
         try
         {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
@@ -130,11 +111,6 @@ public class FullscreenActions extends JmUI
         buttonDeleteMap = new Button(Constants.getString("jm.common.deletemap_title"));
         buttonDeleteMap.setTooltip(Constants.getString("jm.common.deletemap_text"));
 
-        buttonDonate = new Button(Constants.getString("jm.webmap.donate_text"));
-        buttonDonate.setDefaultStyle(false);
-        buttonDonate.setDrawBackground(false);
-        buttonDonate.setDrawFrame(false);
-
         buttonCheck = new Button(Constants.getString("jm.common.update_check"));
 
         buttonEnableMapping = new BooleanPropertyButton(Constants.getString("jm.common.enable_mapping_false"),
@@ -146,7 +122,6 @@ public class FullscreenActions extends JmUI
         buttonList.add(buttonAutomap);
         buttonList.add(buttonSave);
         buttonList.add(buttonCheck);
-        buttonList.add(buttonDonate);
         buttonList.add(buttonBrowser);
         buttonList.add(buttonDeleteMap);
         buttonList.add(buttonEnableMapping);
@@ -188,12 +163,7 @@ public class FullscreenActions extends JmUI
         row2.layoutCenteredHorizontal(bx, row1.getBottomY() + vgap, true, hgap);
         row3.layoutCenteredHorizontal(bx, row2.getBottomY() + vgap, true, hgap);
 
-        int patreonX = bx - 8;
-        int patreonY = row2.getBottomY() + 32;
-        DrawUtil.drawImage(patreonLogo, patreonX, patreonY, false, .5f, 0);
-
-        buttonDonate.centerHorizontalOn(bx).setY(patreonY + 16);
-        buttonClose.below(buttonDonate, vgap * 4).centerHorizontalOn(bx);
+        buttonClose.below(buttonBrowser, vgap * 4).centerHorizontalOn(bx);
     }
 
     @Override
@@ -214,12 +184,6 @@ public class FullscreenActions extends JmUI
         if (guibutton == buttonBrowser)
         {
             launchLocalhost();
-            UIManager.getInstance().openFullscreenMap();
-            return;
-        }
-        if (guibutton == buttonDonate)
-        {
-            launchPatreon();
             UIManager.getInstance().openFullscreenMap();
             return;
         }
