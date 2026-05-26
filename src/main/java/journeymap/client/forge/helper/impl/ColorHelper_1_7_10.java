@@ -442,11 +442,12 @@ public class ColorHelper_1_7_10 implements IColorHelper
             final int off = y * width + x;
             int count = 0;
             int a = 0, r = 0, g = 0, b = 0;
-            for (int i = 0; i < w; i++)
+            for (int i = 0; i < h; i++)
             {
-                for (int j = 0; j < h; j++)
+                final int row = off + i * width;
+                for (int j = 0; j < w; j++)
                 {
-                    final int argb = pixels[off + j * width + i];
+                    final int argb = pixels[row + j];
                     final int alpha = (argb >> 24) & 0xFF;
                     if (alpha > 0)
                     {
