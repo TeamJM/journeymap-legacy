@@ -247,7 +247,7 @@ public class FullscreenActions extends JmUI
         if (mapSaver.isValid())
         {
             JourneymapClient.getInstance().toggleTask(SaveMapTask.Manager.class, true, mapSaver);
-            ChatLog.announceI18N("jm.common.save_filename");
+            ChatLog.announceI18N("jm.common.save_filename", mapSaver.getSaveFileName());
         }
         closeAndReturn();
     }
