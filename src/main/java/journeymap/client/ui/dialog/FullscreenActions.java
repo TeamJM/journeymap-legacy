@@ -7,6 +7,7 @@ package journeymap.client.ui.dialog;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.cartography.ColorPalette;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.io.MapSaver;
 import journeymap.client.log.ChatLog;
@@ -31,7 +32,7 @@ import java.io.IOException;
 
 public class FullscreenActions extends JmUI
 {
-    Button buttonAutomap, buttonSave, buttonAbout, buttonClose, buttonBrowser, buttonCheck, buttonDeleteMap;
+    Button buttonAutomap, buttonSave, buttonAbout, buttonClose, buttonBrowser, buttonCheck, buttonDeleteMap, buttonPalette;
     BooleanPropertyButton buttonEnableMapping;
 
     public FullscreenActions()
@@ -118,6 +119,9 @@ public class FullscreenActions extends JmUI
                 JourneymapClient.getCoreProperties(),
                 JourneymapClient.getCoreProperties().mappingEnabled);
 
+        buttonPalette = new Button(Constants.getString("jm.common.dumppalette_title"));
+        buttonPalette.setTooltip(Constants.getString("jm.common.dumppalette_text"));
+
         buttonList.add(buttonAbout);
         buttonList.add(buttonAutomap);
         buttonList.add(buttonSave);
@@ -125,6 +129,7 @@ public class FullscreenActions extends JmUI
         buttonList.add(buttonBrowser);
         buttonList.add(buttonDeleteMap);
         buttonList.add(buttonEnableMapping);
+        buttonList.add(buttonPalette);
 
         new ButtonList(buttonList).equalizeWidths(getFontRenderer());
 
@@ -163,7 +168,9 @@ public class FullscreenActions extends JmUI
         row2.layoutCenteredHorizontal(bx, row1.getBottomY() + vgap, true, hgap);
         row3.layoutCenteredHorizontal(bx, row2.getBottomY() + vgap, true, hgap);
 
-        buttonClose.below(buttonBrowser, vgap * 4).centerHorizontalOn(bx);
+        buttonPalette.below(buttonBrowser, vgap).setX(buttonBrowser.getX());
+
+        buttonClose.below(buttonPalette, vgap * 4).centerHorizontalOn(bx);
     }
 
     @Override
@@ -215,17 +222,20 @@ public class FullscreenActions extends JmUI
             {
                 UIManager.getInstance().openFullscreenMap();
                 ChatLog.announceI18N("jm.common.enable_mapping_true_text");
-                return;
             }
             else
             {
                 JourneymapClient.getInstance().stopMapping();
                 ChatLog.announceI18N("jm.common.enable_mapping_false_text");
                 UIManager.getInstance().openFullscreenMap();
-                return;
             }
+            return;
         }
-
+        if (guibutton == buttonPalette)
+        {
+            ColorPalette.create(true, false, true);
+            UIManager.getInstance().openFullscreenMap();
+        }
     }
 
     void save()
@@ -242,17 +252,12 @@ public class FullscreenActions extends JmUI
         closeAndReturn();
     }
 
-
     @Override
     protected void keyTyped(char c, int i)
     {
-        switch (i)
+        if (i == Keyboard.KEY_ESCAPE)
         {
-            case Keyboard.KEY_ESCAPE:
-            {
-                closeAndReturn();
-                break;
-            }
+            closeAndReturn();
         }
     }
 }

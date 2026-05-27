@@ -186,7 +186,7 @@ public class ColorPalette
     /**
      * Create a color palette based on current block colors and write it to file.
      */
-    public static ColorPalette create(boolean standard, boolean permanent)
+    public static ColorPalette create(boolean standard, boolean permanent, boolean postChatMessage)
     {
         try
         {
@@ -198,6 +198,10 @@ public class ColorPalette
             palette.setPermanent(permanent);
             palette.writeToFileAsync();
             Journeymap.getLogger().info("Queued color palette file with {} colors for: {}", palette.size(), palette.getOrigin());
+            if (postChatMessage)
+            {
+                ChatLog.announceI18N("jm.common.save_palette", palette.size());
+            }
             return palette;
         }
         catch (Exception e)
