@@ -183,6 +183,10 @@ public class OptionsManager extends JmUI
                     {
                         CategorySlot categorySlot = (CategorySlot) rootSlot;
                         Config.Category category = categorySlot.getCategory();
+                        if (category == null)
+                        {
+                            continue;
+                        }
 
                         // Reset button
                         ResetButton resetButton = new ResetButton(category);
@@ -513,6 +517,10 @@ public class OptionsManager extends JmUI
         {
             // Track the category of the button so resets can happen when OptionsManager is closed
             Config.Category category = categorySlot.getCategory();
+            if (category == null)
+            {
+                return;
+            }
             changedCategories.add(category);
 
             // If the button is MiniMap-related, force it to update
@@ -731,7 +739,10 @@ public class OptionsManager extends JmUI
         {
             if (categorySlot.isSelected())
             {
-                OptionsManager.openCategories.add(categorySlot.getCategory());
+                if (categorySlot.getCategory() != null)
+                {
+                    OptionsManager.openCategories.add(categorySlot.getCategory());
+                }
             }
         }
 

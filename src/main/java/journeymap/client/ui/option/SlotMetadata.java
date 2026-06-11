@@ -8,6 +8,8 @@ package journeymap.client.ui.option;
 import journeymap.client.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.ui.component.Button;
+import journeymap.client.ui.component.BindingDoubleSliderButton;
+import journeymap.client.ui.component.BindingIntSliderButton;
 import journeymap.client.ui.component.DoubleSliderButton;
 import journeymap.client.ui.component.IPropertyHolder;
 import journeymap.client.ui.component.IntSliderButton;
@@ -205,7 +207,8 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
                     lines.addAll(getWordWrappedLines(EnumChatFormatting.YELLOW.toString(), this.tooltip));
                 }
 
-                if (button instanceof IntSliderButton || button instanceof DoubleSliderButton)
+                if (button instanceof IntSliderButton || button instanceof DoubleSliderButton
+                        || button instanceof BindingIntSliderButton || button instanceof BindingDoubleSliderButton)
                 {
                     lines.addAll(getWordWrappedLines(EnumChatFormatting.GRAY.toString() + EnumChatFormatting.ITALIC.toString(),
                             Constants.getString("jm.config.control_arrowkeys")));

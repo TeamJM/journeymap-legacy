@@ -509,3 +509,5 @@ key.journeymap.minimap_preset=切换小地图预设样式
 key.journeymap.night=显示黑夜下的地图
 key.journeymap.zoom_in=放大
 key.journeymap.zoom_out=缩小
+jm.settings.external_page=外部设置
+jm.settings.external_page.tooltip=由已安装客户端模组注册的设置页面
