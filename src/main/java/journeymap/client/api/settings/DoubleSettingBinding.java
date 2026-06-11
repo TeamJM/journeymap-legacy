@@ -17,4 +17,8 @@ public interface DoubleSettingBinding
     int getPrecision();
 
     String getSuffix();
+
+    default void commit()
+    {
+    }
 }

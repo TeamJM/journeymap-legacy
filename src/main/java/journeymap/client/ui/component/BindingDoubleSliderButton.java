@@ -65,7 +65,7 @@ public class BindingDoubleSliderButton extends Button implements IPropertyHolder
             sliderValue = 1D;
         }
         double value = sliderValue * (getMaxValue() - getMinValue()) + getMinValue();
-        setPropertyValue(value);
+        setPropertyValue(value, false);
     }
 
     protected double roundToStep(double value)
@@ -81,7 +81,7 @@ public class BindingDoubleSliderButton extends Button implements IPropertyHolder
 
     protected String formatValue(double value)
     {
-        return String.format(Locale.ROOT, "%1$." + getPrecision() + "f", value);
+        return String.format(Locale.ROOT, "%." + getPrecision() + "f", value);
     }
 
     protected void updateLabel()
@@ -115,8 +115,8 @@ public class BindingDoubleSliderButton extends Button implements IPropertyHolder
     {
         if (super.mousePressed(minecraft, mouseX, mouseY))
         {
-            setSliderValue((mouseX - (this.xPosition + 4)) / (float) (this.width - 8));
             this.dragging = true;
+            setSliderValue((mouseX - (this.xPosition + 4)) / (float) (this.width - 8));
             return true;
         }
         return false;
@@ -125,6 +125,10 @@ public class BindingDoubleSliderButton extends Button implements IPropertyHolder
     @Override
     public void mouseReleased(int mouseX, int mouseY)
     {
+        if (this.dragging && binding != null)
+        {
+            binding.commit();
+        }
         this.dragging = false;
     }
 
@@ -176,12 +180,28 @@ public class BindingDoubleSliderButton extends Button implements IPropertyHolder
     @Override
     public void setPropertyValue(Double value)
     {
+        setPropertyValue(value, true);
+    }
+
+    protected void setPropertyValue(Double value, boolean commit)
+    {
         if (binding == null || value == null)
         {
             return;
         }
 
-        binding.set(roundToStep(value));
+        double roundedValue = roundToStep(value);
+        if (Double.compare(binding.get(), roundedValue) == 0)
+        {
+            updateLabel();
+            return;
+        }
+
+        binding.set(roundedValue);
+        if (commit)
+        {
+            binding.commit();
+        }
         updateLabel();
     }
 }

@@ -125,6 +125,7 @@ public class BindingBooleanButton extends Button implements IPropertyHolder<Bool
         }
 
         binding.set(value);
+        binding.commit();
         toggled = binding.get();
     }
 }

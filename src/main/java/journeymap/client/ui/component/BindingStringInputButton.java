@@ -63,6 +63,7 @@ public class BindingStringInputButton extends Button implements IPropertyHolder<
     {
         if (!mouseOver(mouseX, mouseY))
         {
+            commitValue();
             textField.setFocused(false);
             return false;
         }
@@ -76,6 +77,7 @@ public class BindingStringInputButton extends Button implements IPropertyHolder<
     {
         if (!mouseOver(mouseX, mouseY) && textField.isFocused())
         {
+            commitValue();
             textField.setFocused(false);
         }
     }
@@ -90,16 +92,12 @@ public class BindingStringInputButton extends Button implements IPropertyHolder<
 
         if (i == Keyboard.KEY_RETURN || i == Keyboard.KEY_NUMPADENTER)
         {
+            commitValue();
             textField.setFocused(false);
             return true;
         }
 
-        boolean changed = textField.textboxKeyTyped(c, i);
-        if (changed && binding != null)
-        {
-            binding.set(textField.getText());
-        }
-        return changed;
+        return textField.textboxKeyTyped(c, i);
     }
 
     @Override
@@ -139,6 +137,23 @@ public class BindingStringInputButton extends Button implements IPropertyHolder<
         }
 
         binding.set(value == null ? "" : value);
+        binding.commit();
         refresh();
+    }
+
+    protected void commitValue()
+    {
+        if (binding != null)
+        {
+            String text = textField.getText();
+            String bindingValue = binding.get();
+            bindingValue = bindingValue == null ? "" : bindingValue;
+            text = text == null ? "" : text;
+            if (!bindingValue.equals(text))
+            {
+                binding.set(text);
+                binding.commit();
+            }
+        }
     }
 }

@@ -15,4 +15,8 @@ public interface IntSettingBinding
     int getStep();
 
     String getSuffix();
+
+    default void commit()
+    {
+    }
 }

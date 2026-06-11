@@ -7,4 +7,8 @@ public interface BooleanSettingBinding
     void set(boolean value);
 
     boolean getDefaultValue();
+
+    default void commit()
+    {
+    }
 }

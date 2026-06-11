@@ -9,4 +9,8 @@ public interface StringInputBinding
     String getDefaultValue();
 
     int getMaxLength();
+
+    default void commit()
+    {
+    }
 }

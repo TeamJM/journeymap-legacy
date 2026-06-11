@@ -68,7 +68,7 @@ public class BindingIntSliderButton extends Button implements IPropertyHolder<In
 
     protected void setSliderValue(double sliderValue)
     {
-        setPropertyValue(clampToStep(sliderValue));
+        setPropertyValue(clampToStep(sliderValue), false);
     }
 
     protected void updateLabel()
@@ -108,8 +108,8 @@ public class BindingIntSliderButton extends Button implements IPropertyHolder<In
     {
         if (super.mousePressed(minecraft, mouseX, mouseY))
         {
-            setSliderValue((mouseX - (this.xPosition + 4)) / (float) (this.width - 8));
             this.dragging = true;
+            setSliderValue((mouseX - (this.xPosition + 4)) / (float) (this.width - 8));
             return true;
         }
         return false;
@@ -118,6 +118,10 @@ public class BindingIntSliderButton extends Button implements IPropertyHolder<In
     @Override
     public void mouseReleased(int mouseX, int mouseY)
     {
+        if (this.dragging && binding != null)
+        {
+            binding.commit();
+        }
         this.dragging = false;
     }
 
@@ -169,6 +173,11 @@ public class BindingIntSliderButton extends Button implements IPropertyHolder<In
     @Override
     public void setPropertyValue(Integer value)
     {
+        setPropertyValue(value, true);
+    }
+
+    protected void setPropertyValue(Integer value, boolean commit)
+    {
         if (binding == null || value == null)
         {
             return;
@@ -179,7 +188,18 @@ public class BindingIntSliderButton extends Button implements IPropertyHolder<In
         int step = getStep();
         int clamped = Math.max(min, Math.min(max, value));
         int snapped = min + (int) Math.round((clamped - min) * 1D / step) * step;
-        binding.set(Math.max(min, Math.min(max, snapped)));
+        int boundedValue = Math.max(min, Math.min(max, snapped));
+        if (binding.get() == boundedValue)
+        {
+            updateLabel();
+            return;
+        }
+
+        binding.set(boundedValue);
+        if (commit)
+        {
+            binding.commit();
+        }
         updateLabel();
     }
 }

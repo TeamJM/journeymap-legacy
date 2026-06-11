@@ -13,4 +13,8 @@ public interface ListSettingBinding<T>
     List<T> getOptions();
 
     String getLabel(T value);
+
+    default void commit()
+    {
+    }
 }

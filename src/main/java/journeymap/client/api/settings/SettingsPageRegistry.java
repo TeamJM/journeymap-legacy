@@ -11,7 +11,7 @@ public class SettingsPageRegistry
 {
     private static final SettingsPageRegistry INSTANCE = new SettingsPageRegistry();
 
-    private Map<String, SettingsPageProvider> providers = new LinkedHashMap<String, SettingsPageProvider>();
+    private Map<String, SettingsPageDefinition> pageDefinitions = new LinkedHashMap<String, SettingsPageDefinition>();
 
     public static SettingsPageRegistry getInstance()
     {
@@ -25,13 +25,17 @@ public class SettingsPageRegistry
             return;
         }
 
-        SettingsPageDefinition definition = provider.getPageDefinition();
+        registerPage(provider.getPageDefinition());
+    }
+
+    public synchronized void registerPage(SettingsPageDefinition definition)
+    {
         if (definition == null || definition.getPageId() == null)
         {
             return;
         }
 
-        providers.put(definition.getPageId(), provider);
+        pageDefinitions.put(definition.getPageId(), definition);
     }
 
     public synchronized void unregisterPage(String pageId)
@@ -40,20 +44,13 @@ public class SettingsPageRegistry
         {
             return;
         }
-        providers.remove(pageId);
+        pageDefinitions.remove(pageId);
     }
 
     public synchronized List<SettingsPageDefinition> getPages()
     {
         List<SettingsPageDefinition> pages = new ArrayList<SettingsPageDefinition>();
-        for (SettingsPageProvider provider : providers.values())
-        {
-            SettingsPageDefinition definition = provider.getPageDefinition();
-            if (definition != null)
-            {
-                pages.add(definition);
-            }
-        }
+        pages.addAll(pageDefinitions.values());
 
         Collections.sort(pages, new Comparator<SettingsPageDefinition>()
         {

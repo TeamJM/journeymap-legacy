@@ -130,6 +130,7 @@ public class BindingListButton<T> extends Button implements IPropertyHolder<List
             return;
         }
         binding.set(value);
+        binding.commit();
         refresh();
     }
 }
