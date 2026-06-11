@@ -41,6 +41,11 @@ public abstract class JmUI extends GuiScreen
     protected JmUI returnDisplay;
     protected int scaleFactor = 1;
     protected TextureImpl logo = TextureCache.instance().getLogo();
+    protected List cachedTooltipLayoutSource;
+    protected boolean cachedTooltipLayoutBidi;
+    protected int cachedTooltipMaxLineWidth;
+    protected int cachedTooltipBoxHeight;
+    protected int[] cachedTooltipLineWidths = new int[0];
 
     public JmUI(String title)
     {
@@ -269,65 +274,42 @@ public abstract class JmUI extends GuiScreen
             RenderHelper.disableStandardItemLighting();
             renderHelper.glDisableLighting();
             renderHelper.glDisableDepth();
-            int maxLineWidth = 0;
-            Iterator iterator = tooltip.iterator();
-
-            while (iterator.hasNext())
-            {
-                String line = (String) iterator.next();
-                int lineWidth = fontRenderer.getStringWidth(line);
-                if (fontRenderer.getBidiFlag())
-                {
-                    lineWidth = (int) Math.ceil(lineWidth * 1.25);
-                }
-
-                if (lineWidth > maxLineWidth)
-                {
-                    maxLineWidth = lineWidth;
-                }
-            }
+            updateTooltipLayout(tooltip, fontRenderer);
 
             int drawX = mouseX + 12;
             int drawY = mouseY - 12;
-            int boxHeight = 8;
 
-            if (tooltip.size() > 1)
+            if (drawX + cachedTooltipMaxLineWidth > this.width)
             {
-                boxHeight += 2 + (tooltip.size() - 1) * 10;
+                drawX -= 28 + cachedTooltipMaxLineWidth;
             }
 
-            if (drawX + maxLineWidth > this.width)
+            if (drawY + cachedTooltipBoxHeight + 6 > this.height)
             {
-                drawX -= 28 + maxLineWidth;
-            }
-
-            if (drawY + boxHeight + 6 > this.height)
-            {
-                drawY = this.height - boxHeight - 6;
+                drawY = this.height - cachedTooltipBoxHeight - 6;
             }
 
             this.zLevel = 300.0F;
             itemRender.zLevel = 300.0F;
             int j1 = -267386864;
-            this.drawGradientRect(drawX - 3, drawY - 4, drawX + maxLineWidth + 3, drawY - 3, j1, j1);
-            this.drawGradientRect(drawX - 3, drawY + boxHeight + 3, drawX + maxLineWidth + 3, drawY + boxHeight + 4, j1, j1);
-            this.drawGradientRect(drawX - 3, drawY - 3, drawX + maxLineWidth + 3, drawY + boxHeight + 3, j1, j1);
-            this.drawGradientRect(drawX - 4, drawY - 3, drawX - 3, drawY + boxHeight + 3, j1, j1);
-            this.drawGradientRect(drawX + maxLineWidth + 3, drawY - 3, drawX + maxLineWidth + 4, drawY + boxHeight + 3, j1, j1);
+            this.drawGradientRect(drawX - 3, drawY - 4, drawX + cachedTooltipMaxLineWidth + 3, drawY - 3, j1, j1);
+            this.drawGradientRect(drawX - 3, drawY + cachedTooltipBoxHeight + 3, drawX + cachedTooltipMaxLineWidth + 3, drawY + cachedTooltipBoxHeight + 4, j1, j1);
+            this.drawGradientRect(drawX - 3, drawY - 3, drawX + cachedTooltipMaxLineWidth + 3, drawY + cachedTooltipBoxHeight + 3, j1, j1);
+            this.drawGradientRect(drawX - 4, drawY - 3, drawX - 3, drawY + cachedTooltipBoxHeight + 3, j1, j1);
+            this.drawGradientRect(drawX + cachedTooltipMaxLineWidth + 3, drawY - 3, drawX + cachedTooltipMaxLineWidth + 4, drawY + cachedTooltipBoxHeight + 3, j1, j1);
             int k1 = 1347420415;
             int l1 = (k1 & 16711422) >> 1 | k1 & -16777216;
-            this.drawGradientRect(drawX - 3, drawY - 3 + 1, drawX - 3 + 1, drawY + boxHeight + 3 - 1, k1, l1);
-            this.drawGradientRect(drawX + maxLineWidth + 2, drawY - 3 + 1, drawX + maxLineWidth + 3, drawY + boxHeight + 3 - 1, k1, l1);
-            this.drawGradientRect(drawX - 3, drawY - 3, drawX + maxLineWidth + 3, drawY - 3 + 1, k1, k1);
-            this.drawGradientRect(drawX - 3, drawY + boxHeight + 2, drawX + maxLineWidth + 3, drawY + boxHeight + 3, l1, l1);
+            this.drawGradientRect(drawX - 3, drawY - 3 + 1, drawX - 3 + 1, drawY + cachedTooltipBoxHeight + 3 - 1, k1, l1);
+            this.drawGradientRect(drawX + cachedTooltipMaxLineWidth + 2, drawY - 3 + 1, drawX + cachedTooltipMaxLineWidth + 3, drawY + cachedTooltipBoxHeight + 3 - 1, k1, l1);
+            this.drawGradientRect(drawX - 3, drawY - 3, drawX + cachedTooltipMaxLineWidth + 3, drawY - 3 + 1, k1, k1);
+            this.drawGradientRect(drawX - 3, drawY + cachedTooltipBoxHeight + 2, drawX + cachedTooltipMaxLineWidth + 3, drawY + cachedTooltipBoxHeight + 3, l1, l1);
 
             for (int i2 = 0; i2 < tooltip.size(); ++i2)
             {
                 String line = (String) tooltip.get(i2);
                 if (fontRenderer.getBidiFlag())
                 {
-                    int lineWidth = (int) Math.ceil(fontRenderer.getStringWidth(line) * 1.1);
-                    fontRenderer.drawStringWithShadow(line, (drawX + maxLineWidth) - lineWidth, drawY, -1);
+                    fontRenderer.drawStringWithShadow(line, (drawX + cachedTooltipMaxLineWidth) - cachedTooltipLineWidths[i2], drawY, -1);
                 }
                 else
                 {
@@ -348,6 +330,43 @@ public abstract class JmUI extends GuiScreen
             renderHelper.glEnableDepth();
             RenderHelper.enableStandardItemLighting();
             GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        }
+    }
+
+    protected void updateTooltipLayout(java.util.List tooltip, FontRenderer fontRenderer)
+    {
+        boolean bidi = fontRenderer.getBidiFlag();
+        if (tooltip == cachedTooltipLayoutSource && bidi == cachedTooltipLayoutBidi)
+        {
+            return;
+        }
+
+        cachedTooltipLayoutSource = tooltip;
+        cachedTooltipLayoutBidi = bidi;
+        cachedTooltipMaxLineWidth = 0;
+        cachedTooltipBoxHeight = 8;
+        cachedTooltipLineWidths = new int[tooltip.size()];
+
+        Iterator iterator = tooltip.iterator();
+        int lineIndex = 0;
+        while (iterator.hasNext())
+        {
+            String line = (String) iterator.next();
+            int lineWidth = fontRenderer.getStringWidth(line);
+            if (bidi)
+            {
+                lineWidth = (int) Math.ceil(lineWidth * 1.1);
+            }
+            cachedTooltipLineWidths[lineIndex++] = lineWidth;
+            if (lineWidth > cachedTooltipMaxLineWidth)
+            {
+                cachedTooltipMaxLineWidth = lineWidth;
+            }
+        }
+
+        if (tooltip.size() > 1)
+        {
+            cachedTooltipBoxHeight += 2 + (tooltip.size() - 1) * 10;
         }
     }
 }

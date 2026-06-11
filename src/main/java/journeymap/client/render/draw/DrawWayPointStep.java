@@ -8,6 +8,7 @@ package journeymap.client.render.draw;
 import com.google.common.cache.CacheLoader;
 import journeymap.client.cartography.RGB;
 import journeymap.client.model.Waypoint;
+import journeymap.client.model.WaypointDisplayNameFormatter;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
@@ -19,6 +20,7 @@ import java.awt.geom.Point2D;
  */
 public class DrawWayPointStep implements DrawStep
 {
+    private static final WaypointDisplayNameFormatter NAME_FORMATTER = new WaypointDisplayNameFormatter();
     public final Waypoint waypoint;
     final Integer color;
     final Integer fontColor;
@@ -68,32 +70,55 @@ public class DrawWayPointStep implements DrawStep
             return;
         }
 
+        float renderScale = getRenderScale(drawScale);
+        double textureWidth = texture.getWidth() * renderScale;
+        double textureHeight = texture.getHeight() * renderScale;
         Point2D.Double pixel = getPosition(xOffset, yOffset, gridRenderer, true);
         if (gridRenderer.isOnScreen(pixel))
         {
             if (showLabel)
             {
-                Point2D labelPoint = gridRenderer.shiftWindowPosition(pixel.getX(), pixel.getY(), 0, rotation == 0 ? -texture.getHeight() : texture.getHeight());
-                DrawUtil.drawLabel(waypoint.getName(), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, 180, fontColor, 255, fontScale, false, rotation);
+                int labelOffsetY = (int) Math.round(rotation == 0 ? -textureHeight : textureHeight);
+                Point2D labelPoint = gridRenderer.shiftWindowPosition(pixel.getX(), pixel.getY(), 0, labelOffsetY);
+                DrawUtil.drawLabel(NAME_FORMATTER.formatLabel(waypoint), labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Middle, RGB.BLACK_RGB, 180, fontColor, 255, fontScale, false, rotation);
             }
             if (isEdit)
             {
                 TextureImpl editTex = TextureCache.instance().getWaypointEdit();
-                DrawUtil.drawColoredImage(editTex, 255, color, pixel.getX() - (editTex.getWidth() / 2), pixel.getY() - editTex.getHeight() / 2, -rotation);
+                DrawUtil.drawColoredImage(editTex, 255, color,
+                        pixel.getX() - ((editTex.getWidth() * renderScale) / 2D),
+                        pixel.getY() - ((editTex.getHeight() * renderScale) / 2D),
+                        renderScale,
+                        -rotation);
             }
-            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.getWidth() / 2), pixel.getY() - (texture.getHeight() / 2), -rotation);
+            DrawUtil.drawColoredImage(texture, 255, color,
+                    pixel.getX() - (textureWidth / 2D),
+                    pixel.getY() - (textureHeight / 2D),
+                    renderScale,
+                    -rotation);
         }
         else if (!isEdit)
         {
             gridRenderer.ensureOnScreen(pixel);
             //DrawUtil.drawColoredImage(offscreenTexture, 255, color, pixel.getX() - (offscreenTexture.width / 2), pixel.getY() - (offscreenTexture.height / 2));
-            DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.getWidth() / 2), pixel.getY() - (texture.getHeight() / 2), -rotation);
+            DrawUtil.drawColoredImage(texture, 255, color,
+                    pixel.getX() - (textureWidth / 2D),
+                    pixel.getY() - (textureHeight / 2D),
+                    renderScale,
+                    -rotation);
         }
     }
 
-    public void drawOffscreen(Point2D pixel, double rotation)
+    public void drawOffscreen(Point2D pixel, float drawScale, double rotation)
     {
-        DrawUtil.drawColoredImage(texture, 255, color, pixel.getX() - (texture.getWidth() / 2), pixel.getY() - (texture.getHeight() / 2), -rotation);
+        float renderScale = getRenderScale(drawScale);
+        double textureWidth = texture.getWidth() * renderScale;
+        double textureHeight = texture.getHeight() * renderScale;
+        DrawUtil.drawColoredImage(texture, 255, color,
+                pixel.getX() - (textureWidth / 2D),
+                pixel.getY() - (textureHeight / 2D),
+                renderScale,
+                -rotation);
     }
 
     public Point2D.Double getPosition(double xOffset, double yOffset, GridRenderer gridRenderer, boolean forceUpdate)
@@ -127,6 +152,11 @@ public class DrawWayPointStep implements DrawStep
     public int getTextureSize()
     {
         return Math.max(texture.getHeight(), texture.getWidth());
+    }
+
+    private float getRenderScale(float drawScale)
+    {
+        return Math.max(0.01f, drawScale);
     }
 
     public boolean isOnScreen()

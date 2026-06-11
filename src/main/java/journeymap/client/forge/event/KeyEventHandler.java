@@ -24,7 +24,9 @@ import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
 
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 // 1.8
 //import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -45,6 +47,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
     {
         Minecraft minecraft = Minecraft.getMinecraft();
         HashSet<String> keyDescs = new HashSet<String>();
+        Map<String, KeyBinding> existingBindings = new HashMap<String, KeyBinding>();
         for (KeyBinding existing : minecraft.gameSettings.keyBindings)
         {
             try
@@ -52,6 +55,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 if (existing != null && existing.getKeyDescription() != null)
                 {
                     keyDescs.add(existing.getKeyDescription());
+                    existingBindings.put(existing.getKeyDescription(), existing);
                 }
             }
             catch (Throwable t)
@@ -70,6 +74,7 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
                 }
                 else
                 {
+                    bindExistingKeyBinding(existingBindings.get(kb.getKeyDescription()));
                     Journeymap.getLogger().warn("Avoided duplicate keybinding that was already registered: {}", kb.getKeyDescription());
                 }
             }
@@ -77,6 +82,56 @@ public class KeyEventHandler implements EventHandlerManager.EventHandler
             {
                 ChatLog.announceError("Unexpected error when registering keybinding : " + kb);
             }
+        }
+    }
+
+    private static void bindExistingKeyBinding(KeyBinding existing)
+    {
+        if (existing == null)
+        {
+            return;
+        }
+
+        String description = existing.getKeyDescription();
+        if ("key.journeymap.map_toggle".equals(description))
+        {
+            Constants.KB_MAP = existing;
+        }
+        else if ("key.journeymap.zoom_in".equals(description))
+        {
+            Constants.KB_MAP_ZOOMIN = existing;
+        }
+        else if ("key.journeymap.zoom_out".equals(description))
+        {
+            Constants.KB_MAP_ZOOMOUT = existing;
+        }
+        else if ("key.journeymap.minimap_type".equals(description))
+        {
+            Constants.KB_MAP_SWITCH_TYPE = existing;
+        }
+        else if ("key.journeymap.minimap_preset".equals(description))
+        {
+            Constants.KB_MINIMAP_PRESET = existing;
+        }
+        else if ("key.journeymap.create_waypoint".equals(description))
+        {
+            Constants.KB_WAYPOINT = existing;
+        }
+        else if ("key.journeymap.fullscreen_teleport".equals(description))
+        {
+            Constants.KB_FULLSCREEN_TELEPORT = existing;
+        }
+        else if ("key.journeymap.fullscreen_toggle_waypoint".equals(description))
+        {
+            Constants.KB_FULLSCREEN_TOGGLE_WAYPOINT = existing;
+        }
+        else if ("key.journeymap.fullscreen_delete_waypoint".equals(description))
+        {
+            Constants.KB_FULLSCREEN_DELETE_WAYPOINT = existing;
+        }
+        else if ("key.journeymap.fullscreen_edit_waypoint".equals(description))
+        {
+            Constants.KB_FULLSCREEN_EDIT_WAYPOINT = existing;
         }
     }
 

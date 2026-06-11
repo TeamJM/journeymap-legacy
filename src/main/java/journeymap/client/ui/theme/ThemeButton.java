@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -229,7 +230,7 @@ public class ThemeButton extends BooleanPropertyButton
         {
             return null;
         }
-        List<String> list = super.getTooltip();
+        List<String> list = new ArrayList<String>(super.getTooltip());
 
         String style = null;
         if (!isEnabled())

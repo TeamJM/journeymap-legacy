@@ -7,15 +7,19 @@ package journeymap.client.ui.component;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import cpw.mods.fml.client.config.GuiUtils;
+import journeymap.client.cartography.RGB;
 import journeymap.client.properties.PropertiesBase;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
+
+import java.util.Locale;
 
 /**
  * Created by Mark on 9/29/2014.
  */
 public class DoubleSliderButton extends Button implements IPropertyHolder<AtomicDouble, Double>
 {
+    private static final double KEY_STEP = 0.1D;
     public String prefix = "";
     /**
      * Is this slider control being dragged.
@@ -38,6 +42,7 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
         this.property = property;
         this.properties = properties;
         setValue(property.get());
+        super.disabledLabelColor = RGB.DARK_GRAY_RGB;
     }
 
     /**
@@ -61,7 +66,7 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
      */
     protected void mouseDragged(Minecraft par1Minecraft, int par2, int par3)
     {
-        if (this.visible)
+        if (this.visible && this.isEnabled())
         {
             if (this.dragging)
             {
@@ -70,7 +75,7 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
 
             int k = this.getHoverState(isMouseOver());
 
-            if (this.isMouseOver() || this.dragging)
+            if (this.isEnabled() || this.dragging)
             {
 
                 renderHelper.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -131,7 +136,7 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
     {
         if (drawString)
         {
-            displayString = prefix + property.get() + suffix;
+            displayString = prefix + String.format(Locale.ROOT, "%.1f", property.get()) + suffix;
         }
     }
 
@@ -155,16 +160,16 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
 
     public boolean keyTyped(char c, int i)
     {
-        if (this.isMouseOver())
+        if (this.isEnabled() && this.isMouseOver())
         {
             if (i == Keyboard.KEY_LEFT || i == Keyboard.KEY_DOWN || i == Keyboard.KEY_SUBTRACT)
             {
-                setValue(Math.max(minValue, getValue() - 1));
+                setValue(Math.max(minValue, getValue() - KEY_STEP));
                 return true;
             }
             if (i == Keyboard.KEY_RIGHT || i == Keyboard.KEY_UP || i == Keyboard.KEY_ADD)
             {
-                setValue(Math.min(maxValue, getValue() + 1));
+                setValue(Math.min(maxValue, getValue() + KEY_STEP));
                 return true;
             }
         }
@@ -180,6 +185,7 @@ public class DoubleSliderButton extends Button implements IPropertyHolder<Atomic
     {
         value = Math.min(value, maxValue);
         value = Math.max(value, minValue);
+        value = Math.round(value * 10D) / 10D;
         if (property.get() != value)
         {
             property.set(value);

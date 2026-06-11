@@ -10,6 +10,7 @@ import journeymap.client.cartography.RGB;
 import journeymap.client.command.CmdTeleportWaypoint;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.Waypoint;
+import journeymap.client.model.WaypointDisplayNameFormatter;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.UIManager;
@@ -39,6 +40,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
 
     static Integer background = new Color(20, 20, 20).getRGB();
     static Integer backgroundHover = new Color(40, 40, 40).getRGB();
+    static WaypointDisplayNameFormatter nameFormatter = new WaypointDisplayNameFormatter();
     final FontRenderer fontRenderer;
     final WaypointManager manager;
     int x;
@@ -47,7 +49,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     int internalWidth;
     Integer distance;
     Waypoint waypoint;
-    OnOffButton buttonEnable;
+    WaypointModeButton buttonMode;
     Button buttonRemove;
     Button buttonEdit;
     Button buttonFind;
@@ -68,18 +70,14 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         SlotMetadata<Waypoint> slotMetadata = new SlotMetadata<Waypoint>(null, null, null, false); // TODO
 
 
-        String on = Constants.getString("jm.common.on");
-        String off = Constants.getString("jm.common.off");
-
-        buttonEnable = new OnOffButton(on, off, true); //$NON-NLS-1$
-        buttonEnable.setToggled(waypoint.isEnable());
+        buttonMode = new WaypointModeButton(waypoint);
         buttonFind = new Button(Constants.getString("jm.waypoint.find")); //$NON-NLS-1$
 
         buttonTeleport = new Button(Constants.getString("jm.waypoint.teleport")); //$NON-NLS-1$
         buttonTeleport.setDrawButton(manager.canUserTeleport);
         buttonTeleport.setEnabled(manager.canUserTeleport);
 
-        buttonListLeft = new ButtonList(buttonEnable, buttonFind, buttonTeleport);
+        buttonListLeft = new ButtonList(buttonMode, buttonFind, buttonTeleport);
         buttonListLeft.setHeights(manager.rowHeight);
         buttonListLeft.fitWidths(fontRenderer);
 
@@ -175,7 +173,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         int yOffset = 1 + (this.manager.rowHeight - fr.FONT_HEIGHT) / 2;
         fr.drawStringWithShadow(String.format("%sm", getDistance()), x + manager.colLocation, y + yOffset, color);
 
-        String name = waypointValid ? waypoint.getName() : EnumChatFormatting.STRIKETHROUGH + waypoint.getName();
+        String name = nameFormatter.formatManagerLabel(waypoint, waypointValid);
         fr.drawStringWithShadow(name, manager.colName, y + yOffset, color);
     }
 
@@ -187,13 +185,12 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
 
     protected void enableWaypoint(boolean enable)
     {
-        buttonEnable.setToggled(enable);
         waypoint.setEnable(enable);
     }
 
     protected int getButtonEnableCenterX()
     {
-        return buttonEnable.getCenterX();
+        return buttonMode.getCenterX();
     }
 
     protected int getNameLeftX()
@@ -209,6 +206,11 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     //@Override
     public boolean clickScrollable(int mouseX, int mouseY)
     {
+        return clickScrollable(mouseX, mouseY, 0);
+    }
+
+    public boolean clickScrollable(int mouseX, int mouseY, int mouseButton)
+    {
         boolean mouseOver = false;
         if (waypoint == null)
         {
@@ -223,15 +225,9 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         }
         else
         {
-            if (buttonEnable.mouseOver(mouseX, mouseY))
+            if (buttonMode.mouseOver(mouseX, mouseY))
             {
-                buttonEnable.toggle();
-                waypoint.setEnable(buttonEnable.getToggled());
-                if (waypoint.isDirty())
-                {
-                    WaypointStore.instance().save(waypoint);
-                }
-                mouseOver = true;
+                mouseOver = updateWaypointMode(mouseButton);
             }
             else
             {
@@ -262,6 +258,29 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         }
 
         return mouseOver;
+    }
+
+    protected boolean updateWaypointMode(int mouseButton)
+    {
+        if (mouseButton == 0)
+        {
+            buttonMode.cycle();
+        }
+        else if (mouseButton == 1)
+        {
+            buttonMode.cyclePrevious();
+        }
+        else
+        {
+            return false;
+        }
+
+        buttonMode.applyTo(waypoint);
+        if (waypoint.isDirty())
+        {
+            WaypointStore.instance().save(waypoint);
+        }
+        return true;
     }
 
     public int getDistance()
@@ -333,7 +352,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     @Override
     public boolean mousePressed(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY)
     {
-        return this.clickScrollable(x, y);
+        return this.clickScrollable(x, y, mouseEvent);
     }
 
     @Override
@@ -369,7 +388,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
     @Override
     public void setEnabled(boolean enabled)
     {
-        buttonEnable.setToggled(waypoint.isEnable());
+        buttonMode.refresh();
     }
 
     @Override
@@ -384,7 +403,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         return false;
     }
 
-    abstract static class Sort implements Comparator<WaypointManagerItem>
+    public abstract static class Sort implements Comparator<WaypointManagerItem>
     {
         boolean ascending;
 
@@ -414,7 +433,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         }
     }
 
-    static class NameComparator extends Sort
+    public static class NameComparator extends Sort
     {
         public NameComparator(boolean ascending)
         {
@@ -435,7 +454,7 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
         }
     }
 
-    static class DistanceComparator extends Sort
+    public static class DistanceComparator extends Sort
     {
         EntityPlayer player;
 

@@ -8,6 +8,7 @@ package journeymap.client.ui.option;
 import journeymap.client.Constants;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.ui.component.Button;
+import journeymap.client.ui.component.DoubleSliderButton;
 import journeymap.client.ui.component.IPropertyHolder;
 import journeymap.client.ui.component.IntSliderButton;
 import net.minecraft.client.gui.FontRenderer;
@@ -84,6 +85,10 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
             valueType = ValueType.Boolean;
         }
         else if (defaultValue instanceof Integer)
+        {
+            valueType = ValueType.Integer;
+        }
+        else if (defaultValue instanceof Double)
         {
             valueType = ValueType.Integer;
         }
@@ -200,7 +205,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
                     lines.addAll(getWordWrappedLines(EnumChatFormatting.YELLOW.toString(), this.tooltip));
                 }
 
-                if (button != null && button instanceof IntSliderButton)
+                if (button instanceof IntSliderButton || button instanceof DoubleSliderButton)
                 {
                     lines.addAll(getWordWrappedLines(EnumChatFormatting.GRAY.toString() + EnumChatFormatting.ITALIC.toString(),
                             Constants.getString("jm.config.control_arrowkeys")));

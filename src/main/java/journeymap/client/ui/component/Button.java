@@ -17,6 +17,7 @@ import net.minecraft.util.EnumChatFormatting;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -46,6 +47,8 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
     protected boolean defaultStyle = true;
     protected int WIDTH_PAD = 12;
     protected String[] tooltip;
+    protected List<String> cachedTooltipLines;
+    protected List<String> cachedDisabledTooltip;
 
     FontRenderer fontRenderer = ForgeHelper.INSTANCE.getFontRenderer();
 
@@ -260,26 +263,35 @@ public class Button extends GuiButton implements ScrollPane.Scrollable
 
     public List<String> getTooltip()
     {
-        ArrayList<String> list = new ArrayList<String>();
         if (tooltip != null)
         {
-            for (String line : tooltip)
+            if (cachedTooltipLines == null)
             {
-                list.addAll(fontRenderer.listFormattedStringToWidth(line, 200));
+                ArrayList<String> lines = new ArrayList<String>();
+                for (String line : tooltip)
+                {
+                    lines.addAll(fontRenderer.listFormattedStringToWidth(line, 200));
+                }
+                cachedTooltipLines = Collections.unmodifiableList(lines);
             }
-            return list;
+            return cachedTooltipLines;
         }
 
         if (!this.isEnabled() && showDisabledHoverText)
         {
-            list.add(EnumChatFormatting.ITALIC + Constants.getString("jm.common.disabled_feature"));
+            if (cachedDisabledTooltip == null)
+            {
+                cachedDisabledTooltip = Collections.singletonList(EnumChatFormatting.ITALIC + Constants.getString("jm.common.disabled_feature"));
+            }
+            return cachedDisabledTooltip;
         }
-        return list;
+        return Collections.emptyList();
     }
 
     public void setTooltip(String... tooltip)
     {
         this.tooltip = tooltip;
+        this.cachedTooltipLines = null;
     }
 
     public boolean mouseOver(int mouseX, int mouseY)

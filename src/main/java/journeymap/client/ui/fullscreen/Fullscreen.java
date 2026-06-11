@@ -22,6 +22,7 @@ import journeymap.client.model.MapType;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.properties.MiniMapProperties;
+import journeymap.client.properties.WaypointProperties;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.draw.RadarDrawStepFactory;
 import journeymap.client.render.draw.WaypointDrawStepFactory;
@@ -34,6 +35,8 @@ import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.component.OnOffButton;
 import journeymap.client.ui.dialog.FullscreenActions;
+import journeymap.client.ui.fullscreen.context.FullscreenContextMenu;
+import journeymap.client.ui.fullscreen.context.FullscreenContextTarget;
 import journeymap.client.ui.fullscreen.layer.LayerDelegate;
 import journeymap.client.ui.minimap.Shape;
 import journeymap.client.ui.option.LocationFormat;
@@ -76,6 +79,7 @@ public class Fullscreen extends JmUI
     boolean hideOptionsToolbar = false;
     Boolean isScrolling = false;
     int msx, msy, mx, my;
+    BlockCoordIntPair lastHoverBlockCoord;
     Logger logger = Journeymap.getLogger();
     MapChat chat;
     ThemeButton buttonFollow, buttonZoomIn, buttonZoomOut, buttonDay, buttonNight, buttonCaves;
@@ -92,6 +96,7 @@ public class Fullscreen extends JmUI
     StatTimer drawMapTimer = StatTimer.get("Fullscreen.drawScreen.drawMap", 50);
     StatTimer drawMapTimerWithRefresh = StatTimer.get("Fullscreen.drawMap+refreshState", 5);
     LocationFormat locationFormat = new LocationFormat();
+    FullscreenContextMenu contextMenu = new FullscreenContextMenu(this);
 
     /**
      * Default constructor
@@ -145,6 +150,8 @@ public class Fullscreen extends JmUI
     {
         try
         {
+            updateMousePosition();
+            updateDraggingState();
             drawBackground(0); // drawBackground
             drawMap();
 
@@ -183,6 +190,8 @@ public class Fullscreen extends JmUI
             {
                 chat.drawScreen(width, height, f);
             }
+
+            contextMenu.draw(mc, mx, my);
 
             if (tooltip != null && !tooltip.isEmpty())
             {
@@ -597,9 +606,7 @@ public class Fullscreen extends JmUI
             //return;
         }
 
-        // Scale mouse position to Gui Scale coords
-        mx = (Mouse.getEventX() * width) / mc.displayWidth;
-        my = height - (Mouse.getEventY() * height) / mc.displayHeight - 1;
+        updateMousePosition();
 
         if (Mouse.getEventButtonState())
         {
@@ -634,13 +641,27 @@ public class Fullscreen extends JmUI
             chat.mouseClicked(mouseX, mouseY, mouseButton);
         }
 
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+        if (contextMenu.mouseClicked(mouseX, mouseY, mouseButton))
+        {
+            return;
+        }
 
         // Bail if over a button
         if (isMouseOverButton(mouseX, mouseY))
         {
+            super.mouseClicked(mouseX, mouseY, mouseButton);
             return;
         }
+
+        if (mouseButton == 1)
+        {
+            BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
+            FullscreenContextTarget contextTarget = layerDelegate.getContextTarget(mc, blockCoord);
+            contextMenu.openFor(contextTarget, mouseX, mouseY, width, height);
+            return;
+        }
+
+        super.mouseClicked(mouseX, mouseY, mouseButton);
 
         // Invoke layer delegate
         BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
@@ -657,44 +678,15 @@ public class Fullscreen extends JmUI
             return;
         }
 
-        int blockSize = (int) Math.pow(2, fullMapProperties.zoomLevel.get());
-
-        if (Mouse.isButtonDown(0) && !isScrolling)
-        {
-            isScrolling = true;
-            msx = mx;
-            msy = my;
-        }
-        else
-        {
-            if (!Mouse.isButtonDown(0) && isScrolling)
-            {
-                isScrolling = false;
-                int mouseDragX = (mx - msx) * Math.max(1, scaleFactor) / blockSize;
-                int mouseDragY = (my - msy) * Math.max(1, scaleFactor) / blockSize;
-                msx = mx;
-                msy = my;
-
-                try
-                {
-                    gridRenderer.move(-mouseDragX, -mouseDragY);
-                    gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
-                    gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
-                }
-                catch (Exception e)
-                {
-                    logger.error("Error moving grid: {}", String.valueOf(e));
-                }
-
-                setFollow(false);
-                refreshState();
-            }
-        }
-
         if (!isScrolling && which == -1)
         {
-            BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
-            layerDelegate.onMouseMove(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord);
+            BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getX(), Mouse.getY(), mc.displayWidth, mc.displayHeight);
+            if (blockCoord.equals(lastHoverBlockCoord))
+            {
+                return;
+            }
+            lastHoverBlockCoord = blockCoord;
+            layerDelegate.onMouseMove(mc, Mouse.getX(), Mouse.getY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord);
         }
     }
 
@@ -744,6 +736,11 @@ public class Fullscreen extends JmUI
         if (chat != null && !chat.isHidden())
         {
             chat.keyTyped(c, i);
+            return;
+        }
+
+        if (contextMenu.isOpen() && contextMenu.keyTyped(c, i))
+        {
             return;
         }
 
@@ -908,7 +905,9 @@ public class Fullscreen extends JmUI
             gridRenderer.clearGlErrors(false);
 
             gridRenderer.updateRotation(0);
-            float drawScale = fullMapProperties.textureSmall.get() ? 1f : 2f;
+            WaypointProperties waypointProperties = JourneymapClient.getWaypointProperties();
+            float drawScale = 1f;
+            float waypointDrawScale = drawScale * 2f * (float) waypointProperties.fullscreenIconScale.get();
 
             if (state.follow.get())
             {
@@ -917,7 +916,7 @@ public class Fullscreen extends JmUI
             gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
             gridRenderer.draw(1f, xOffset, yOffset, fullMapProperties.showGrid.get());
             gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
-            gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
+            gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, waypointDrawScale, getMapFontScale(), 0);
 
             if (fullMapProperties.showSelf.get())
             {
@@ -928,7 +927,7 @@ public class Fullscreen extends JmUI
                 }
             }
 
-            gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
+            gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, waypointDrawScale, getMapFontScale(), 0);
 
             DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above,
                     statusBackgroundColor, statusBackgroundAlpha, statusForegroundColor, statusForegroundAlpha, getMapFontScale(), true);
@@ -969,6 +968,74 @@ public class Fullscreen extends JmUI
             refreshState();
             updateScreen();
         }
+    }
+
+    public void clearContextSelection()
+    {
+        layerDelegate.clearContextSelection();
+        lastHoverBlockCoord = null;
+    }
+
+    private void updateMousePosition()
+    {
+        mx = (Mouse.getX() * width) / mc.displayWidth;
+        my = height - (Mouse.getY() * height) / mc.displayHeight - 1;
+    }
+
+    private void updateDraggingState()
+    {
+        if (contextMenu.isOpen())
+        {
+            finishDraggingIfNeeded();
+            return;
+        }
+
+        if (Mouse.isButtonDown(0))
+        {
+            if (!isScrolling && !isMouseOverButton(mx, my))
+            {
+                isScrolling = true;
+                msx = mx;
+                msy = my;
+            }
+            return;
+        }
+
+        finishDraggingIfNeeded();
+    }
+
+    private void finishDraggingIfNeeded()
+    {
+        if (!isScrolling)
+        {
+            return;
+        }
+
+        isScrolling = false;
+        int blockSize = (int) Math.pow(2, fullMapProperties.zoomLevel.get());
+        int mouseDragX = (mx - msx) * Math.max(1, scaleFactor) / blockSize;
+        int mouseDragY = (my - msy) * Math.max(1, scaleFactor) / blockSize;
+        msx = mx;
+        msy = my;
+
+        if (mouseDragX == 0 && mouseDragY == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            gridRenderer.move(-mouseDragX, -mouseDragY);
+            gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
+            gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
+        }
+        catch (Exception e)
+        {
+            logger.error("Error moving grid: {}", String.valueOf(e));
+        }
+
+        setFollow(false);
+        refreshState();
     }
 
     /**
@@ -1027,7 +1094,7 @@ public class Fullscreen extends JmUI
         timer.stop();
     }
 
-    void openChat(String defaultText)
+    public void openChat(String defaultText)
     {
         if (chat != null)
         {

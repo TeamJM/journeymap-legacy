@@ -150,7 +150,7 @@ public class DisplayVars
             compassLabelHeight = (int) (DrawUtil.getLabelHeight(fontRenderer, minimapSpec.compassLabel.shadow) * compassFontScale);
         }
 
-        drawScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
+        drawScale = .75f;
 
         minimapFrame = new ThemeMinimapFrame(theme, minimapSpec, miniMapProperties, minimapWidth, minimapHeight);
         marginX = marginY = minimapSpec.margin;

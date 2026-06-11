@@ -81,7 +81,7 @@ public class ConfigValidation
                 }
                 else if (fieldType.equals(AtomicDouble.class))
                 {
-                    Journeymap.getLogger().error("Validation for AtomicDouble not implemented.");
+                    saveNeeded = validateDouble(config, field, instance) || saveNeeded;
                 }
                 else if (fieldType.equals(AtomicReference.class))
                 {
@@ -135,6 +135,48 @@ public class ConfigValidation
             int value = property.get();
             int okValue = Math.max((int) config.minValue(), Math.min((int) config.maxValue(), value));
             if (okValue != value)
+            {
+                if (defaultValueUsable)
+                {
+                    okValue = defaultValue;
+                }
+                warnPropertyValue(config, field, value, okValue);
+                property.set(okValue);
+                saveNeeded = true;
+            }
+        }
+        return saveNeeded;
+    }
+
+    /**
+     * Validate an AtomicDouble field using its @Config
+     *
+     * @param config   the annotation
+     * @param field    the field
+     * @param instance the owning instance
+     */
+    private static boolean validateDouble(Config config, Field field, PropertiesBase instance) throws Exception
+    {
+        boolean saveNeeded = false;
+
+        if (config.minValue() == config.maxValue())
+        {
+            Journeymap.getLogger().warn("@Config on {}.{} has no range", instance.getClass().getSimpleName(), field.getName());
+        }
+        else
+        {
+            double defaultValue = config.defaultValue();
+            boolean defaultValueUsable = true;
+            if (defaultValue < config.minValue() || defaultValue > config.maxValue())
+            {
+                defaultValueUsable = false;
+                Journeymap.getLogger().warn("@Config on {}.{} defaultValue is out of range", instance.getClass().getSimpleName(), field.getName());
+            }
+
+            AtomicDouble property = (AtomicDouble) field.get(instance);
+            double value = property.get();
+            double okValue = Math.max(config.minValue(), Math.min(config.maxValue(), value));
+            if (Double.compare(okValue, value) != 0)
             {
                 if (defaultValueUsable)
                 {

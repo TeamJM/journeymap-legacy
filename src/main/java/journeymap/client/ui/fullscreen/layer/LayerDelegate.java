@@ -8,6 +8,7 @@ package journeymap.client.ui.fullscreen.layer;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.render.draw.DrawStep;
+import journeymap.client.ui.fullscreen.context.FullscreenContextTarget;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 
@@ -22,11 +23,13 @@ public class LayerDelegate
 
     private List<DrawStep> drawSteps = new ArrayList<DrawStep>();
     private List<Layer> layers = new ArrayList<Layer>();
+    private WaypointLayer waypointLayer;
 
     public LayerDelegate()
     {
         layers.add(new BlockInfoLayer());
-        layers.add(new WaypointLayer());
+        waypointLayer = new WaypointLayer();
+        layers.add(waypointLayer);
     }
 
     public void onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
@@ -64,6 +67,16 @@ public class LayerDelegate
     public List<DrawStep> getDrawSteps()
     {
         return drawSteps;
+    }
+
+    public FullscreenContextTarget getContextTarget(Minecraft mc, BlockCoordIntPair blockCoord)
+    {
+        return waypointLayer.getContextTarget(mc, blockCoord);
+    }
+
+    public void clearContextSelection()
+    {
+        waypointLayer.clearSelection();
     }
 
     public interface Layer

@@ -26,9 +26,6 @@ public abstract class InGameMapProperties extends MapProperties
     @Config(category = Inherit, key = "jm.common.font_scale", minValue = 1, maxValue = 4, defaultValue = 1)
     public final AtomicInteger fontScale = new AtomicInteger(1);
 
-    @Config(category = Inherit, key = "jm.minimap.texture_size")
-    public final AtomicBoolean textureSmall = new AtomicBoolean(true);
-
     @Config(category = Inherit, key = "jm.minimap.show_waypointlabels")
     public final AtomicBoolean showWaypointLabels = new AtomicBoolean(true);
 
@@ -70,7 +67,6 @@ public abstract class InGameMapProperties extends MapProperties
         int result = super.hashCode();
         result = 31 * result + showCaves.hashCode();
         result = 31 * result + fontScale.hashCode();
-        result = 31 * result + textureSmall.hashCode();
         result = 31 * result + showWaypointLabels.hashCode();
         result = 31 * result + locationFormatVerbose.hashCode();
         result = 31 * result + locationFormat.hashCode();
@@ -89,7 +85,6 @@ public abstract class InGameMapProperties extends MapProperties
                 .add("showCaves", showCaves)
                 .add("showWaypointLabels", showWaypointLabels)
                 .add("showMobHeading", showMobHeading)
-                .add("showPlayerHeading", showPlayerHeading)
-                .add("textureSmall", textureSmall);
+                .add("showPlayerHeading", showPlayerHeading);
     }
 }

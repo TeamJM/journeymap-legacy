@@ -9,9 +9,9 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
 import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
-import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.model.BlockCoordIntPair;
 import journeymap.client.model.Waypoint;
+import journeymap.client.properties.WaypointProperties;
 import journeymap.client.properties.FullMapProperties;
 import journeymap.client.render.draw.DrawStep;
 import journeymap.client.render.draw.DrawUtil;
@@ -19,33 +19,54 @@ import journeymap.client.render.draw.DrawWayPointStep;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
+import journeymap.client.ui.fullscreen.context.FullscreenContextTarget;
+import journeymap.client.ui.fullscreen.context.MapLocationContextTarget;
+import journeymap.client.ui.fullscreen.context.WaypointContextTarget;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.chunk.Chunk;
 import org.lwjgl.input.Mouse;
 
 import java.awt.geom.Point2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Waypoint selection/creation.
  */
 public class WaypointLayer implements LayerDelegate.Layer
 {
-    private final long hoverDelay = 100;
-    private final List<DrawStep> drawStepList = new ArrayList<DrawStep>(1);
+    private static final long HOVER_DELAY_MS = 100L;
+    private static final List<DrawStep> NO_DRAW_STEPS = Collections.emptyList();
+    private final List<DrawStep> drawStepList = new ArrayList<>(1);
     private final BlockOutlineDrawStep clickDrawStep = new BlockOutlineDrawStep(new BlockCoordIntPair(0, 0));
-    BlockCoordIntPair lastCoord = null;
+    private BlockCoordIntPair lastCoord = null;
+    private BlockCoordIntPair lastResolvedCoord = null;
+    private Waypoint lastResolvedWaypoint = null;
+    private Integer lastResolvedY = null;
 
-    long lastClick = 0;
-    long startHover = 0;
+    private long lastClick = 0;
+    private long startHover = 0;
 
-    DrawWayPointStep selectedWaypointStep = null;
-    Waypoint selected = null;
+    private Waypoint selected = null;
+    private DrawWayPointStep selectedWaypointStep = null;
 
 
     public WaypointLayer()
     {
+    }
+
+    public void clearSelection()
+    {
+        selected = null;
+        selectedWaypointStep = null;
+        lastCoord = null;
+        lastResolvedCoord = null;
+        lastResolvedWaypoint = null;
+        lastResolvedY = null;
+        drawStepList.clear();
     }
 
     @Override
@@ -53,7 +74,7 @@ public class WaypointLayer implements LayerDelegate.Layer
     {
         if (!WaypointsData.isManagerEnabled())
         {
-            return Collections.EMPTY_LIST;
+            return NO_DRAW_STEPS;
         }
 
         drawStepList.clear();
@@ -75,17 +96,15 @@ public class WaypointLayer implements LayerDelegate.Layer
         // Get search area
         int proximity = getProximity();
 
-        AxisAlignedBB area = ForgeHelper.INSTANCE.getBoundingBox(blockCoord.x - proximity, -1, blockCoord.z - proximity,
-                blockCoord.x + proximity, mc.theWorld.getActualHeight() + 1, blockCoord.z + proximity);
-
         if (!lastCoord.equals(blockCoord))
         {
-            if (!area.isVecInside(ForgeHelper.INSTANCE.newVec3(lastCoord.x, 1, lastCoord.z)))
+            if (!isWithinHorizontalRange(blockCoord, lastCoord.x, lastCoord.z, proximity))
             {
                 selected = null;
+                selectedWaypointStep = null;
                 lastCoord = blockCoord;
                 startHover = now;
-                return Collections.EMPTY_LIST;
+                return NO_DRAW_STEPS;
             }
         }
         else
@@ -97,36 +116,16 @@ public class WaypointLayer implements LayerDelegate.Layer
             }
         }
 
-        if (now - startHover < hoverDelay)
+        if (now - startHover < HOVER_DELAY_MS)
         {
-            return Collections.EMPTY_LIST;
+            return NO_DRAW_STEPS;
         }
 
-        int dimension = mc.thePlayer.dimension;
-
-        // check for existing
-        Collection<Waypoint> waypoints = DataCache.instance().getWaypoints(false);
-        ArrayList<Waypoint> proximal = new ArrayList<Waypoint>();
-        for (Waypoint waypoint : waypoints)
+        Waypoint nearestWaypoint = getNearestWaypoint(mc, blockCoord);
+        if (nearestWaypoint != null)
         {
-            if (!waypoint.isReadOnly() && waypoint.isEnable() && waypoint.isInPlayerDimension())
-            {
-                if (area.isVecInside(ForgeHelper.INSTANCE.newVec3(waypoint.getX(), waypoint.getY(), waypoint.getZ())))
-                {
-                    proximal.add(waypoint);
-                }
-            }
+            select(nearestWaypoint);
         }
-
-        if (!proximal.isEmpty())
-        {
-            if (proximal.size() > 1)
-            {
-                sortByDistance(proximal, blockCoord, dimension);
-            }
-            select(proximal.get(0));
-        }
-
         return drawStepList;
     }
 
@@ -135,7 +134,7 @@ public class WaypointLayer implements LayerDelegate.Layer
     {
         if (!WaypointsData.isManagerEnabled())
         {
-            return Collections.EMPTY_LIST;
+            return NO_DRAW_STEPS;
         }
 
         // check for double-click
@@ -176,37 +175,100 @@ public class WaypointLayer implements LayerDelegate.Layer
         return drawStepList;
     }
 
-    private void sortByDistance(List<Waypoint> waypoints, final BlockCoordIntPair blockCoord, final int dimension)
+    public FullscreenContextTarget getContextTarget(Minecraft mc, BlockCoordIntPair blockCoord)
     {
-        Collections.sort(waypoints, new Comparator<Waypoint>()
+        resolveContext(mc, blockCoord);
+        Waypoint nearestWaypoint = lastResolvedWaypoint;
+        if (nearestWaypoint != null)
         {
-            @Override
-            public int compare(Waypoint o1, Waypoint o2)
-            {
-                return Double.compare(getDistance(o1), getDistance(o2));
-            }
+            return new WaypointContextTarget(nearestWaypoint);
+        }
 
-            private double getDistance(Waypoint waypoint)
+        Integer y = lastResolvedY;
+        int fallbackY = MathHelper.floor_double(mc.thePlayer.posY);
+        return new MapLocationContextTarget(blockCoord.x, fallbackY, blockCoord.z, y, mc.thePlayer.dimension);
+    }
+
+    private Waypoint getNearestWaypoint(Minecraft mc, BlockCoordIntPair blockCoord)
+    {
+        resolveContext(mc, blockCoord);
+        return lastResolvedWaypoint;
+    }
+
+    private void resolveContext(Minecraft mc, BlockCoordIntPair blockCoord)
+    {
+        if (blockCoord.equals(lastResolvedCoord))
+        {
+            return;
+        }
+
+        lastResolvedCoord = blockCoord;
+        lastResolvedWaypoint = resolveNearestWaypoint(mc, blockCoord);
+        lastResolvedY = getKnownY(mc, blockCoord);
+    }
+
+    private Waypoint resolveNearestWaypoint(Minecraft mc, BlockCoordIntPair blockCoord)
+    {
+        int proximity = getProximity();
+        Collection<Waypoint> waypoints = DataCache.instance().getWaypoints(false);
+        Waypoint nearestWaypoint = null;
+        long nearestDistanceSquared = Long.MAX_VALUE;
+        for (Waypoint waypoint : waypoints)
+        {
+            if (!waypoint.isReadOnly() && waypoint.isEnable() && waypoint.isInPlayerDimension()
+                    && isWithinHorizontalRange(blockCoord, waypoint.getX(), waypoint.getZ(), proximity))
             {
-                double dx = waypoint.getX() - blockCoord.x;
-                double dz = waypoint.getZ() - blockCoord.z;
-                return (Math.sqrt(dx * dx + dz * dz));
+                long distanceSquared = getHorizontalDistanceSquared(blockCoord, waypoint.getX(), waypoint.getZ());
+                if (distanceSquared < nearestDistanceSquared)
+                {
+                    nearestDistanceSquared = distanceSquared;
+                    nearestWaypoint = waypoint;
+                }
             }
-        });
+        }
+        return nearestWaypoint;
+    }
+
+    private Integer getKnownY(Minecraft mc, BlockCoordIntPair blockCoord)
+    {
+        Chunk chunk = mc.theWorld.getChunkFromChunkCoords(blockCoord.x >> 4, blockCoord.z >> 4);
+        if (chunk.isEmpty())
+        {
+            return null;
+        }
+        return Math.max(1, chunk.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15));
+    }
+
+    private boolean isWithinHorizontalRange(BlockCoordIntPair blockCoord, int x, int z, int proximity)
+    {
+        return Math.abs(x - blockCoord.x) <= proximity && Math.abs(z - blockCoord.z) <= proximity;
+    }
+
+    private long getHorizontalDistanceSquared(BlockCoordIntPair blockCoord, int x, int z)
+    {
+        long dx = x - blockCoord.x;
+        long dz = z - blockCoord.z;
+        return (dx * dx) + (dz * dz);
     }
 
     private void select(Waypoint waypoint)
     {
+        if (selectedWaypointStep == null || selected != waypoint)
+        {
+            selectedWaypointStep = new DrawWayPointStep(waypoint, waypoint.getColor(), RGB.WHITE_RGB, true);
+        }
         selected = waypoint;
-        selectedWaypointStep = new DrawWayPointStep(waypoint, waypoint.getColor(), RGB.WHITE_RGB, true);
         drawStepList.add(selectedWaypointStep);
     }
 
     private int getProximity()
     {
+        WaypointProperties waypointProperties = JourneymapClient.getWaypointProperties();
         FullMapProperties fullMapProperties = JourneymapClient.getFullMapProperties();
         int blockSize = (int) Math.max(1, Math.pow(2, fullMapProperties.zoomLevel.get()));
-        return Math.max(1, 8 / blockSize);
+        int dynamicProximity = (int) Math.ceil(20D / blockSize);
+        int arrivalProximity = waypointProperties == null ? 0 : waypointProperties.arrivalHorizontalRange.get();
+        return Math.max(4, Math.min(12, Math.max(dynamicProximity, arrivalProximity + 2)));
     }
 
     private void unclick()
@@ -215,7 +277,7 @@ public class WaypointLayer implements LayerDelegate.Layer
         drawStepList.remove(clickDrawStep);
     }
 
-    class BlockOutlineDrawStep implements DrawStep
+    private class BlockOutlineDrawStep implements DrawStep
     {
         BlockCoordIntPair blockCoord;
 

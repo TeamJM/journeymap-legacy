@@ -12,6 +12,7 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
+import journeymap.client.model.WaypointDisplayNameFormatter;
 import journeymap.client.properties.WaypointProperties;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.texture.TextureImpl;
@@ -42,6 +43,7 @@ public class RenderWaypointBeacon
     static IRenderHelper renderHelper = ForgeHelper.INSTANCE.getRenderHelper();
     static String distanceLabel = Constants.getString("jm.waypoint.distance_meters", "%1.0f");
     static WaypointProperties waypointProperties;
+    static WaypointDisplayNameFormatter displayNameFormatter = new WaypointDisplayNameFormatter();
 
     private static final float MIN_VISIBLE_ALPHA = 0.01F;
 
@@ -162,7 +164,7 @@ public class RenderWaypointBeacon
                 renderBeam(shiftX, -renderManager.viewerPosY, shiftZ, waypoint.getColor(), showStaticBeam, showRotatingBeam, fadeAlpha);
             }
 
-            String label = waypoint.getName();
+            String label = displayNameFormatter.formatLabel(waypoint);
 
             // Check for auto-hidden labels
             boolean labelHidden = false;
@@ -288,7 +290,7 @@ public class RenderWaypointBeacon
                 renderHelper.glDisableDepth();
                 renderHelper.glDepthMask(false);
 
-                scale = scale * (waypointProperties.textureSmall.get() ? 1 : 2);
+                scale = scale * 1;
 
                 GL11.glTranslated(shiftX, shiftY, shiftZ);
                 GL11.glRotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);

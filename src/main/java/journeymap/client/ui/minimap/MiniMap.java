@@ -17,6 +17,7 @@ import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.properties.MiniMapProperties;
+import journeymap.client.properties.WaypointProperties;
 import journeymap.client.render.draw.DrawUtil;
 import journeymap.client.render.draw.DrawWayPointStep;
 import journeymap.client.render.draw.RadarDrawStepFactory;
@@ -416,6 +417,7 @@ public class MiniMap
     private void drawOnMapWaypoints(double rotation)
     {
         boolean showLabel = miniMapProperties.showWaypointLabels.get();
+        float waypointDrawScale = getWaypointDrawScale();
         for (DrawWayPointStep drawWayPointStep : state.getDrawWaypointSteps())
         {
             Point2D.Double waypointPos = drawWayPointStep.getPosition(0, 0, gridRenderer, true);
@@ -424,13 +426,14 @@ public class MiniMap
             if (onScreen)
             {
                 drawWayPointStep.setShowLabel(showLabel);
-                drawWayPointStep.draw(0, 0, gridRenderer, dv.drawScale, dv.fontScale, rotation);
+                drawWayPointStep.draw(0, 0, gridRenderer, waypointDrawScale, dv.fontScale, rotation);
             }
         }
     }
 
     private void drawOffMapWaypoints(double rotation)
     {
+        float waypointDrawScale = getWaypointDrawScale();
         for (DrawWayPointStep drawWayPointStep : state.getDrawWaypointSteps())
         {
             if (!drawWayPointStep.isOnScreen())
@@ -441,9 +444,15 @@ public class MiniMap
                         dv.minimapSpec.waypointOffset);
 
                 //point = drawWayPointStep.getPosition(0, 0, gridRenderer, false);
-                drawWayPointStep.drawOffscreen(point, rotation);
+                drawWayPointStep.drawOffscreen(point, waypointDrawScale, rotation);
             }
         }
+    }
+
+    private float getWaypointDrawScale()
+    {
+        WaypointProperties waypointProperties = JourneymapClient.getWaypointProperties();
+        return dv.drawScale * (float) waypointProperties.minimapIconScale.get();
     }
 
     private void startMapRotation(double rotation)
