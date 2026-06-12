@@ -228,6 +228,11 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         return this.selected;
     }
 
+    public String getStateKey()
+    {
+        return sortKey;
+    }
+
     public void setSelected(boolean selected)
     {
         this.selected = selected;

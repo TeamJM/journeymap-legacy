@@ -328,6 +328,10 @@ public class WaypointManager extends JmUI
     protected void mouseClicked(int mouseX, int mouseY, int mouseEvent)
     {
         super.mouseClicked(mouseX, mouseY, mouseEvent);
+        if (itemScrollPane == null)
+        {
+            return;
+        }
         boolean pressed = itemScrollPane.mousePressed(mouseX, mouseY, mouseEvent);
         if (pressed)
         {
@@ -339,8 +343,10 @@ public class WaypointManager extends JmUI
     protected void mouseMovedOrUp(int mouseX, int mouseY, int state)
     {
         super.mouseMovedOrUp(mouseX, mouseY, state);
-
-        itemScrollPane.mouseMovedOrUp(mouseX, mouseY, state);
+        if (itemScrollPane != null)
+        {
+            itemScrollPane.mouseMovedOrUp(mouseX, mouseY, state);
+        }
     }
 
     @Override
@@ -357,6 +363,10 @@ public class WaypointManager extends JmUI
     public void handleMouseInput()
     {
         super.handleMouseInput();
+        if (itemScrollPane == null)
+        {
+            return;
+        }
         int i = Mouse.getEventDWheel();
 
         if (i != 0)
@@ -376,6 +386,10 @@ public class WaypointManager extends JmUI
      */
     protected void checkPressedButton()
     {
+        if (itemScrollPane == null)
+        {
+            return;
+        }
         SlotMetadata slotMetadata = itemScrollPane.getLastPressed();
         if (slotMetadata != null) // TODO
         {
@@ -473,18 +487,18 @@ public class WaypointManager extends JmUI
             }
         }
 
-        boolean keyUsed = itemScrollPane.keyTyped(c, i);
+        boolean keyUsed = itemScrollPane != null && itemScrollPane.keyTyped(c, i);
         if (keyUsed)
         {
             return;
         }
 
-        if (i == Keyboard.KEY_HOME)
+        if (itemScrollPane != null && i == Keyboard.KEY_HOME)
         {
             this.itemScrollPane.scrollBy(-this.itemScrollPane.getAmountScrolled());
         }
 
-        if (i == Keyboard.KEY_END)
+        if (itemScrollPane != null && i == Keyboard.KEY_END)
         {
             this.itemScrollPane.scrollBy(items.size() * rowHeight);
         }
@@ -598,7 +612,7 @@ public class WaypointManager extends JmUI
 
     protected boolean isSelected(WaypointManagerItem item)
     {
-        return itemScrollPane.isSelected(item.getSlotIndex()); // TODO
+        return itemScrollPane != null && itemScrollPane.isSelected(item.getSlotIndex()); // TODO
     }
 
     protected int getMargin()

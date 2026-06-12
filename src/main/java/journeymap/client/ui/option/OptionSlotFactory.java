@@ -313,7 +313,7 @@ public class OptionSlotFactory
             String defaultTip = Constants.getString("jm.config.default_numeric", annotation.minValue(), annotation.maxValue(), annotation.defaultValue());
             boolean advanced = annotation.category() == Config.Category.Advanced;
 
-            String suffix = annotation.key().contains("icon_scale") ? "x" : "";
+            String suffix = annotation.key().contains("_scale") ? "x" : "";
             DoubleSliderButton button = new DoubleSliderButton(properties, property, name + " : ", suffix, (double) annotation.minValue(), (double) annotation.maxValue(), true);
             button.setDefaultStyle(false);
             button.setDrawBackground(false);

@@ -6,6 +6,7 @@
 package journeymap.client.properties;
 
 import com.google.common.base.Objects;
+import com.google.common.util.concurrent.AtomicDouble;
 import journeymap.client.io.IconSetFileHandler;
 import journeymap.client.model.MapType;
 import journeymap.client.properties.config.Config;
@@ -54,6 +55,12 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
     @Config(category = Inherit, key = "jm.common.entity_blur")
     public final AtomicBoolean entityBlur = new AtomicBoolean(true);
 
+    @Config(category = Inherit, key = "jm.common.player_arrow_scale", minValue = 0.1, maxValue = 10.0, defaultValue = 1.0)
+    public final AtomicDouble playerArrowScale = new AtomicDouble(1D);
+
+    @Config(category = Inherit, key = "jm.common.smooth_zoom", defaultBoolean = true)
+    public final AtomicBoolean smoothZoom = new AtomicBoolean(true);
+
     public final AtomicInteger zoomLevel = new AtomicInteger(0);
 
     protected MapProperties()
@@ -93,6 +100,8 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
         result = 31 * result + getEntityIconSetName().hashCode();
         result = 31 * result + entityScale.hashCode();
         result = 31 * result + entityBlur.hashCode();
+        result = 31 * result + playerArrowScale.hashCode();
+        result = 31 * result + smoothZoom.hashCode();
         return result;
     }
 
@@ -115,7 +124,9 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
                 .add("showWaypoints", showWaypoints)
                 .add("zoomLevel", zoomLevel)
                 .add("entityScale", entityScale)
-                .add("entityBlur", entityBlur);
+                .add("entityBlur", entityBlur)
+                .add("playerArrowScale", playerArrowScale)
+                .add("smoothZoom", smoothZoom);
     }
 
 
