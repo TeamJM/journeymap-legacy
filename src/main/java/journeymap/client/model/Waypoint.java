@@ -69,6 +69,12 @@ public class Waypoint implements Serializable
     protected boolean enable;
 
     @Since(1)
+    protected WaypointVisibility visibility;
+
+    @Since(1)
+    protected WaypointLifecycle lifecycle;
+
+    @Since(1)
     protected Type type;
 
     @Since(1)
@@ -125,6 +131,8 @@ public class Waypoint implements Serializable
         this.g = green;
         this.b = blue;
         this.enable = enable;
+        this.visibility = enable ? WaypointVisibility.ENABLED : WaypointVisibility.DISABLED;
+        this.lifecycle = WaypointLifecycle.PERSISTENT;
         this.type = type;
         this.origin = origin;
 
@@ -199,7 +207,7 @@ public class Waypoint implements Serializable
 
     public TextureImpl getTexture()
     {
-        return isDeathPoint() ? TextureCache.instance().getDeathpoint() : TextureCache.instance().getWaypoint();
+        return isDeathPoint() || isTemporary() ? TextureCache.instance().getDeathpoint() : TextureCache.instance().getWaypoint();
     }
 
     public ChunkCoordIntPair getChunkCoordIntPair()
@@ -368,16 +376,59 @@ public class Waypoint implements Serializable
 
     public boolean isEnable()
     {
-        return enable;
+        return getVisibility() == WaypointVisibility.ENABLED;
     }
 
     public void setEnable(boolean enable)
     {
-        if (enable != this.enable)
+        setVisibility(enable ? WaypointVisibility.ENABLED : WaypointVisibility.DISABLED);
+    }
+
+    public WaypointVisibility getVisibility()
+    {
+        if (visibility == null)
         {
-            this.enable = enable;
+            visibility = enable ? WaypointVisibility.ENABLED : WaypointVisibility.DISABLED;
+        }
+        return visibility;
+    }
+
+    public void setVisibility(WaypointVisibility visibility)
+    {
+        if (visibility != getVisibility())
+        {
+            this.visibility = visibility;
+            this.enable = visibility == WaypointVisibility.ENABLED;
             this.dirty = true;
         }
+    }
+
+    public WaypointLifecycle getLifecycle()
+    {
+        if (lifecycle == null)
+        {
+            lifecycle = WaypointLifecycle.PERSISTENT;
+        }
+        return lifecycle;
+    }
+
+    public void setLifecycle(WaypointLifecycle lifecycle)
+    {
+        if (lifecycle != getLifecycle())
+        {
+            this.lifecycle = lifecycle;
+            this.dirty = true;
+        }
+    }
+
+    public boolean isTemporary()
+    {
+        return getLifecycle() == WaypointLifecycle.TEMPORARY;
+    }
+
+    public boolean isDestination()
+    {
+        return getLifecycle() == WaypointLifecycle.DESTINATION;
     }
 
     public Type getType()
@@ -453,6 +504,14 @@ public class Waypoint implements Serializable
         {
             return false;
         }
+        if (getVisibility() != waypoint.getVisibility())
+        {
+            return false;
+        }
+        if (getLifecycle() != waypoint.getLifecycle())
+        {
+            return false;
+        }
         if (g != waypoint.g)
         {
             return false;
@@ -504,7 +563,10 @@ public class Waypoint implements Serializable
     @Override
     public int hashCode()
     {
-        return id.hashCode();
+        int result = id.hashCode();
+        result = 31 * result + getVisibility().hashCode();
+        result = 31 * result + getLifecycle().hashCode();
+        return result;
     }
 
     public enum Origin

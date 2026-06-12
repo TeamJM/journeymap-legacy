@@ -6,6 +6,7 @@
 package journeymap.client.properties;
 
 import com.google.common.base.Objects;
+import com.google.common.util.concurrent.AtomicDouble;
 import journeymap.client.properties.config.Config;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -49,14 +50,29 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     @Config(category = WaypointBeacon, key = "jm.waypoint.font_scale", minValue = 1, maxValue = 3, defaultValue = 2)
     public final AtomicInteger fontScale = new AtomicInteger(2);
 
-    @Config(category = WaypointBeacon, key = "jm.waypoint.texture_size")
-    public final AtomicBoolean textureSmall = new AtomicBoolean(true);
-
     @Config(category = Waypoint, key = "jm.waypoint.max_distance", minValue = 0, maxValue = 10000, defaultValue = 0)
     public final AtomicInteger maxDistance = new AtomicInteger(0);
 
+    @Config(category = Waypoint, key = "jm.waypoint.fullscreen_icon_scale", minValue = 0.1, maxValue = 10.0, defaultValue = 1.0)
+    public final AtomicDouble fullscreenIconScale = new AtomicDouble(1D);
+
+    @Config(category = Waypoint, key = "jm.waypoint.minimap_icon_scale", minValue = 0.1, maxValue = 10.0, defaultValue = 1.0)
+    public final AtomicDouble minimapIconScale = new AtomicDouble(1D);
+
     @Config(category = Waypoint, key = "jm.waypoint.create_deathpoints")
     public final AtomicBoolean createDeathpoints = new AtomicBoolean(true);
+
+    @Config(category = Waypoint, key = "jm.waypoint.delete_deathpoint_on_arrival", defaultBoolean = false)
+    public final AtomicBoolean deleteDeathpointOnArrival = new AtomicBoolean(false);
+
+    @Config(category = Waypoint, key = "jm.waypoint.keep_only_latest_deathpoint", defaultBoolean = false)
+    public final AtomicBoolean keepOnlyLatestDeathpoint = new AtomicBoolean(false);
+
+    @Config(category = Waypoint, key = "jm.waypoint.arrival_horizontal_range", minValue = 1, maxValue = 50, defaultValue = 3)
+    public final AtomicInteger arrivalHorizontalRange = new AtomicInteger(3);
+
+    @Config(category = Waypoint, key = "jm.waypoint.arrival_vertical_range", minValue = 1, maxValue = 50, defaultValue = 3)
+    public final AtomicInteger arrivalVerticalRange = new AtomicInteger(3);
 
     @Config(category = WaypointBeacon, key = "jm.waypoint.beacon_fade_start", minValue = 0, maxValue = 500, defaultValue = 40)
     public final AtomicInteger beaconFadeStart = new AtomicInteger(40);
@@ -101,9 +117,14 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
         result = 31 * result + autoHideLabel.hashCode();
         result = 31 * result + boldLabel.hashCode();
         result = 31 * result + fontScale.hashCode();
-        result = 31 * result + textureSmall.hashCode();
         result = 31 * result + maxDistance.hashCode();
+        result = 31 * result + fullscreenIconScale.hashCode();
+        result = 31 * result + minimapIconScale.hashCode();
         result = 31 * result + createDeathpoints.hashCode();
+        result = 31 * result + deleteDeathpointOnArrival.hashCode();
+        result = 31 * result + keepOnlyLatestDeathpoint.hashCode();
+        result = 31 * result + arrivalHorizontalRange.hashCode();
+        result = 31 * result + arrivalVerticalRange.hashCode();
         result = 31 * result + beaconFadeStart.hashCode();
         result = 31 * result + beaconFadeEnd.hashCode();
         result = 31 * result + name.hashCode();
@@ -118,16 +139,21 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
                 .add("beaconEnabled", beaconEnabled)
                 .add("boldLabel", boldLabel)
                 .add("createDeathpoints", createDeathpoints)
+                .add("deleteDeathpointOnArrival", deleteDeathpointOnArrival)
                 .add("fontScale", fontScale)
+                .add("fullscreenIconScale", fullscreenIconScale)
+                .add("keepOnlyLatestDeathpoint", keepOnlyLatestDeathpoint)
                 .add("managerEnabled", managerEnabled)
                 .add("maxDistance", maxDistance)
+                .add("minimapIconScale", minimapIconScale)
+                .add("arrivalHorizontalRange", arrivalHorizontalRange)
+                .add("arrivalVerticalRange", arrivalVerticalRange)
                 .add("name", name)
                 .add("showDistance", showDistance)
                 .add("showName", showName)
                 .add("showRotatingBeam", showRotatingBeam)
                 .add("showStaticBeam", showStaticBeam)
                 .add("showTexture", showTexture)
-                .add("textureSmall", textureSmall)
                 .add("beaconFadeStart", beaconFadeStart)
                 .add("beaconFadeEnd", beaconFadeEnd)
                 .toString();

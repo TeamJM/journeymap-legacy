@@ -6,12 +6,14 @@
 package journeymap.client.properties;
 
 import com.google.common.io.Files;
+import com.google.common.util.concurrent.AtomicDouble;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import journeymap.client.Constants;
 import journeymap.client.io.FileHandler;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.properties.config.AtomicBooleanSerializer;
+import journeymap.client.properties.config.AtomicDoubleSerializer;
 import journeymap.client.properties.config.AtomicIntegerSerializer;
 import journeymap.client.properties.config.AtomicReferenceSerializer;
 import journeymap.client.properties.config.ConfigValidation;
@@ -49,6 +51,7 @@ public abstract class PropertiesBase
     protected transient final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeAdapter(AtomicBoolean.class, new AtomicBooleanSerializer(configFormatChanged))
+            .registerTypeAdapter(AtomicDouble.class, new AtomicDoubleSerializer(configFormatChanged))
             .registerTypeAdapter(AtomicInteger.class, new AtomicIntegerSerializer(configFormatChanged))
             .registerTypeAdapter(AtomicReference.class, new AtomicReferenceSerializer(configFormatChanged))
             .create();

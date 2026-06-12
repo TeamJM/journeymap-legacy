@@ -61,6 +61,11 @@ public class WaypointStore
         return cache.asMap().values();
     }
 
+    public List<Waypoint> snapshot()
+    {
+        return new ArrayList<Waypoint>(cache.asMap().values());
+    }
+
     public void add(Waypoint waypoint)
     {
         if (cache.getIfPresent(waypoint.getId()) == null)
