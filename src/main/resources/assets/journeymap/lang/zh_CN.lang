@@ -1,4 +1,4 @@
-﻿### JourneyMap 5.1.1 Resource Bundle - zh_CN
+### JourneyMap 5.1.1 Resource Bundle - zh_CN
 ### Translation by: NightSharp
 jm.advanced.announcemod=声明Mod
 jm.advanced.announcemod.tooltip=在聊天窗口中声明JourneyMap已经就绪.
@@ -493,4 +493,3 @@ key.journeymap.minimap_preset=切换小地图预设样式
 key.journeymap.night=显示黑夜下的地图
 key.journeymap.zoom_in=放大
 key.journeymap.zoom_out=缩小
-
