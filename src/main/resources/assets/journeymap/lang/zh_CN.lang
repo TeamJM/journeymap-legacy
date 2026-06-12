@@ -1,4 +1,4 @@
-### JourneyMap 5.1.1 Resource Bundle - zh_CN
+﻿### JourneyMap 5.1.1 Resource Bundle - zh_CN
 ### Translation by: NightSharp
 jm.advanced.announcemod=声明Mod
 jm.advanced.announcemod.tooltip=在聊天窗口中声明JourneyMap已经就绪.
@@ -378,12 +378,27 @@ jm.waypoint.import_vox_version=你的VoxelMap版本不不被支持. 请更新至
 jm.waypoint.location=位置坐标
 jm.waypoint.manage_title=管理导航点
 jm.waypoint.manager=导航点管理器
+jm.waypoint.mode=模式
+jm.waypoint.mode_open=开启
+jm.waypoint.mode_closed=关闭
+jm.waypoint.mode_temporary=临时
+jm.waypoint.mode_destination=目的地
 jm.waypoint.max_distance=最大距离
 jm.waypoint.max_distance.tooltip=从你本身算起一个导航点可以被呈现的最大距离(单位为 方块数或米). 该项将同时影响地图上的导航点与导航点信标. 设为 0 将没有最大距离限制.
 jm.waypoint.name=名称
 jm.waypoint.new=新建...
 jm.waypoint.new_title=新建导航点
 jm.waypoint.options=导航点选项(游戏内呈现)
+jm.waypoint.temporary_suffix=临时的
+jm.waypoint.destination_suffix=目的地
+jm.waypoint.delete_deathpoint_on_arrival=抵达死亡导航点时删除
+jm.waypoint.delete_deathpoint_on_arrival.tooltip=当你进入设定的抵达范围时，自动删除死亡导航点。
+jm.waypoint.keep_only_latest_deathpoint=只记录最近一次的死亡导航点
+jm.waypoint.keep_only_latest_deathpoint.tooltip=创建新的死亡导航点前先删除旧的，始终只保留最近一次。
+jm.waypoint.arrival_horizontal_range=抵达水平距离
+jm.waypoint.arrival_horizontal_range.tooltip=用于判定已抵达目的地或死亡导航点并自动删除的水平方块距离。
+jm.waypoint.arrival_vertical_range=抵达高度差
+jm.waypoint.arrival_vertical_range.tooltip=用于判定已抵达目的地或死亡导航点并自动删除的垂直高度差。
 jm.waypoint.randomize=随机颜色
 jm.waypoint.red_abbreviated=R
 jm.waypoint.remove=移除
@@ -478,3 +493,4 @@ key.journeymap.minimap_preset=切换小地图预设样式
 key.journeymap.night=显示黑夜下的地图
 key.journeymap.zoom_in=放大
 key.journeymap.zoom_out=缩小
+
