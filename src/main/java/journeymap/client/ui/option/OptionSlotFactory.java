@@ -8,6 +8,8 @@ package journeymap.client.ui.option;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.AtomicDouble;
+import journeymap.client.api.settings.SettingsPageDefinition;
+import journeymap.client.api.settings.SettingsPageRegistry;
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.cartography.RGB;
@@ -68,6 +70,11 @@ public class OptionSlotFactory
             }
 
             categories.add(categorySlot);
+        }
+
+        for (SettingsPageDefinition pageDefinition : SettingsPageRegistry.getInstance().getPages())
+        {
+            categories.add(new ExternalSettingsCategorySlot(pageDefinition));
         }
 
         Collections.sort(categories);

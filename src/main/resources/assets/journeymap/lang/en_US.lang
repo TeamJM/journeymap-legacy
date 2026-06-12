@@ -506,3 +506,5 @@ key.journeymap.minimap_type=Switch between Day/Night/Caves
 key.journeymap.night=Show Night Map
 key.journeymap.zoom_in=Zoom In
 key.journeymap.zoom_out=Zoom Out
+jm.settings.external_page=External Settings
+jm.settings.external_page.tooltip=Settings pages registered by installed client mods
