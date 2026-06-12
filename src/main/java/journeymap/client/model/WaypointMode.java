@@ -1,5 +1,6 @@
 package journeymap.client.model;
 
+// This is the UI-facing mode that maps legacy enabled state and new lifecycle state into one control.
 public enum WaypointMode
 {
     OPEN("jm.waypoint.mode_open"),
@@ -66,6 +67,7 @@ public enum WaypointMode
         }
     }
 
+    // Keep legacy visibility and lifecycle fields synchronized so old waypoint files still round-trip safely.
     public void applyTo(Waypoint waypoint)
     {
         switch (this)

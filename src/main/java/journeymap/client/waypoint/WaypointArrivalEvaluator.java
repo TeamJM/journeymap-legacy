@@ -18,6 +18,7 @@ public class WaypointArrivalEvaluator
             return false;
         }
 
+        // Unknown Y coordinates cannot be reached deterministically, so they are never auto-removed.
         if (waypoint.getY() < 0)
         {
             return false;

@@ -11,6 +11,7 @@ public class WaypointLifecycleService
 
     public void removeTemporaryWaypoints()
     {
+        // Iterate over a snapshot because removal mutates the backing waypoint store.
         for (Waypoint waypoint : WaypointStore.instance().snapshot())
         {
             if (waypoint.isTemporary())
@@ -30,6 +31,7 @@ public class WaypointLifecycleService
         WaypointProperties waypointProperties = JourneymapClient.getWaypointProperties();
         int horizontalRange = waypointProperties.arrivalHorizontalRange.get();
         int verticalRange = waypointProperties.arrivalVerticalRange.get();
+        // Iterate over a snapshot because arrival cleanup can remove multiple waypoints in one tick.
         for (Waypoint waypoint : WaypointStore.instance().snapshot())
         {
             if (shouldDeleteOnArrival(waypoint, waypointProperties)
