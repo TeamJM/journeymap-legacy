@@ -44,6 +44,7 @@ import java.util.*;
 public class OptionsManager extends JmUI
 {
     protected static EnumSet<Config.Category> openCategories = EnumSet.noneOf(Config.Category.class);
+    protected static Set<String> openCategoryKeys = new HashSet<String>();
 
     protected final int inGameMinimapId;
     protected Config.Category[] initialCategories;
@@ -173,6 +174,15 @@ public class OptionsManager extends JmUI
                                 categorySlots.add(categorySlot);
                             }
                         }
+                    }
+                }
+
+                for (CategorySlot categorySlot : optionsListPane.getRootSlots())
+                {
+                    if (openCategoryKeys.contains(categorySlot.getStateKey()))
+                    {
+                        categorySlot.setSelected(true);
+                        categorySlots.add(categorySlot);
                     }
                 }
 
@@ -735,10 +745,12 @@ public class OptionsManager extends JmUI
         }
 
         OptionsManager.openCategories.clear();
+        OptionsManager.openCategoryKeys.clear();
         for (CategorySlot categorySlot : optionsListPane.getRootSlots())
         {
             if (categorySlot.isSelected())
             {
+                OptionsManager.openCategoryKeys.add(categorySlot.getStateKey());
                 if (categorySlot.getCategory() != null)
                 {
                     OptionsManager.openCategories.add(categorySlot.getCategory());
