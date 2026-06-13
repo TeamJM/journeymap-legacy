@@ -155,6 +155,10 @@ public class MapState
         }
         else if (currentMapType.isNight())
         {
+            setMapType(MapType.topo(player));
+        }
+        else if (currentMapType.isTopo())
+        {
             if (underground && caveMappingAllowed)
             {
                 lastMapProperties.showCaves.set(true);
