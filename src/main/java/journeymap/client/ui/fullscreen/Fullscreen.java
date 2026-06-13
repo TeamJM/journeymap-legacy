@@ -341,7 +341,7 @@ public class Fullscreen extends JmUI
                 {
                     if (toggled)
                     {
-                        state.setMapType(MapType.Name.topo);
+                        state.setMapType(MapType.topo(state.getCurrentMapType().dimension));
                         buttonDay.setToggled(false);
                         buttonNight.setToggled(false);
                         if (state.isUnderground())
