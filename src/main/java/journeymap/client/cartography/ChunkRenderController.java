@@ -101,14 +101,15 @@ public class ChunkRenderController
             {
                 if (rCoord.dimension == 0)
                 {
-                    BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, MapType.topo(rCoord.dimension));
+                    MapType topoMapType = MapType.topo(rCoord.dimension);
+                    BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, topoMapType);
                     if (imageTopo != null)
                     {
                         topoG2D = new ChunkPainter(reusableBuffer4, RegionImageHandler.initRenderingHints(imageTopo.createGraphics()));
                         renderOkay = overWorldTopoRenderer.render(topoG2D, chunkMd, null);
                         if (renderOkay)
                         {
-                            regionImageSet.setChunkImage(chunkMd, MapType.topo(rCoord.dimension), imageTopo);
+                            regionImageSet.setChunkImage(chunkMd, topoMapType, imageTopo);
                         }
                     }
                 }
@@ -137,13 +138,14 @@ public class ChunkRenderController
 
                     if (rCoord.dimension == 0)
                     {
-                        BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, MapType.topo(rCoord.dimension));
+                        MapType topoMapType = MapType.topo(rCoord.dimension);
+                        BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, topoMapType);
                         if (imageTopo != null)
                         {
                             topoG2D = new ChunkPainter(reusableBuffer4, RegionImageHandler.initRenderingHints(imageTopo.createGraphics()));
                             if (overWorldTopoRenderer.render(topoG2D, chunkMd, null))
                             {
-                                regionImageSet.setChunkImage(chunkMd, MapType.topo(rCoord.dimension), imageTopo);
+                                regionImageSet.setChunkImage(chunkMd, topoMapType, imageTopo);
                             }
                         }
                     }
