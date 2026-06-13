@@ -1,19 +1,19 @@
 package journeymap.client.ui.component;
 
 import cpw.mods.fml.client.config.GuiUtils;
-import journeymap.client.api.settings.IntSettingBinding;
+import journeymap.client.api.settings.ExternalSettingEntry.IntBinding;
 import journeymap.client.cartography.RGB;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import org.lwjgl.input.Keyboard;
 
-public class BindingIntSliderButton extends Button implements IPropertyHolder<IntSettingBinding, Integer>
+public class BindingIntSliderButton extends Button implements IPropertyHolder<IntBinding, Integer>
 {
     protected String prefix = "";
     protected boolean dragging;
-    protected IntSettingBinding binding;
+    protected IntBinding binding;
 
-    public BindingIntSliderButton(String prefix, IntSettingBinding binding)
+    public BindingIntSliderButton(String prefix, IntBinding binding)
     {
         super(prefix);
         this.prefix = prefix;
@@ -155,7 +155,7 @@ public class BindingIntSliderButton extends Button implements IPropertyHolder<In
     }
 
     @Override
-    public IntSettingBinding getProperty()
+    public IntBinding getProperty()
     {
         return binding;
     }

@@ -1,7 +1,7 @@
 package journeymap.client.ui.component;
 
 import cpw.mods.fml.client.config.GuiUtils;
-import journeymap.client.api.settings.DoubleSettingBinding;
+import journeymap.client.api.settings.ExternalSettingEntry.DoubleBinding;
 import journeymap.client.cartography.RGB;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -9,13 +9,13 @@ import org.lwjgl.input.Keyboard;
 
 import java.util.Locale;
 
-public class BindingDoubleSliderButton extends Button implements IPropertyHolder<DoubleSettingBinding, Double>
+public class BindingDoubleSliderButton extends Button implements IPropertyHolder<DoubleBinding, Double>
 {
     protected String prefix = "";
     protected boolean dragging;
-    protected DoubleSettingBinding binding;
+    protected DoubleBinding binding;
 
-    public BindingDoubleSliderButton(String prefix, DoubleSettingBinding binding)
+    public BindingDoubleSliderButton(String prefix, DoubleBinding binding)
     {
         super(prefix);
         this.prefix = prefix;
@@ -162,7 +162,7 @@ public class BindingDoubleSliderButton extends Button implements IPropertyHolder
     }
 
     @Override
-    public DoubleSettingBinding getProperty()
+    public DoubleBinding getProperty()
     {
         return binding;
     }

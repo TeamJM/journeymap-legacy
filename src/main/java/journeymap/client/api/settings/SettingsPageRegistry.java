@@ -20,17 +20,6 @@ public class SettingsPageRegistry
     {
         return INSTANCE;
     }
-
-    public synchronized void registerPage(SettingsPageProvider provider)
-    {
-        if (provider == null)
-        {
-            return;
-        }
-
-        registerPage(provider.getPageDefinition());
-    }
-
     public synchronized void registerPage(SettingsPageDefinition definition)
     {
         if (definition == null || definition.getPageId() == null)

@@ -1,5 +1,6 @@
 package journeymap.client.api.settings;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -7,21 +8,97 @@ import java.util.concurrent.Callable;
  */
 public class ExternalSettingEntry
 {
+    public static final int LABEL = 0;
+    public static final int BOOLEAN = 1;
+    public static final int INT_SLIDER = 2;
+    public static final int DOUBLE_SLIDER = 3;
+    public static final int ENUM_LIST = 4;
+    public static final int STRING_LIST = 5;
+    public static final int STRING_INPUT = 6;
+
+    public static interface BooleanBinding
+    {
+        boolean get();
+
+        void set(boolean value);
+
+        boolean getDefaultValue();
+    }
+
+    public static interface IntBinding
+    {
+        int get();
+
+        void set(int value);
+
+        int getDefaultValue();
+
+        int getMinValue();
+
+        int getMaxValue();
+
+        int getStep();
+
+        String getSuffix();
+    }
+
+    public static interface DoubleBinding
+    {
+        double get();
+
+        void set(double value);
+
+        double getDefaultValue();
+
+        double getMinValue();
+
+        double getMaxValue();
+
+        double getStep();
+
+        int getPrecision();
+
+        String getSuffix();
+    }
+
+    public static interface ListBinding<T>
+    {
+        T get();
+
+        void set(T value);
+
+        T getDefaultValue();
+
+        List<T> getOptions();
+
+        String getLabel(T value);
+    }
+
+    public static interface StringBinding
+    {
+        String get();
+
+        void set(String value);
+
+        String getDefaultValue();
+
+        int getMaxLength();
+    }
     private String id;
-    private ExternalSettingKind kind;
+    private int kind;
     private String titleKey;
     private String tooltipKey;
     private int order;
     private boolean advanced;
     private Callable<Boolean> visibleSupplier;
     private Callable<Boolean> enabledSupplier;
-    private BooleanSettingBinding booleanBinding;
-    private IntSettingBinding intBinding;
-    private DoubleSettingBinding doubleBinding;
-    private ListSettingBinding<?> listBinding;
-    private StringInputBinding stringInputBinding;
+    private BooleanBinding booleanBinding;
+    private IntBinding intBinding;
+    private DoubleBinding doubleBinding;
+    private ListBinding<?> listBinding;
+    private StringBinding stringInputBinding;
 
-    protected ExternalSettingEntry(String id, ExternalSettingKind kind, String titleKey, String tooltipKey, int order)
+    protected ExternalSettingEntry(String id, int kind, String titleKey, String tooltipKey, int order)
     {
         this.id = id;
         this.kind = kind;
@@ -32,47 +109,47 @@ public class ExternalSettingEntry
 
     public static ExternalSettingEntry label(String id, String titleKey, String tooltipKey, int order)
     {
-        return new ExternalSettingEntry(id, ExternalSettingKind.LABEL, titleKey, tooltipKey, order);
+        return new ExternalSettingEntry(id, LABEL, titleKey, tooltipKey, order);
     }
 
-    public static ExternalSettingEntry bool(String id, String titleKey, String tooltipKey, int order, BooleanSettingBinding binding)
+    public static ExternalSettingEntry bool(String id, String titleKey, String tooltipKey, int order, BooleanBinding binding)
     {
-        ExternalSettingEntry entry = new ExternalSettingEntry(id, ExternalSettingKind.BOOLEAN, titleKey, tooltipKey, order);
+        ExternalSettingEntry entry = new ExternalSettingEntry(id, BOOLEAN, titleKey, tooltipKey, order);
         entry.booleanBinding = binding;
         return entry;
     }
 
-    public static ExternalSettingEntry intSlider(String id, String titleKey, String tooltipKey, int order, IntSettingBinding binding)
+    public static ExternalSettingEntry intSlider(String id, String titleKey, String tooltipKey, int order, IntBinding binding)
     {
-        ExternalSettingEntry entry = new ExternalSettingEntry(id, ExternalSettingKind.INT_SLIDER, titleKey, tooltipKey, order);
+        ExternalSettingEntry entry = new ExternalSettingEntry(id, INT_SLIDER, titleKey, tooltipKey, order);
         entry.intBinding = binding;
         return entry;
     }
 
-    public static ExternalSettingEntry doubleSlider(String id, String titleKey, String tooltipKey, int order, DoubleSettingBinding binding)
+    public static ExternalSettingEntry doubleSlider(String id, String titleKey, String tooltipKey, int order, DoubleBinding binding)
     {
-        ExternalSettingEntry entry = new ExternalSettingEntry(id, ExternalSettingKind.DOUBLE_SLIDER, titleKey, tooltipKey, order);
+        ExternalSettingEntry entry = new ExternalSettingEntry(id, DOUBLE_SLIDER, titleKey, tooltipKey, order);
         entry.doubleBinding = binding;
         return entry;
     }
 
-    public static ExternalSettingEntry enumList(String id, String titleKey, String tooltipKey, int order, ListSettingBinding<?> binding)
+    public static ExternalSettingEntry enumList(String id, String titleKey, String tooltipKey, int order, ListBinding<?> binding)
     {
-        ExternalSettingEntry entry = new ExternalSettingEntry(id, ExternalSettingKind.ENUM_LIST, titleKey, tooltipKey, order);
+        ExternalSettingEntry entry = new ExternalSettingEntry(id, ENUM_LIST, titleKey, tooltipKey, order);
         entry.listBinding = binding;
         return entry;
     }
 
-    public static ExternalSettingEntry stringList(String id, String titleKey, String tooltipKey, int order, ListSettingBinding<?> binding)
+    public static ExternalSettingEntry stringList(String id, String titleKey, String tooltipKey, int order, ListBinding<?> binding)
     {
-        ExternalSettingEntry entry = new ExternalSettingEntry(id, ExternalSettingKind.STRING_LIST, titleKey, tooltipKey, order);
+        ExternalSettingEntry entry = new ExternalSettingEntry(id, STRING_LIST, titleKey, tooltipKey, order);
         entry.listBinding = binding;
         return entry;
     }
 
-    public static ExternalSettingEntry stringInput(String id, String titleKey, String tooltipKey, int order, StringInputBinding binding)
+    public static ExternalSettingEntry stringInput(String id, String titleKey, String tooltipKey, int order, StringBinding binding)
     {
-        ExternalSettingEntry entry = new ExternalSettingEntry(id, ExternalSettingKind.STRING_INPUT, titleKey, tooltipKey, order);
+        ExternalSettingEntry entry = new ExternalSettingEntry(id, STRING_INPUT, titleKey, tooltipKey, order);
         entry.stringInputBinding = binding;
         return entry;
     }
@@ -100,7 +177,7 @@ public class ExternalSettingEntry
         return id;
     }
 
-    public ExternalSettingKind getKind()
+    public int getKind()
     {
         return kind;
     }
@@ -135,27 +212,27 @@ public class ExternalSettingEntry
         return resolveCallable(enabledSupplier, true);
     }
 
-    public BooleanSettingBinding getBooleanBinding()
+    public BooleanBinding getBooleanBinding()
     {
         return booleanBinding;
     }
 
-    public IntSettingBinding getIntBinding()
+    public IntBinding getIntBinding()
     {
         return intBinding;
     }
 
-    public DoubleSettingBinding getDoubleBinding()
+    public DoubleBinding getDoubleBinding()
     {
         return doubleBinding;
     }
 
-    public ListSettingBinding<?> getListBinding()
+    public ListBinding<?> getListBinding()
     {
         return listBinding;
     }
 
-    public StringInputBinding getStringInputBinding()
+    public StringBinding getStringBinding()
     {
         return stringInputBinding;
     }

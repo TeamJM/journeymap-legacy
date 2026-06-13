@@ -2,19 +2,19 @@ package journeymap.client.ui.component;
 
 import cpw.mods.fml.client.config.GuiUtils;
 import journeymap.client.cartography.RGB;
-import journeymap.client.api.settings.BooleanSettingBinding;
+import journeymap.client.api.settings.ExternalSettingEntry.BooleanBinding;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import org.lwjgl.input.Keyboard;
 
-public class BindingBooleanButton extends Button implements IPropertyHolder<BooleanSettingBinding, Boolean>
+public class BindingBooleanButton extends Button implements IPropertyHolder<BooleanBinding, Boolean>
 {
     protected int boxWidth = 11;
     protected String glyph = "\u2714";
-    protected BooleanSettingBinding binding;
+    protected BooleanBinding binding;
     protected boolean toggled;
 
-    public BindingBooleanButton(String displayString, BooleanSettingBinding binding)
+    public BindingBooleanButton(String displayString, BooleanBinding binding)
     {
         super(displayString);
         this.binding = binding;
@@ -105,7 +105,7 @@ public class BindingBooleanButton extends Button implements IPropertyHolder<Bool
     }
 
     @Override
-    public BooleanSettingBinding getProperty()
+    public BooleanBinding getProperty()
     {
         return binding;
     }

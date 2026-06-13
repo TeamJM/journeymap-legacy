@@ -1,19 +1,19 @@
 package journeymap.client.ui.component;
 
-import journeymap.client.api.settings.StringInputBinding;
+import journeymap.client.api.settings.ExternalSettingEntry.StringBinding;
 import journeymap.client.cartography.RGB;
 import journeymap.client.render.draw.DrawUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import org.lwjgl.input.Keyboard;
 
-public class BindingStringInputButton extends Button implements IPropertyHolder<StringInputBinding, String>
+public class BindingStringInputButton extends Button implements IPropertyHolder<StringBinding, String>
 {
-    protected StringInputBinding binding;
+    protected StringBinding binding;
     protected String label;
     protected TextField textField;
 
-    public BindingStringInputButton(String label, StringInputBinding binding)
+    public BindingStringInputButton(String label, StringBinding binding)
     {
         super(label);
         this.label = label;
@@ -119,7 +119,7 @@ public class BindingStringInputButton extends Button implements IPropertyHolder<
     }
 
     @Override
-    public StringInputBinding getProperty()
+    public StringBinding getProperty()
     {
         return binding;
     }

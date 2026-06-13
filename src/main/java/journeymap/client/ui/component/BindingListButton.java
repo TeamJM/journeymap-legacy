@@ -1,6 +1,6 @@
 package journeymap.client.ui.component;
 
-import journeymap.client.api.settings.ListSettingBinding;
+import journeymap.client.api.settings.ExternalSettingEntry.ListBinding;
 import journeymap.client.cartography.RGB;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -9,15 +9,15 @@ import org.lwjgl.input.Keyboard;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BindingListButton<T> extends Button implements IPropertyHolder<ListSettingBinding<T>, T>
+public class BindingListButton<T> extends Button implements IPropertyHolder<ListBinding<T>, T>
 {
     protected String glyph = "\u21D5";
     protected String labelPattern = "%1$s : %2$s %3$s %2$s";
     protected String baseLabel;
-    protected ListSettingBinding<T> binding;
+    protected ListBinding<T> binding;
     protected List<T> values;
 
-    public BindingListButton(String label, ListSettingBinding<T> binding)
+    public BindingListButton(String label, ListBinding<T> binding)
     {
         super("");
         this.baseLabel = label;
@@ -111,7 +111,7 @@ public class BindingListButton<T> extends Button implements IPropertyHolder<List
     }
 
     @Override
-    public ListSettingBinding<T> getProperty()
+    public ListBinding<T> getProperty()
     {
         return binding;
     }
