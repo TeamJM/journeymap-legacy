@@ -134,6 +134,19 @@ public class ChunkRenderController
                 {
                     regionImageSet.setChunkImage(chunkMd, MapType.day(rCoord.dimension), imageDay);
                     regionImageSet.setChunkImage(chunkMd, MapType.night(rCoord.dimension), imageNight);
+
+                    if (rCoord.dimension == 0)
+                    {
+                        BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, MapType.topo(rCoord.dimension));
+                        if (imageTopo != null)
+                        {
+                            topoG2D = new ChunkPainter(reusableBuffer4, RegionImageHandler.initRenderingHints(imageTopo.createGraphics()));
+                            if (overWorldTopoRenderer.render(topoG2D, chunkMd, null))
+                            {
+                                regionImageSet.setChunkImage(chunkMd, MapType.topo(rCoord.dimension), imageTopo);
+                            }
+                        }
+                    }
                 }
             }
 
