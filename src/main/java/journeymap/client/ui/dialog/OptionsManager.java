@@ -44,6 +44,7 @@ import java.util.*;
 public class OptionsManager extends JmUI
 {
     protected static EnumSet<Config.Category> openCategories = EnumSet.noneOf(Config.Category.class);
+    protected static Set<String> openCategoryKeys = new HashSet<String>();
 
     protected final int inGameMinimapId;
     protected Config.Category[] initialCategories;
@@ -176,6 +177,15 @@ public class OptionsManager extends JmUI
                     }
                 }
 
+                for (CategorySlot categorySlot : optionsListPane.getRootSlots())
+                {
+                    if (openCategoryKeys.contains(categorySlot.getStateKey()))
+                    {
+                        categorySlot.setSelected(true);
+                        categorySlots.add(categorySlot);
+                    }
+                }
+
                 // Add Toolbar buttons
                 for (ScrollListPane.ISlot rootSlot : optionsListPane.getRootSlots())
                 {
@@ -183,6 +193,10 @@ public class OptionsManager extends JmUI
                     {
                         CategorySlot categorySlot = (CategorySlot) rootSlot;
                         Config.Category category = categorySlot.getCategory();
+                        if (category == null)
+                        {
+                            continue;
+                        }
 
                         // Reset button
                         ResetButton resetButton = new ResetButton(category);
@@ -513,6 +527,10 @@ public class OptionsManager extends JmUI
         {
             // Track the category of the button so resets can happen when OptionsManager is closed
             Config.Category category = categorySlot.getCategory();
+            if (category == null)
+            {
+                return;
+            }
             changedCategories.add(category);
 
             // If the button is MiniMap-related, force it to update
@@ -727,11 +745,16 @@ public class OptionsManager extends JmUI
         }
 
         OptionsManager.openCategories.clear();
+        OptionsManager.openCategoryKeys.clear();
         for (CategorySlot categorySlot : optionsListPane.getRootSlots())
         {
             if (categorySlot.isSelected())
             {
-                OptionsManager.openCategories.add(categorySlot.getCategory());
+                OptionsManager.openCategoryKeys.add(categorySlot.getStateKey());
+                if (categorySlot.getCategory() != null)
+                {
+                    OptionsManager.openCategories.add(categorySlot.getCategory());
+                }
             }
         }
 

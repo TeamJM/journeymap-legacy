@@ -22,6 +22,8 @@ import java.util.*;
 public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySlot>
 {
     final String name;
+    final int sortOrder;
+    final String sortKey;
     Minecraft mc = ForgeHelper.INSTANCE.getClient();
     SlotMetadata metadata;
     Config.Category category;
@@ -39,22 +41,18 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
 
     public CategorySlot(Config.Category category)
     {
+        this(Constants.getString(category.key), Constants.getString(category.key + ".tooltip"), category.ordinal(), category.name(),
+                category == Config.Category.Advanced);
         this.category = category;
-        this.name = Constants.getString(category.key);
-        String tooltip = Constants.getString(category.key + ".tooltip");
-        boolean advanced = category == Config.Category.Advanced;
+    }
 
+    protected CategorySlot(String name, String tooltip, int sortOrder, String sortKey, boolean advanced)
+    {
+        this.category = null;
+        this.name = name;
+        this.sortOrder = sortOrder;
+        this.sortKey = sortKey == null ? name : sortKey;
         button = new Button(name);
-//        button.setDefaultStyle(false);
-//        button.setDrawLabelShadow(false);
-//        button.setLabelColors(new Color(10, 10, 100), new Color(10, 10, 100), null);
-//
-//        Color smallBgColor = new Color(220, 220, 250);
-//        Color smallBgHoverColor = new Color(235, 235, 255);
-//        Color smallBgHoverColor2 = new Color(100, 100, 100);
-//
-//        button.setBackgroundColors(smallBgColor, smallBgHoverColor, smallBgHoverColor2);
-
         metadata = new SlotMetadata(button, name, tooltip, advanced);
         updateButtonLabel();
     }
@@ -230,6 +228,11 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         return this.selected;
     }
 
+    public String getStateKey()
+    {
+        return sortKey;
+    }
+
     public void setSelected(boolean selected)
     {
         this.selected = selected;
@@ -272,7 +275,12 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     @Override
     public int compareTo(CategorySlot other)
     {
-        return category.compareTo(other.category);
+        int orderCompare = Integer.compare(this.sortOrder, other.sortOrder);
+        if (orderCompare != 0)
+        {
+            return orderCompare;
+        }
+        return this.sortKey.compareTo(other.sortKey);
     }
 
     @Override
