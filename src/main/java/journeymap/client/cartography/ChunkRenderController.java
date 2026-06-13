@@ -99,18 +99,15 @@ public class ChunkRenderController
             }
             else if (mapType.isTopo())
             {
-                if (rCoord.dimension == 0)
+                MapType topoMapType = MapType.topo(rCoord.dimension);
+                BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, topoMapType);
+                if (imageTopo != null)
                 {
-                    MapType topoMapType = MapType.topo(rCoord.dimension);
-                    BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, topoMapType);
-                    if (imageTopo != null)
+                    topoG2D = new ChunkPainter(reusableBuffer4, RegionImageHandler.initRenderingHints(imageTopo.createGraphics()));
+                    renderOkay = overWorldTopoRenderer.render(topoG2D, chunkMd, null);
+                    if (renderOkay)
                     {
-                        topoG2D = new ChunkPainter(reusableBuffer4, RegionImageHandler.initRenderingHints(imageTopo.createGraphics()));
-                        renderOkay = overWorldTopoRenderer.render(topoG2D, chunkMd, null);
-                        if (renderOkay)
-                        {
-                            regionImageSet.setChunkImage(chunkMd, topoMapType, imageTopo);
-                        }
+                        regionImageSet.setChunkImage(chunkMd, topoMapType, imageTopo);
                     }
                 }
             }
@@ -136,17 +133,14 @@ public class ChunkRenderController
                     regionImageSet.setChunkImage(chunkMd, MapType.day(rCoord.dimension), imageDay);
                     regionImageSet.setChunkImage(chunkMd, MapType.night(rCoord.dimension), imageNight);
 
-                    if (rCoord.dimension == 0)
+                    MapType topoMapType = MapType.topo(rCoord.dimension);
+                    BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, topoMapType);
+                    if (imageTopo != null)
                     {
-                        MapType topoMapType = MapType.topo(rCoord.dimension);
-                        BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, topoMapType);
-                        if (imageTopo != null)
+                        topoG2D = new ChunkPainter(reusableBuffer4, RegionImageHandler.initRenderingHints(imageTopo.createGraphics()));
+                        if (overWorldTopoRenderer.render(topoG2D, chunkMd, null))
                         {
-                            topoG2D = new ChunkPainter(reusableBuffer4, RegionImageHandler.initRenderingHints(imageTopo.createGraphics()));
-                            if (overWorldTopoRenderer.render(topoG2D, chunkMd, null))
-                            {
-                                regionImageSet.setChunkImage(chunkMd, topoMapType, imageTopo);
-                            }
+                            regionImageSet.setChunkImage(chunkMd, topoMapType, imageTopo);
                         }
                     }
                 }

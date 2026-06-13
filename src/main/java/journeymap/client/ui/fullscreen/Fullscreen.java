@@ -333,7 +333,7 @@ public class Fullscreen extends JmUI
             // Topo Toggle
             buttonTopo = new ThemeToggle(theme, "jm.fullscreen.map_topo", "topo");
             buttonTopo.setToggled(mapType.isTopo(), false);
-            buttonTopo.setDrawButton(state.getCurrentMapType().dimension == 0);
+            buttonTopo.setDrawButton(true);
             buttonTopo.addToggleListener(new OnOffButton.ToggleListener()
             {
                 @Override

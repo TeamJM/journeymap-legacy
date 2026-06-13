@@ -155,19 +155,7 @@ public class MapState
         }
         else if (currentMapType.isNight())
         {
-            if (player.dimension == 0)
-            {
-                setMapType(MapType.topo(player));
-            }
-            else if (underground && caveMappingAllowed)
-            {
-                lastMapProperties.showCaves.set(true);
-                setMapType(MapType.underground(player));
-            }
-            else
-            {
-                setMapType(MapType.day(player));
-            }
+            setMapType(MapType.topo(player));
         }
         else if (currentMapType.isTopo())
         {
