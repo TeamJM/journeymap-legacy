@@ -20,13 +20,16 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Renders waypoints in-game.  No longer needs to extend RenderEntity, since waypoint
@@ -62,12 +65,34 @@ public class RenderWaypointBeacon
         {
             waypointProperties = JourneymapClient.getWaypointProperties();
 
-            Collection<Waypoint> waypoints = WaypointStore.instance().getAll();
+            EntityPlayer player = mc.thePlayer;
+            if (player == null)
+            {
+                return;
+            }
+
+            WaypointStore waypointStore = WaypointStore.instance();
+            Collection<Waypoint> waypoints = waypointStore.getAll();
+            List<Waypoint> pendingRemovals = null;
+            boolean renderBeacons = waypointProperties.beaconEnabled.get() && !mc.gameSettings.hideGUI;
             //allTimer.start();
-            final int playerDim = mc.thePlayer.dimension;
+            final int playerDim = player.dimension;
             for (Waypoint wp : waypoints)
             {
-                if (wp.isEnable() && wp.getDimensions().contains(playerDim))
+                if (!wp.getDimensions().contains(playerDim))
+                {
+                    continue;
+                }
+                if (shouldRemoveOnArrival(wp, waypointProperties, player))
+                {
+                    if (pendingRemovals == null)
+                    {
+                        pendingRemovals = new ArrayList<Waypoint>();
+                    }
+                    pendingRemovals.add(wp);
+                    continue;
+                }
+                if (renderBeacons && wp.isEnable())
                 {
                     try
                     {
@@ -77,6 +102,13 @@ public class RenderWaypointBeacon
                     {
                         Journeymap.getLogger().error("EntityWaypoint failed to render for {}: {}", wp, LogFormatter.toString(t));
                     }
+                }
+            }
+            if (pendingRemovals != null)
+            {
+                for (Waypoint waypoint : pendingRemovals)
+                {
+                    waypointStore.remove(waypoint);
                 }
             }
         }
@@ -440,6 +472,28 @@ public class RenderWaypointBeacon
         renderHelper.glEnableDepth();
     }
 
+    private static boolean shouldRemoveOnArrival(Waypoint waypoint, WaypointProperties properties, EntityPlayer player)
+    {
+        if (waypoint.getY() < 0)
+        {
+            return false;
+        }
+        if (!waypoint.isDestination() && !(waypoint.isDeathPoint() && properties.deleteDeathpointOnArrival.get()))
+        {
+            return false;
+        }
+
+        int horizontalRange = properties.arrivalHorizontalRange.get();
+        int verticalRange = properties.arrivalVerticalRange.get();
+        int playerX = MathHelper.floor_double(player.posX);
+        int playerY = MathHelper.floor_double(player.posY);
+        int playerZ = MathHelper.floor_double(player.posZ);
+        int dx = playerX - waypoint.getX();
+        int dz = playerZ - waypoint.getZ();
+        int dy = Math.abs(playerY - waypoint.getY());
+        int horizontalDistanceSquared = dx * dx + dz * dz;
+        return horizontalDistanceSquared <= horizontalRange * horizontalRange && dy <= verticalRange;
+    }
     /**
      * Calculates the alpha (transparency) multiplier based on the horizontal distance.
      * 1.0F = fully visible, 0.0F = fully transparent.

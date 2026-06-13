@@ -7,6 +7,7 @@ package journeymap.client.model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.annotations.Since;
 import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
@@ -66,13 +67,14 @@ public class Waypoint implements Serializable
     protected int b;
 
     @Since(1)
-    protected boolean enable;
+    @SerializedName("enable")
+    protected boolean enabled;
 
     @Since(1)
-    protected WaypointVisibility visibility;
+    protected boolean persistent = true;
 
     @Since(1)
-    protected WaypointLifecycle lifecycle;
+    protected boolean isTemp;
 
     @Since(1)
     protected Type type;
@@ -96,10 +98,12 @@ public class Waypoint implements Serializable
 
     public Waypoint(Waypoint original)
     {
-        this(original.name, original.x, original.y, original.z, original.enable, original.r, original.g, original.b, original.type, original.origin, original.dimensions.first(), original.dimensions);
+        this(original.name, original.x, original.y, original.z, original.enabled, original.r, original.g, original.b, original.type, original.origin, original.dimensions.first(), original.dimensions);
         this.x = original.x;
         this.y = original.y;
         this.z = original.z;
+        this.persistent = original.isPersistent();
+        this.isTemp = original.isTemporary();
     }
 
     public Waypoint(String name, int posX, int posY, int posZ, Color color, Type type, Integer currentDimension)
@@ -130,9 +134,9 @@ public class Waypoint implements Serializable
         this.r = red;
         this.g = green;
         this.b = blue;
-        this.enable = enable;
-        this.visibility = enable ? WaypointVisibility.ENABLED : WaypointVisibility.DISABLED;
-        this.lifecycle = WaypointLifecycle.PERSISTENT;
+        this.enabled = enable;
+        this.persistent = true;
+        this.isTemp = false;
         this.type = type;
         this.origin = origin;
 
@@ -376,59 +380,88 @@ public class Waypoint implements Serializable
 
     public boolean isEnable()
     {
-        return getVisibility() == WaypointVisibility.ENABLED;
+        return enabled;
     }
 
     public void setEnable(boolean enable)
     {
-        setVisibility(enable ? WaypointVisibility.ENABLED : WaypointVisibility.DISABLED);
-    }
-
-    public WaypointVisibility getVisibility()
-    {
-        if (visibility == null)
+        if (enable != this.enabled)
         {
-            visibility = enable ? WaypointVisibility.ENABLED : WaypointVisibility.DISABLED;
-        }
-        return visibility;
-    }
-
-    public void setVisibility(WaypointVisibility visibility)
-    {
-        if (visibility != getVisibility())
-        {
-            this.visibility = visibility;
-            this.enable = visibility == WaypointVisibility.ENABLED;
+            this.enabled = enable;
             this.dirty = true;
         }
     }
 
-    public WaypointLifecycle getLifecycle()
+    public boolean isPersistent()
     {
-        if (lifecycle == null)
-        {
-            lifecycle = WaypointLifecycle.PERSISTENT;
-        }
-        return lifecycle;
+        return persistent && !isTemp;
     }
 
-    public void setLifecycle(WaypointLifecycle lifecycle)
+    public void setPersistent(boolean persistent)
     {
-        if (lifecycle != getLifecycle())
+        if (persistent)
         {
-            this.lifecycle = lifecycle;
-            this.dirty = true;
+            setWaypointMode(enabled, true, false);
+        }
+        else
+        {
+            setDestination(true);
         }
     }
 
     public boolean isTemporary()
     {
-        return getLifecycle() == WaypointLifecycle.TEMPORARY;
+        return !persistent && isTemp;
+    }
+
+    public void setTemporary(boolean temporary)
+    {
+        if (temporary)
+        {
+            setWaypointMode(true, false, true);
+        }
+        else if (isTemporary())
+        {
+            setWaypointMode(enabled, true, false);
+        }
     }
 
     public boolean isDestination()
     {
-        return getLifecycle() == WaypointLifecycle.DESTINATION;
+        return !persistent && !isTemp;
+    }
+
+    public void setDestination(boolean destination)
+    {
+        if (destination)
+        {
+            setWaypointMode(true, false, false);
+        }
+        else if (isDestination())
+        {
+            setWaypointMode(enabled, true, false);
+        }
+    }
+
+    public void setWaypointMode(boolean enabled, boolean persistent, boolean temporary)
+    {
+        // The four UI modes are represented by enabled plus the two lifecycle flags.
+        if (temporary)
+        {
+            persistent = false;
+            enabled = true;
+        }
+        if (!persistent && !temporary)
+        {
+            enabled = true;
+        }
+        if (this.enabled != enabled || this.persistent != persistent || this.isTemp != temporary)
+        {
+            this.enabled = enabled;
+            this.persistent = persistent;
+            this.isTemp = temporary;
+            this.dirty = true;
+        }
     }
 
     public Type getType()
@@ -500,15 +533,15 @@ public class Waypoint implements Serializable
         {
             return false;
         }
-        if (enable != waypoint.enable)
+        if (enabled != waypoint.enabled)
         {
             return false;
         }
-        if (getVisibility() != waypoint.getVisibility())
+        if (persistent != waypoint.persistent)
         {
             return false;
         }
-        if (getLifecycle() != waypoint.getLifecycle())
+        if (isTemp != waypoint.isTemp)
         {
             return false;
         }
@@ -563,10 +596,7 @@ public class Waypoint implements Serializable
     @Override
     public int hashCode()
     {
-        int result = id.hashCode();
-        result = 31 * result + getVisibility().hashCode();
-        result = 31 * result + getLifecycle().hashCode();
-        return result;
+        return id.hashCode();
     }
 
     public enum Origin

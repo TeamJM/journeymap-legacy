@@ -8,7 +8,6 @@ package journeymap.client.forge.event;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import journeymap.client.JourneymapClient;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.render.ingame.RenderWaypointBeacon;
 import net.minecraft.client.Minecraft;
@@ -42,16 +41,13 @@ public class WaypointBeaconHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void onRenderWorldLastEvent(RenderWorldLastEvent event)
     {
-        if (mc.thePlayer != null && JourneymapClient.getWaypointProperties().beaconEnabled.get())
+        if (mc.thePlayer != null)
         {
-            if (!this.mc.gameSettings.hideGUI)
-            {
-                mc.mcProfiler.startSection("journeymap");
-                mc.mcProfiler.startSection("beacons");
-                RenderWaypointBeacon.renderAll(event.partialTicks);
-                mc.mcProfiler.endSection();
-                mc.mcProfiler.endSection();
-            }
+            mc.mcProfiler.startSection("journeymap");
+            mc.mcProfiler.startSection("beacons");
+            RenderWaypointBeacon.renderAll(event.partialTicks);
+            mc.mcProfiler.endSection();
+            mc.mcProfiler.endSection();
         }
     }
 }

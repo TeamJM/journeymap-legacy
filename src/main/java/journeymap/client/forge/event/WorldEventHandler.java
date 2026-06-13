@@ -12,7 +12,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.client.JourneymapClient;
 import journeymap.client.feature.FeatureManager;
-import journeymap.client.waypoint.WaypointLifecycleService;
 import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.EnumSet;
@@ -28,8 +27,6 @@ import java.util.EnumSet;
 @SideOnly(Side.CLIENT)
 public class WorldEventHandler implements EventHandlerManager.EventHandler
 {
-    private final WaypointLifecycleService waypointLifecycleService = new WaypointLifecycleService();
-
     String playerName;
 
     @Override
@@ -42,7 +39,6 @@ public class WorldEventHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void invoke(WorldEvent.Unload event)
     {
-        waypointLifecycleService.removeTemporaryWaypoints();
         JourneymapClient.getInstance().stopMapping();
         FeatureManager.instance().reset();
     }

@@ -77,6 +77,13 @@ public class WaypointStore
     public void save(Waypoint waypoint)
     {
         cache.put(waypoint.getId(), waypoint);
+        if (waypoint.isTemporary())
+        {
+            remove(new File(FileHandler.getWaypointDir(), waypoint.getFileName()));
+            waypoint.setDirty(false);
+            return;
+        }
+
         boolean saved = writeToFile(waypoint);
         if (saved)
         {
@@ -90,11 +97,7 @@ public class WaypointStore
         {
             if (waypoint.isDirty())
             {
-                boolean saved = writeToFile(waypoint);
-                if (saved)
-                {
-                    waypoint.setDirty(false);
-                }
+                save(waypoint);
             }
         }
     }
@@ -159,6 +162,12 @@ public class WaypointStore
     {
         for (Waypoint waypoint : waypoints)
         {
+            if (waypoint.isTemporary())
+            {
+                remove(waypoint);
+                continue;
+            }
+
             if (forceSave || (!waypoint.isReadOnly() && waypoint.isDirty()))
             {
                 save(waypoint);

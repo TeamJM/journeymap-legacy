@@ -16,8 +16,6 @@ import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.WaypointProperties;
-import journeymap.client.waypoint.DeathpointPolicyService;
-import journeymap.client.waypoint.WaypointLifecycleService;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
@@ -43,8 +41,6 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
     static boolean javaChecked = false;
     Minecraft mc = ForgeHelper.INSTANCE.getClient();
     int counter = 0;
-    private final DeathpointPolicyService deathpointPolicyService = new DeathpointPolicyService();
-    private final WaypointLifecycleService waypointLifecycleService = new WaypointLifecycleService();
     private boolean deathpointCreated;
 
 
@@ -82,11 +78,6 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         if (!javaChecked && mc.thePlayer != null && !mc.thePlayer.isDead)
         {
             checkJava();
-        }
-
-        if (mc.thePlayer != null && !mc.thePlayer.isDead)
-        {
-            waypointLifecycleService.removeArrivedWaypoints(mc.thePlayer);
         }
 
         try
@@ -142,7 +133,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
                 Waypoint deathpoint = Waypoint.at(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ), Waypoint.Type.Death, ForgeHelper.INSTANCE.getPlayerDimension());
                 if (waypointProperties.keepOnlyLatestDeathpoint.get())
                 {
-                    deathpointPolicyService.removePreviousDeathpoints(deathpoint);
+                    removePreviousDeathpoints(deathpoint);
                 }
                 WaypointStore.instance().save(deathpoint);
             }
@@ -157,6 +148,17 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         catch (Throwable t)
         {
             Journeymap.getLogger().error("Unexpected Error in createDeathpoint(): {}", LogFormatter.toString(t));
+        }
+    }
+
+    private void removePreviousDeathpoints(Waypoint latestDeathpoint)
+    {
+        for (Waypoint waypoint : WaypointStore.instance().snapshot())
+        {
+            if (waypoint.isDeathPoint() && !waypoint.getId().equals(latestDeathpoint.getId()))
+            {
+                WaypointStore.instance().remove(waypoint);
+            }
         }
     }
 
