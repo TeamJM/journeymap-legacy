@@ -61,6 +61,7 @@ public class ChunkRenderController
         ChunkPainter undergroundG2D = null;
         ChunkPainter dayG2D = null;
         ChunkPainter nightG2D = null;
+        ChunkPainter topoG2D = null;
         boolean renderOkay = false;
 
         try
@@ -103,18 +104,11 @@ public class ChunkRenderController
                     BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, MapType.topo(rCoord.dimension));
                     if (imageTopo != null)
                     {
-                        ChunkPainter topoG2D = new ChunkPainter(reusableBuffer4, RegionImageHandler.initRenderingHints(imageTopo.createGraphics()));
-                        try
+                        topoG2D = new ChunkPainter(reusableBuffer4, RegionImageHandler.initRenderingHints(imageTopo.createGraphics()));
+                        renderOkay = overWorldTopoRenderer.render(topoG2D, chunkMd, null);
+                        if (renderOkay)
                         {
-                            renderOkay = overWorldTopoRenderer.render(topoG2D, chunkMd, null);
-                            if (renderOkay)
-                            {
-                                regionImageSet.setChunkImage(chunkMd, MapType.topo(rCoord.dimension), imageTopo);
-                            }
-                        }
-                        finally
-                        {
-                            topoG2D.finishPainting();
+                            regionImageSet.setChunkImage(chunkMd, MapType.topo(rCoord.dimension), imageTopo);
                         }
                     }
                 }
@@ -170,6 +164,10 @@ public class ChunkRenderController
             if (undergroundG2D != null)
             {
                 undergroundG2D.finishPainting();
+            }
+            if (topoG2D != null)
+            {
+                topoG2D.finishPainting();
             }
         }
 
