@@ -10,6 +10,7 @@ import journeymap.client.cartography.render.CaveRenderer;
 import journeymap.client.cartography.render.EndRenderer;
 import journeymap.client.cartography.render.NetherRenderer;
 import journeymap.client.cartography.render.SurfaceRenderer;
+import journeymap.client.cartography.render.TopoRenderer;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.*;
@@ -29,9 +30,11 @@ public class ChunkRenderController
     private final IChunkRenderer endRenderer;
     private final SurfaceRenderer overWorldSurfaceRenderer;
     private final IChunkRenderer overWorldCaveRenderer;
+    private final TopoRenderer overWorldTopoRenderer;
     private final BufferedImage reusableBuffer1;
     private final BufferedImage reusableBuffer2;
     private final BufferedImage reusableBuffer3;
+    private final BufferedImage reusableBuffer4;
 
     public ChunkRenderController()
     {
@@ -41,9 +44,11 @@ public class ChunkRenderController
         overWorldSurfaceRenderer = surfaceRenderer;
         overWorldCaveRenderer = new CaveRenderer(surfaceRenderer);
         //standardRenderer = new ChunkTopoRenderer();
+        overWorldTopoRenderer = new TopoRenderer();
         reusableBuffer1 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
         reusableBuffer2 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
         reusableBuffer3 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        reusableBuffer4 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
     }
 
     public boolean renderChunk(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
@@ -88,6 +93,29 @@ public class ChunkRenderController
                     if (renderOkay)
                     {
                         regionImageSet.setChunkImage(chunkMd, mapType, image);
+                    }
+                }
+            }
+            else if (mapType.isTopo())
+            {
+                if (rCoord.dimension == 0)
+                {
+                    BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, MapType.topo(rCoord.dimension));
+                    if (imageTopo != null)
+                    {
+                        ChunkPainter topoG2D = new ChunkPainter(reusableBuffer4, RegionImageHandler.initRenderingHints(imageTopo.createGraphics()));
+                        try
+                        {
+                            renderOkay = overWorldTopoRenderer.render(topoG2D, chunkMd, null);
+                            if (renderOkay)
+                            {
+                                regionImageSet.setChunkImage(chunkMd, MapType.topo(rCoord.dimension), imageTopo);
+                            }
+                        }
+                        finally
+                        {
+                            topoG2D.finishPainting();
+                        }
                     }
                 }
             }
