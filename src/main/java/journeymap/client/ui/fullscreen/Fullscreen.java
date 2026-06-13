@@ -275,6 +275,7 @@ public class Fullscreen extends JmUI
                     {
                         state.setMapType(MapType.Name.day);
                         buttonNight.setToggled(false);
+                        buttonTopo.setToggled(false);
                         if (state.isUnderground())
                         {
                             buttonCaves.setToggled(false);
@@ -301,6 +302,7 @@ public class Fullscreen extends JmUI
                     {
                         state.setMapType(MapType.night(state.getCurrentMapType().dimension));
                         buttonDay.setToggled(false);
+                        buttonTopo.setToggled(false);
                         if (state.isUnderground())
                         {
                             buttonCaves.setToggled(false);
