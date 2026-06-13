@@ -15,5 +15,5 @@ public interface FullscreenContextMenuProvider
     /**
      * Handles a click for an entry previously returned by this provider.
      */
-    FullscreenContextMenuActionResult onMenuItemClicked(FullscreenContextMenuContext context, String actionId);
+    boolean onMenuItemClicked(FullscreenContextMenuContext context, String actionId);
 }

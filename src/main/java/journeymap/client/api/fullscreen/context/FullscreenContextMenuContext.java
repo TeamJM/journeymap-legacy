@@ -9,7 +9,6 @@ import java.util.Collection;
  */
 public class FullscreenContextMenuContext
 {
-    private final FullscreenContextTargetType targetType;
     private final int x;
     private final int resolvedY;
     private final Integer displayY;
@@ -20,9 +19,8 @@ public class FullscreenContextMenuContext
     private final Collection<Integer> dimensions;
     private final Waypoint waypoint;
 
-    public FullscreenContextMenuContext(FullscreenContextTargetType targetType, int x, int resolvedY, Integer displayY, int z, int chunkX, int chunkZ, int dimension, Collection<Integer> dimensions, Waypoint waypoint)
+    public FullscreenContextMenuContext(int x, int resolvedY, Integer displayY, int z, int chunkX, int chunkZ, int dimension, Collection<Integer> dimensions, Waypoint waypoint)
     {
-        this.targetType = targetType;
         this.x = x;
         this.resolvedY = resolvedY;
         this.displayY = displayY;
@@ -33,13 +31,7 @@ public class FullscreenContextMenuContext
         this.dimensions = dimensions;
         this.waypoint = waypoint;
     }
-
-    public FullscreenContextTargetType getTargetType()
-    {
-        return targetType;
-    }
-
-    public int getX()
+public int getX()
     {
         return x;
     }
