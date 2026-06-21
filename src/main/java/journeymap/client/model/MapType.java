@@ -77,6 +77,16 @@ public class MapType
         return from(Name.underground, vSlice, dimension);
     }
 
+    public static MapType topo(int dimension)
+    {
+        return from(Name.topo, null, dimension);
+    }
+
+    public static MapType topo(EntityDTO player)
+    {
+        return from(Name.topo, null, player.dimension);
+    }
+
     public static String toCacheKey(Name name, Integer vSlice, int dimension)
     {
         return "" + dimension + name + vSlice;
@@ -117,6 +127,11 @@ public class MapType
         return name == Name.night;
     }
 
+    public boolean isTopo()
+    {
+        return name == Name.topo;
+    }
+
     @Override
     public int hashCode()
     {
@@ -155,7 +170,7 @@ public class MapType
 
     public enum Name
     {
-        day, night, underground, surface
+        day, night, underground, surface, topo
     }
 
 }
