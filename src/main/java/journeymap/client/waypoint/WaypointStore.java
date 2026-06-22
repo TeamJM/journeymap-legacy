@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JourneyMap Mod <journeymap.info> for Minecraft
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
@@ -59,11 +59,6 @@ public class WaypointStore
     public Collection<Waypoint> getAll()
     {
         return cache.asMap().values();
-    }
-
-    public List<Waypoint> snapshot()
-    {
-        return new ArrayList<Waypoint>(cache.asMap().values());
     }
 
     public void add(Waypoint waypoint)
@@ -162,12 +157,6 @@ public class WaypointStore
     {
         for (Waypoint waypoint : waypoints)
         {
-            if (waypoint.isTemporary())
-            {
-                remove(waypoint);
-                continue;
-            }
-
             if (forceSave || (!waypoint.isReadOnly() && waypoint.isDirty()))
             {
                 save(waypoint);

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JourneyMap Mod <journeymap.info> for Minecraft
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
@@ -27,9 +27,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Renders waypoints in-game.  No longer needs to extend RenderEntity, since waypoint
@@ -71,10 +69,7 @@ public class RenderWaypointBeacon
                 return;
             }
 
-            WaypointStore waypointStore = WaypointStore.instance();
-            Collection<Waypoint> waypoints = waypointStore.getAll();
-            List<Waypoint> pendingRemovals = null;
-            boolean renderBeacons = waypointProperties.beaconEnabled.get() && !mc.gameSettings.hideGUI;
+            Collection<Waypoint> waypoints = WaypointStore.instance().getAll();
             //allTimer.start();
             final int playerDim = player.dimension;
             for (Waypoint wp : waypoints)
@@ -83,16 +78,7 @@ public class RenderWaypointBeacon
                 {
                     continue;
                 }
-                if (shouldRemoveOnArrival(wp, waypointProperties, player))
-                {
-                    if (pendingRemovals == null)
-                    {
-                        pendingRemovals = new ArrayList<Waypoint>();
-                    }
-                    pendingRemovals.add(wp);
-                    continue;
-                }
-                if (renderBeacons && wp.isEnable())
+                if (wp.isEnable())
                 {
                     try
                     {
@@ -102,13 +88,6 @@ public class RenderWaypointBeacon
                     {
                         Journeymap.getLogger().error("EntityWaypoint failed to render for {}: {}", wp, LogFormatter.toString(t));
                     }
-                }
-            }
-            if (pendingRemovals != null)
-            {
-                for (Waypoint waypoint : pendingRemovals)
-                {
-                    waypointStore.remove(waypoint);
                 }
             }
         }
@@ -243,8 +222,8 @@ public class RenderWaypointBeacon
 
             final int depthShadowAlpha = clampAlpha(Math.round(150.0F * fadeAlpha));
             final int frontShadowAlpha = clampAlpha(Math.round(100.0F * fadeAlpha));
-            final int textAlpha        = clampAlpha(Math.round(255.0F * fadeAlpha));
-            final int iconAlpha        = textAlpha;
+            final int textAlpha = clampAlpha(Math.round(255.0F * fadeAlpha));
+            final int iconAlpha = textAlpha;
 
             // Depth-masked and non-masked label
             final boolean showName = waypointProperties.showName.get() && label != null && label.length() > 0;
@@ -444,7 +423,7 @@ public class RenderWaypointBeacon
 
             int rgba = RGB.toRGBA(color, clampAlpha(Math.round(40.0F * alphaMultiplier)));
             renderHelper.startDrawingQuads(true);
-            
+
             renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30, rgba);
             renderHelper.addVertexWithUV(x + .2, y, z + .2, 1, d29, rgba);
             renderHelper.addVertexWithUV(x + .8, y, z + .2, 0, d29, rgba);
@@ -472,28 +451,6 @@ public class RenderWaypointBeacon
         renderHelper.glEnableDepth();
     }
 
-    private static boolean shouldRemoveOnArrival(Waypoint waypoint, WaypointProperties properties, EntityPlayer player)
-    {
-        if (waypoint.getY() < 0)
-        {
-            return false;
-        }
-        if (!waypoint.isDestination() && !(waypoint.isDeathPoint() && properties.deleteDeathpointOnArrival.get()))
-        {
-            return false;
-        }
-
-        int horizontalRange = properties.arrivalHorizontalRange.get();
-        int verticalRange = properties.arrivalVerticalRange.get();
-        int playerX = MathHelper.floor_double(player.posX);
-        int playerY = MathHelper.floor_double(player.posY);
-        int playerZ = MathHelper.floor_double(player.posZ);
-        int dx = playerX - waypoint.getX();
-        int dz = playerZ - waypoint.getZ();
-        int dy = Math.abs(playerY - waypoint.getY());
-        int horizontalDistanceSquared = dx * dx + dz * dz;
-        return horizontalDistanceSquared <= horizontalRange * horizontalRange && dy <= verticalRange;
-    }
     /**
      * Calculates the alpha (transparency) multiplier based on the horizontal distance.
      * 1.0F = fully visible, 0.0F = fully transparent.

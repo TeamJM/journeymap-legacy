@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JourneyMap Mod <journeymap.info> for Minecraft
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
@@ -32,6 +32,13 @@ public class Waypoint implements Serializable
 {
     public static final int VERSION = 1;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).create();
+
+    public enum Lifecycle
+    {
+        PERSISTENT,
+        TEMPORARY,
+        DESTINATION
+    }
 
     protected static final String ICON_NORMAL = "waypoint-normal.png";
     protected static final String ICON_DEATH = "waypoint-death.png";
@@ -71,10 +78,10 @@ public class Waypoint implements Serializable
     protected boolean enabled;
 
     @Since(1)
-    protected boolean persistent = true;
+    protected Lifecycle lifecycle = Lifecycle.PERSISTENT;
 
-    @Since(1)
-    protected boolean isTemp;
+    protected transient boolean persistent = true;
+    protected transient boolean isTemp;
 
     @Since(1)
     protected Type type;
@@ -102,8 +109,7 @@ public class Waypoint implements Serializable
         this.x = original.x;
         this.y = original.y;
         this.z = original.z;
-        this.persistent = original.isPersistent();
-        this.isTemp = original.isTemporary();
+        this.lifecycle = original.getLifecycle();
     }
 
     public Waypoint(String name, int posX, int posY, int posZ, Color color, Type type, Integer currentDimension)
@@ -135,8 +141,7 @@ public class Waypoint implements Serializable
         this.g = green;
         this.b = blue;
         this.enabled = enable;
-        this.persistent = true;
-        this.isTemp = false;
+        this.lifecycle = Lifecycle.PERSISTENT;
         this.type = type;
         this.origin = origin;
 
@@ -392,74 +397,89 @@ public class Waypoint implements Serializable
         }
     }
 
+    public Lifecycle getLifecycle()
+    {
+        return lifecycle == null ? getLegacyLifecycle() : lifecycle;
+    }
+
+    protected Lifecycle getLegacyLifecycle()
+    {
+        if (!persistent && isTemp)
+        {
+            return Lifecycle.TEMPORARY;
+        }
+        if (!persistent)
+        {
+            return Lifecycle.DESTINATION;
+        }
+        return Lifecycle.PERSISTENT;
+    }
+
     public boolean isPersistent()
     {
-        return persistent && !isTemp;
+        return getLifecycle() == Lifecycle.PERSISTENT;
     }
 
     public void setPersistent(boolean persistent)
     {
-        if (persistent)
-        {
-            setWaypointMode(enabled, true, false);
-        }
-        else
-        {
-            setDestination(true);
-        }
+        setLifecycle(persistent ? Lifecycle.PERSISTENT : Lifecycle.DESTINATION);
     }
 
     public boolean isTemporary()
     {
-        return !persistent && isTemp;
+        return getLifecycle() == Lifecycle.TEMPORARY;
     }
 
     public void setTemporary(boolean temporary)
     {
         if (temporary)
         {
-            setWaypointMode(true, false, true);
+            setLifecycle(Lifecycle.TEMPORARY);
         }
         else if (isTemporary())
         {
-            setWaypointMode(enabled, true, false);
+            setLifecycle(Lifecycle.PERSISTENT);
         }
     }
 
     public boolean isDestination()
     {
-        return !persistent && !isTemp;
+        return getLifecycle() == Lifecycle.DESTINATION;
     }
 
     public void setDestination(boolean destination)
     {
         if (destination)
         {
-            setWaypointMode(true, false, false);
+            setLifecycle(Lifecycle.DESTINATION);
         }
         else if (isDestination())
         {
-            setWaypointMode(enabled, true, false);
+            setLifecycle(Lifecycle.PERSISTENT);
         }
     }
 
-    public void setWaypointMode(boolean enabled, boolean persistent, boolean temporary)
+    public void setLifecycle(Lifecycle lifecycle)
     {
-        // The four UI modes are represented by enabled plus the two lifecycle flags.
-        if (temporary)
+        Lifecycle nextLifecycle = lifecycle == null ? Lifecycle.PERSISTENT : lifecycle;
+        if (this.lifecycle != nextLifecycle)
         {
-            persistent = false;
+            this.lifecycle = nextLifecycle;
+            this.dirty = true;
+        }
+    }
+
+    public void setWaypointMode(boolean enabled, Lifecycle lifecycle)
+    {
+        Lifecycle nextLifecycle = lifecycle == null ? Lifecycle.PERSISTENT : lifecycle;
+        if (nextLifecycle != Lifecycle.PERSISTENT)
+        {
             enabled = true;
         }
-        if (!persistent && !temporary)
-        {
-            enabled = true;
-        }
-        if (this.enabled != enabled || this.persistent != persistent || this.isTemp != temporary)
+        if (this.enabled != enabled || getLifecycle() != nextLifecycle)
         {
             this.enabled = enabled;
-            this.persistent = persistent;
-            this.isTemp = temporary;
+            this.lifecycle = nextLifecycle;
             this.dirty = true;
         }
     }
@@ -537,11 +557,7 @@ public class Waypoint implements Serializable
         {
             return false;
         }
-        if (persistent != waypoint.persistent)
-        {
-            return false;
-        }
-        if (isTemp != waypoint.isTemp)
+        if (getLifecycle() != waypoint.getLifecycle())
         {
             return false;
         }

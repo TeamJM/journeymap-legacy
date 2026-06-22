@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JourneyMap Mod <journeymap.info> for Minecraft
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
@@ -41,7 +41,6 @@ import java.util.Collection;
 
 public class WaypointEditor extends JmUI
 {
-
     private final TextureImpl wpTexture;
     private final TextureImpl colorPickTexture;
     private final Waypoint originalWaypoint;
@@ -60,7 +59,7 @@ public class WaypointEditor extends JmUI
     String currentLocation = "";
     LocationFormat.LocationFormatKeys locationFormatKeys;
     private Button buttonRandomize;
-    private OnOffButton buttonEnable;
+    private Button buttonMode;
     private Button buttonRemove;
     private Button buttonReset;
     private Button buttonSave;
@@ -184,15 +183,9 @@ public class WaypointEditor extends JmUI
 
             if (this.buttonList.isEmpty())
             {
-                String on = Constants.getString("jm.common.on");
-                String off = Constants.getString("jm.common.off");
-                String enableOn = Constants.getString("jm.waypoint.enable", on);
-                String enableOff = Constants.getString("jm.waypoint.enable", off);
-
                 buttonRandomize = new Button(Constants.getString("jm.waypoint.randomize")); //$NON-NLS-1$
 
-                buttonEnable = new OnOffButton(enableOn, enableOff, true); //$NON-NLS-1$
-                buttonEnable.setToggled(originalWaypoint.isEnable());
+                buttonMode = new Button(getModeLabel(originalWaypoint));
 
                 buttonRemove = new Button(Constants.getString("jm.waypoint.remove")); //$NON-NLS-1$
                 buttonRemove.setEnabled(!isNew);
@@ -203,7 +196,7 @@ public class WaypointEditor extends JmUI
                 String closeLabel = isNew ? "jm.waypoint.cancel" : "jm.common.close";
                 buttonClose = new Button(Constants.getString(closeLabel));
 
-                buttonList.add(buttonEnable);
+                buttonList.add(buttonMode);
                 buttonList.add(buttonRandomize);
                 buttonList.add(buttonRemove);
                 buttonList.add(buttonReset);
@@ -220,6 +213,8 @@ public class WaypointEditor extends JmUI
 
 
         }
+
+
         catch (Throwable t)
         {
             Journeymap.getLogger().error(LogFormatter.toString(t));
@@ -301,14 +296,14 @@ public class WaypointEditor extends JmUI
         int iconY = buttonRandomize.getY() - vpad / 2;
         drawWaypoint(iconX, iconY);
 
-        // Enable
+        // Mode
         leftRowY += (vgap);
-        buttonEnable.fitWidth(fr);
-        buttonEnable.setWidth(Math.max(leftWidth / 2, buttonEnable.getWidth()));
-        buttonEnable.setPosition(leftX - 2, leftRowY);
+        buttonMode.fitWidth(fr);
+        buttonMode.setWidth(Math.max(leftWidth / 2, buttonMode.getWidth()));
+        buttonMode.setPosition(leftX - 2, leftRowY);
 
         // Reset
-        buttonReset.setWidth(leftWidth - buttonEnable.getWidth() - 2);
+        buttonReset.setWidth(leftWidth - buttonMode.getWidth() - 2);
         buttonReset.setPosition(leftXEnd - buttonReset.getWidth() + 2, leftRowY);
 
         // Dimensions column
@@ -341,8 +336,7 @@ public class WaypointEditor extends JmUI
 
         DrawUtil.drawLabel(currentLocation, width / 2, height, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, 255, RGB.LIGHT_GRAY_RGB, 255, 1, true);
 
-        for (int k = 0; k < this.buttonList.size(); ++k)
-        {
+        for (int k = 0; k < this.buttonList.size(); ++k) {
             GuiButton guibutton = (GuiButton) this.buttonList.get(k);
             guibutton.drawButton(this.mc, x, y);
         }
@@ -486,9 +480,9 @@ public class WaypointEditor extends JmUI
                 setRandomColor();
                 return;
             }
-            if (guibutton == buttonEnable)
+            if (guibutton == buttonMode)
             {
-                buttonEnable.toggle();
+                cycleWaypointMode();
                 return;
             }
             if (guibutton == buttonRemove)
@@ -610,10 +604,60 @@ public class WaypointEditor extends JmUI
             }
         }
         editedWaypoint.setDimensions(dims);
-        editedWaypoint.setEnable(buttonEnable.getToggled());
+        applyModeToEditedWaypoint();
         editedWaypoint.setName(fieldName.getText());
 
         editedWaypoint.setLocation(getSafeCoordInt(fieldX), getSafeCoordInt(fieldY), getSafeCoordInt(fieldZ), mc.thePlayer.dimension);
+    }
+
+    protected void cycleWaypointMode()
+    {
+        Waypoint.Lifecycle lifecycle = editedWaypoint.getLifecycle();
+        if (!editedWaypoint.isEnable())
+        {
+            editedWaypoint.setWaypointMode(true, Waypoint.Lifecycle.PERSISTENT);
+        }
+        else if (lifecycle == Waypoint.Lifecycle.PERSISTENT)
+        {
+            editedWaypoint.setWaypointMode(true, Waypoint.Lifecycle.TEMPORARY);
+        }
+        else if (lifecycle == Waypoint.Lifecycle.TEMPORARY)
+        {
+            editedWaypoint.setWaypointMode(true, Waypoint.Lifecycle.DESTINATION);
+        }
+        else
+        {
+            editedWaypoint.setWaypointMode(false, Waypoint.Lifecycle.PERSISTENT);
+        }
+        buttonMode.displayString = getModeLabel(editedWaypoint);
+        validate();
+    }
+
+    protected void applyModeToEditedWaypoint()
+    {
+        editedWaypoint.setWaypointMode(editedWaypoint.isEnable(), editedWaypoint.getLifecycle());
+    }
+
+    protected String getModeLabel(Waypoint waypoint)
+    {
+        String mode;
+        if (!waypoint.isEnable())
+        {
+            mode = Constants.getString("jm.waypoint.mode_disabled");
+        }
+        else if (waypoint.isTemporary())
+        {
+            mode = Constants.getString("jm.waypoint.mode_temporary");
+        }
+        else if (waypoint.isDestination())
+        {
+            mode = Constants.getString("jm.waypoint.mode_destination");
+        }
+        else
+        {
+            mode = Constants.getString("jm.waypoint.mode_enabled");
+        }
+        return Constants.getString("jm.waypoint.mode") + ": " + mode;
     }
 
     protected int getSafeColorInt(TextField field)
@@ -686,8 +730,7 @@ public class WaypointEditor extends JmUI
     {
         public final int dimension;
 
-        DimensionButton(int id, int dimension, String dimensionName, boolean toggled)
-        {
+        DimensionButton(int id, int dimension, String dimensionName, boolean toggled) {
             super(id, String.format("%s: %s", dimensionName, Constants.getString("jm.common.on")), String.format("%s: %s", dimensionName, Constants.getString("jm.common.off")), toggled);
             this.dimension = dimension;
             setToggled(toggled);
