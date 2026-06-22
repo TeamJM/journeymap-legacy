@@ -336,7 +336,8 @@ public class WaypointEditor extends JmUI
 
         DrawUtil.drawLabel(currentLocation, width / 2, height, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, 255, RGB.LIGHT_GRAY_RGB, 255, 1, true);
 
-        for (int k = 0; k < this.buttonList.size(); ++k) {
+        for (int k = 0; k < this.buttonList.size(); ++k)
+        {
             GuiButton guibutton = (GuiButton) this.buttonList.get(k);
             guibutton.drawButton(this.mc, x, y);
         }
@@ -730,7 +731,8 @@ public class WaypointEditor extends JmUI
     {
         public final int dimension;
 
-        DimensionButton(int id, int dimension, String dimensionName, boolean toggled) {
+        DimensionButton(int id, int dimension, String dimensionName, boolean toggled)
+        {
             super(id, String.format("%s: %s", dimensionName, Constants.getString("jm.common.on")), String.format("%s: %s", dimensionName, Constants.getString("jm.common.off")), toggled);
             this.dimension = dimension;
             setToggled(toggled);
