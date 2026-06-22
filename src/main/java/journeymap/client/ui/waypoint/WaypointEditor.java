@@ -60,7 +60,7 @@ public class WaypointEditor extends JmUI
     String currentLocation = "";
     LocationFormat.LocationFormatKeys locationFormatKeys;
     private Button buttonRandomize;
-    private OnOffButton buttonEnable;
+    private Button buttonEnable;
     private Button buttonRemove;
     private Button buttonReset;
     private Button buttonSave;
@@ -184,15 +184,9 @@ public class WaypointEditor extends JmUI
 
             if (this.buttonList.isEmpty())
             {
-                String on = Constants.getString("jm.common.on");
-                String off = Constants.getString("jm.common.off");
-                String enableOn = Constants.getString("jm.waypoint.enable", on);
-                String enableOff = Constants.getString("jm.waypoint.enable", off);
-
                 buttonRandomize = new Button(Constants.getString("jm.waypoint.randomize")); //$NON-NLS-1$
 
-                buttonEnable = new OnOffButton(enableOn, enableOff, true); //$NON-NLS-1$
-                buttonEnable.setToggled(originalWaypoint.isEnable());
+                buttonEnable = new Button(getWaypointModeLabel(originalWaypoint));
 
                 buttonRemove = new Button(Constants.getString("jm.waypoint.remove")); //$NON-NLS-1$
                 buttonRemove.setEnabled(!isNew);
@@ -488,7 +482,7 @@ public class WaypointEditor extends JmUI
             }
             if (guibutton == buttonEnable)
             {
-                buttonEnable.toggle();
+                cycleWaypointMode();
                 return;
             }
             if (guibutton == buttonRemove)
@@ -610,10 +604,54 @@ public class WaypointEditor extends JmUI
             }
         }
         editedWaypoint.setDimensions(dims);
-        editedWaypoint.setEnable(buttonEnable.getToggled());
+        applyWaypointMode();
         editedWaypoint.setName(fieldName.getText());
 
         editedWaypoint.setLocation(getSafeCoordInt(fieldX), getSafeCoordInt(fieldY), getSafeCoordInt(fieldZ), mc.thePlayer.dimension);
+    }
+
+    protected void cycleWaypointMode()
+    {
+        if (!editedWaypoint.isEnable())
+        {
+            editedWaypoint.setEnable(true);
+            editedWaypoint.setTemporary(false);
+        }
+        else if (!editedWaypoint.isTemporary())
+        {
+            editedWaypoint.setTemporary(true);
+        }
+        else
+        {
+            editedWaypoint.setTemporary(false);
+            editedWaypoint.setEnable(false);
+        }
+        buttonEnable.displayString = getWaypointModeLabel(editedWaypoint);
+        validate();
+    }
+
+    protected void applyWaypointMode()
+    {
+        editedWaypoint.setEnable(editedWaypoint.isEnable());
+        editedWaypoint.setTemporary(editedWaypoint.isEnable() && editedWaypoint.isTemporary());
+    }
+
+    protected String getWaypointModeLabel(Waypoint waypoint)
+    {
+        String mode;
+        if (!waypoint.isEnable())
+        {
+            mode = Constants.getString("jm.waypoint.mode_disabled");
+        }
+        else if (waypoint.isTemporary())
+        {
+            mode = Constants.getString("jm.waypoint.mode_temporary");
+        }
+        else
+        {
+            mode = Constants.getString("jm.waypoint.mode_enabled");
+        }
+        return Constants.getString("jm.waypoint.mode") + ": " + mode;
     }
 
     protected int getSafeColorInt(TextField field)
