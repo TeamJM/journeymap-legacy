@@ -8,6 +8,8 @@ package journeymap.client.ui.fullscreen;
 
 import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.api.fullscreen.context.FullscreenContextMenuContext;
+import journeymap.client.data.DataCache;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
@@ -17,6 +19,7 @@ import journeymap.client.log.ChatLog;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.BlockCoordIntPair;
+import journeymap.client.model.ChunkMD;
 import journeymap.client.model.MapState;
 import journeymap.client.model.MapType;
 import journeymap.client.model.Waypoint;
@@ -34,6 +37,7 @@ import journeymap.client.ui.component.ButtonList;
 import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.component.OnOffButton;
 import journeymap.client.ui.dialog.FullscreenActions;
+import journeymap.client.ui.fullscreen.context.FullscreenContextMenu;
 import journeymap.client.ui.fullscreen.layer.LayerDelegate;
 import journeymap.client.ui.minimap.Shape;
 import journeymap.client.ui.option.LocationFormat;
@@ -41,6 +45,7 @@ import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemeButton;
 import journeymap.client.ui.theme.ThemeToggle;
 import journeymap.client.ui.theme.ThemeToolbar;
+import journeymap.client.waypoint.WaypointStore;
 import journeymap.common.Journeymap;
 import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
@@ -50,6 +55,8 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.chunk.Chunk;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
@@ -92,6 +99,7 @@ public class Fullscreen extends JmUI
     StatTimer drawMapTimer = StatTimer.get("Fullscreen.drawScreen.drawMap", 50);
     StatTimer drawMapTimerWithRefresh = StatTimer.get("Fullscreen.drawMap+refreshState", 5);
     LocationFormat locationFormat = new LocationFormat();
+    FullscreenContextMenu contextMenu;
 
     /**
      * Default constructor
@@ -182,6 +190,12 @@ public class Fullscreen extends JmUI
             if (chat != null)
             {
                 chat.drawScreen(width, height, f);
+            }
+
+            if (contextMenu != null)
+            {
+                contextMenu.draw(mx, my, this.width, this.height);
+                tooltip = null;
             }
 
             if (tooltip != null && !tooltip.isEmpty())
@@ -610,12 +624,14 @@ public class Fullscreen extends JmUI
             int wheel = Mouse.getEventDWheel();
             if (wheel > 0)
             {
+                contextMenu = null;
                 zoomIn();
             }
             else
             {
                 if (wheel < 0)
                 {
+                    contextMenu = null;
                     zoomOut();
                 }
                 else
@@ -634,6 +650,16 @@ public class Fullscreen extends JmUI
             chat.mouseClicked(mouseX, mouseY, mouseButton);
         }
 
+        if (contextMenu != null)
+        {
+            if (contextMenu.mouseClicked(mouseX, mouseY, mouseButton))
+            {
+                contextMenu = null;
+                return;
+            }
+            contextMenu = null;
+        }
+
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
         // Bail if over a button
@@ -642,8 +668,18 @@ public class Fullscreen extends JmUI
             return;
         }
 
-        // Invoke layer delegate
         BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
+        if (mouseButton == 1)
+        {
+            // Reuse the existing hover selection path so context providers can receive the waypoint under the cursor.
+            layerDelegate.onMouseMove(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord);
+        }
+        if (mouseButton == 1 && openContextMenu(blockCoord, mouseX, mouseY))
+        {
+            return;
+        }
+
+        // Invoke layer delegate
         layerDelegate.onMouseClicked(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord, mouseButton);
     }
 
@@ -652,7 +688,7 @@ public class Fullscreen extends JmUI
     {
         super.mouseMovedOrUp(mouseX, mouseY, which);
 
-        if (isMouseOverButton(mouseX, mouseY))
+        if (isMouseOverButton(mouseX, mouseY) || contextMenu != null)
         {
             return;
         }
@@ -696,6 +732,58 @@ public class Fullscreen extends JmUI
             BlockCoordIntPair blockCoord = gridRenderer.getBlockUnderMouse(Mouse.getEventX(), Mouse.getEventY(), mc.displayWidth, mc.displayHeight);
             layerDelegate.onMouseMove(mc, Mouse.getEventX(), Mouse.getEventY(), gridRenderer.getWidth(), gridRenderer.getHeight(), blockCoord);
         }
+    }
+
+    /**
+     * Opens the provider-backed menu only when at least one integration contributes an entry.
+     */
+    private boolean openContextMenu(BlockCoordIntPair blockCoord, int mouseX, int mouseY)
+    {
+        FullscreenContextMenuContext context = createContextMenuContext(blockCoord);
+        FullscreenContextMenu menu = new FullscreenContextMenu(context, mouseX, mouseY, width, height);
+        if (menu.isEmpty())
+        {
+            return false;
+        }
+
+        contextMenu = menu;
+        return true;
+    }
+
+    /**
+     * Builds a stable map target snapshot before providers are asked for menu entries.
+     */
+    private FullscreenContextMenuContext createContextMenuContext(BlockCoordIntPair blockCoord)
+    {
+        int resolvedY = MathHelper.floor_double(mc.thePlayer.posY);
+        Integer displayY = null;
+        int chunkX = blockCoord.x >> 4;
+        int chunkZ = blockCoord.z >> 4;
+        Chunk chunk = mc.theWorld.getChunkFromChunkCoords(chunkX, chunkZ);
+
+        if (!chunk.isEmpty())
+        {
+            // Prefer JourneyMap's cached terrain height so labels and actions match the map data.
+            ChunkMD chunkMD = DataCache.instance().getChunkMD(ChunkCoordIntPair.chunkXZ2Int(chunk.xPosition, chunk.zPosition));
+            if (chunkMD != null)
+            {
+                displayY = chunkMD.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15);
+            }
+            else
+            {
+                displayY = Math.max(1, chunk.getPrecipitationHeight(blockCoord.x & 15, blockCoord.z & 15));
+            }
+            resolvedY = displayY;
+        }
+
+        return FullscreenContextMenuContext.builder(blockCoord.x, blockCoord.z)
+                .resolvedY(resolvedY)
+                .displayY(displayY)
+                .chunk(chunkX, chunkZ)
+                .dimension(mc.thePlayer.dimension)
+                .dimensions(WaypointStore.instance().getLoadedDimensions())
+                .waypoint(layerDelegate.getSelectedWaypoint())
+                .build();
     }
 
     void zoomIn()
@@ -750,6 +838,12 @@ public class Fullscreen extends JmUI
         if (i == Keyboard.KEY_O)
         {
             UIManager.getInstance().openOptionsManager();
+            return;
+        }
+
+        if (contextMenu != null && i == Keyboard.KEY_ESCAPE)
+        {
+            contextMenu = null;
             return;
         }
 
