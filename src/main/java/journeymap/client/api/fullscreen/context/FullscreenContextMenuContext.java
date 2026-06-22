@@ -1,8 +1,10 @@
-package journeymap.client.api.fullscreen.context;
+﻿package journeymap.client.api.fullscreen.context;
 
 import journeymap.client.model.Waypoint;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Immutable snapshot of the map target used to build and handle a fullscreen context menu.
@@ -19,7 +21,16 @@ public class FullscreenContextMenuContext
     private final Collection<Integer> dimensions;
     private final Waypoint waypoint;
 
-    public FullscreenContextMenuContext(int x, int resolvedY, Integer displayY, int z, int chunkX, int chunkZ, int dimension, Collection<Integer> dimensions, Waypoint waypoint)
+    /**
+     * Creates a context snapshot for the clicked fullscreen map location.
+     *
+     * @param x block x coordinate
+     * @param resolvedY y coordinate used for actions; falls back to the player y when terrain height is unknown
+     * @param displayY known terrain height for labels, or null when the target is unexplored
+     * @param z block z coordinate
+     */
+    public FullscreenContextMenuContext(int x, int resolvedY, Integer displayY, int z, int chunkX, int chunkZ,
+                                        int dimension, Collection<Integer> dimensions, Waypoint waypoint)
     {
         this.x = x;
         this.resolvedY = resolvedY;
@@ -28,14 +39,19 @@ public class FullscreenContextMenuContext
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         this.dimension = dimension;
-        this.dimensions = dimensions;
+        this.dimensions = dimensions == null ? Collections.<Integer>emptyList()
+                : Collections.unmodifiableList(new ArrayList<Integer>(dimensions));
         this.waypoint = waypoint;
     }
-public int getX()
+
+    public int getX()
     {
         return x;
     }
 
+    /**
+     * Returns the y coordinate used for actions such as teleporting.
+     */
     public int getResolvedY()
     {
         return resolvedY;
@@ -57,6 +73,9 @@ public int getX()
         return displayY != null;
     }
 
+    /**
+     * Returns the block z coordinate.
+     */
     public int getZ()
     {
         return z;

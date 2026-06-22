@@ -1,6 +1,5 @@
-package journeymap.client.api.fullscreen.context;
+﻿package journeymap.client.api.fullscreen.context;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -39,7 +38,6 @@ public class FullscreenContextMenuRegistry
 
     public List<FullscreenContextMenuProvider> getProviders()
     {
-        // Return a snapshot so providers can register or unregister while the menu is being built.
-        return Collections.unmodifiableList(new ArrayList<FullscreenContextMenuProvider>(providers));
+        return Collections.unmodifiableList(providers);
     }
 }

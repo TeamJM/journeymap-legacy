@@ -1,19 +1,24 @@
-package journeymap.client.api.fullscreen.context;
+﻿package journeymap.client.api.fullscreen.context;
 
 /**
  * Describes one entry in the fullscreen map context menu.
  */
 public class FullscreenContextMenuEntry
 {
-    private String actionId;
-    private String label;
-    private String shortcut;
-    private boolean enabled;
-    private boolean interactive;
-    private Integer backgroundColor;
-    private int order;
+    private final String actionId;
+    private final String label;
+    private final String shortcut;
+    private final boolean enabled;
+    private final boolean interactive;
+    private final Integer backgroundColor;
+    private final int order;
 
-    public FullscreenContextMenuEntry(String actionId, String label, String shortcut, boolean enabled, boolean interactive, Integer backgroundColor, int order)
+    /**
+     * @param enabled false when the row should be visible but disabled
+     * @param interactive false when the row is informational and should ignore clicks
+     */
+    public FullscreenContextMenuEntry(String actionId, String label, String shortcut, boolean enabled, boolean interactive,
+                                      Integer backgroundColor, int order)
     {
         this.actionId = actionId;
         this.label = label;
