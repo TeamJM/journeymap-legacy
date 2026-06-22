@@ -125,7 +125,8 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         {
             ButtonListSlot row = new ButtonListSlot(this);
             SlotMetadata.ValueType lastType = null;
-            for (int i = 0; i < columns; i++) {
+            for (int i = 0; i < columns; i++)
+            {
                 if (!remaining.isEmpty())
                 {
                     SlotMetadata.ValueType thisType = remaining.get(0).valueType;

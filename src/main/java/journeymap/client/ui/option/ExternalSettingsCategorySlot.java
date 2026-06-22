@@ -68,7 +68,6 @@ public class ExternalSettingsCategorySlot extends CategorySlot
         }
     }
 
-
     protected static SlotMetadata<?> createSlot(ExternalSettingEntry entry)
     {
         switch (entry.getKind())

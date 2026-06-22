@@ -761,7 +761,8 @@ public class OptionsManager extends JmUI
         }
     }
 
-    Map<Config.Category, List<SlotMetadata>> getToolbars() {
+    Map<Config.Category, List<SlotMetadata>> getToolbars()
+    {
         if (toolbars == null)
         {
             this.toolbars = new HashMap<Config.Category, List<SlotMetadata>>();
