@@ -1,4 +1,4 @@
-﻿/*
+/*
  * JourneyMap Mod <journeymap.info> for Minecraft
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
@@ -20,7 +20,6 @@ import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
@@ -63,22 +62,12 @@ public class RenderWaypointBeacon
         {
             waypointProperties = JourneymapClient.getWaypointProperties();
 
-            EntityPlayer player = mc.thePlayer;
-            if (player == null)
-            {
-                return;
-            }
-
             Collection<Waypoint> waypoints = WaypointStore.instance().getAll();
             //allTimer.start();
-            final int playerDim = player.dimension;
+            final int playerDim = mc.thePlayer.dimension;
             for (Waypoint wp : waypoints)
             {
-                if (!wp.getDimensions().contains(playerDim))
-                {
-                    continue;
-                }
-                if (wp.isEnable())
+                if (wp.isEnable() && wp.getDimensions().contains(playerDim))
                 {
                     try
                     {
@@ -222,8 +211,8 @@ public class RenderWaypointBeacon
 
             final int depthShadowAlpha = clampAlpha(Math.round(150.0F * fadeAlpha));
             final int frontShadowAlpha = clampAlpha(Math.round(100.0F * fadeAlpha));
-            final int textAlpha = clampAlpha(Math.round(255.0F * fadeAlpha));
-            final int iconAlpha = textAlpha;
+            final int textAlpha        = clampAlpha(Math.round(255.0F * fadeAlpha));
+            final int iconAlpha        = textAlpha;
 
             // Depth-masked and non-masked label
             final boolean showName = waypointProperties.showName.get() && label != null && label.length() > 0;
@@ -423,7 +412,7 @@ public class RenderWaypointBeacon
 
             int rgba = RGB.toRGBA(color, clampAlpha(Math.round(40.0F * alphaMultiplier)));
             renderHelper.startDrawingQuads(true);
-
+            
             renderHelper.addVertexWithUV(x + .2, y + d26, z + .2, 1, d30, rgba);
             renderHelper.addVertexWithUV(x + .2, y, z + .2, 1, d29, rgba);
             renderHelper.addVertexWithUV(x + .8, y, z + .2, 0, d29, rgba);

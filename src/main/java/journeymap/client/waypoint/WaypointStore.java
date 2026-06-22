@@ -1,4 +1,4 @@
-﻿/*
+/*
  * JourneyMap Mod <journeymap.info> for Minecraft
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
@@ -72,13 +72,6 @@ public class WaypointStore
     public void save(Waypoint waypoint)
     {
         cache.put(waypoint.getId(), waypoint);
-        if (waypoint.isTemporary())
-        {
-            remove(new File(FileHandler.getWaypointDir(), waypoint.getFileName()));
-            waypoint.setDirty(false);
-            return;
-        }
-
         boolean saved = writeToFile(waypoint);
         if (saved)
         {
@@ -92,7 +85,11 @@ public class WaypointStore
         {
             if (waypoint.isDirty())
             {
-                save(waypoint);
+                boolean saved = writeToFile(waypoint);
+                if (saved)
+                {
+                    waypoint.setDirty(false);
+                }
             }
         }
     }

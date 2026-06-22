@@ -1,4 +1,4 @@
-﻿/*
+/*
  * JourneyMap Mod <journeymap.info> for Minecraft
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
@@ -27,6 +27,7 @@ import java.util.EnumSet;
 @SideOnly(Side.CLIENT)
 public class WorldEventHandler implements EventHandlerManager.EventHandler
 {
+
     String playerName;
 
     @Override

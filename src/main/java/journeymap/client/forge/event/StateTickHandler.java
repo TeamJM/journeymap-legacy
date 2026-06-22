@@ -1,4 +1,4 @@
-﻿/*
+/*
  * JourneyMap Mod <journeymap.info> for Minecraft
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
@@ -88,7 +88,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             {
                 mc.mcProfiler.startSection("mainTasks");
                 JourneymapClient.getInstance().performMainThreadTasks();
-                removeArrivedWaypoints();
+                removeArrivedDeathpoints();
                 counter = 0;
                 mc.mcProfiler.endSection();
             }
@@ -166,23 +166,19 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         }
     }
 
-    private void removeArrivedWaypoints()
+    private void removeArrivedDeathpoints()
     {
         EntityPlayer player = mc.thePlayer;
-        if (player == null || player.isDead)
+        WaypointProperties properties = JourneymapClient.getWaypointProperties();
+        if (player == null || player.isDead || !properties.deleteDeathpointOnArrival.get())
         {
             return;
         }
 
-        WaypointProperties properties = JourneymapClient.getWaypointProperties();
         List<Waypoint> pendingRemovals = null;
         for (Waypoint waypoint : WaypointStore.instance().getAll())
         {
-            if (!waypoint.isDestination() && !(waypoint.isDeathPoint() && properties.deleteDeathpointOnArrival.get()))
-            {
-                continue;
-            }
-            if (shouldRemoveOnArrival(waypoint, properties, player))
+            if (waypoint.isDeathPoint() && shouldRemoveOnArrival(waypoint, properties, player))
             {
                 if (pendingRemovals == null)
                 {

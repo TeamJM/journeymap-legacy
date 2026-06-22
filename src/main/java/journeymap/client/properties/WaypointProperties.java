@@ -1,4 +1,4 @@
-﻿/*
+/*
  * JourneyMap Mod <journeymap.info> for Minecraft
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
@@ -58,16 +58,16 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     @Config(category = Waypoint, key = "jm.waypoint.create_deathpoints")
     public final AtomicBoolean createDeathpoints = new AtomicBoolean(true);
 
-    @Config(category = Waypoint, key = "jm.waypoint.delete_deathpoint_on_arrival", defaultBoolean = false)
+    @Config(category = Waypoint, key = "jm.waypoint.delete_deathpoint_on_arrival")
     public final AtomicBoolean deleteDeathpointOnArrival = new AtomicBoolean(false);
 
-    @Config(category = Waypoint, key = "jm.waypoint.keep_only_latest_deathpoint", defaultBoolean = false)
+    @Config(category = Waypoint, key = "jm.waypoint.keep_only_latest_deathpoint")
     public final AtomicBoolean keepOnlyLatestDeathpoint = new AtomicBoolean(false);
 
-    @Config(category = Waypoint, key = "jm.waypoint.arrival_horizontal_range", minValue = 1, maxValue = 50, defaultValue = 3)
+    @Config(category = Waypoint, key = "jm.waypoint.arrival_horizontal_range", minValue = 1, maxValue = 50)
     public final AtomicInteger arrivalHorizontalRange = new AtomicInteger(3);
 
-    @Config(category = Waypoint, key = "jm.waypoint.arrival_vertical_range", minValue = 1, maxValue = 50, defaultValue = 3)
+    @Config(category = Waypoint, key = "jm.waypoint.arrival_vertical_range", minValue = 1, maxValue = 50)
     public final AtomicInteger arrivalVerticalRange = new AtomicInteger(3);
 
     @Config(category = WaypointBeacon, key = "jm.waypoint.beacon_fade_start", minValue = 0, maxValue = 500, defaultValue = 40)

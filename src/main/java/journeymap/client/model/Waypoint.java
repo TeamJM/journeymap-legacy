@@ -1,4 +1,4 @@
-﻿/*
+/*
  * JourneyMap Mod <journeymap.info> for Minecraft
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
@@ -7,7 +7,6 @@ package journeymap.client.model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.SerializedName;
 import com.google.gson.annotations.Since;
 import journeymap.client.Constants;
 import journeymap.client.cartography.RGB;
@@ -32,13 +31,6 @@ public class Waypoint implements Serializable
 {
     public static final int VERSION = 1;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).create();
-
-    public enum Lifecycle
-    {
-        PERSISTENT,
-        TEMPORARY,
-        DESTINATION
-    }
 
     protected static final String ICON_NORMAL = "waypoint-normal.png";
     protected static final String ICON_DEATH = "waypoint-death.png";
@@ -74,14 +66,7 @@ public class Waypoint implements Serializable
     protected int b;
 
     @Since(1)
-    @SerializedName("enable")
-    protected boolean enabled;
-
-    @Since(1)
-    protected Lifecycle lifecycle = Lifecycle.PERSISTENT;
-
-    protected transient boolean persistent = true;
-    protected transient boolean isTemp;
+    protected boolean enable;
 
     @Since(1)
     protected Type type;
@@ -105,11 +90,10 @@ public class Waypoint implements Serializable
 
     public Waypoint(Waypoint original)
     {
-        this(original.name, original.x, original.y, original.z, original.enabled, original.r, original.g, original.b, original.type, original.origin, original.dimensions.first(), original.dimensions);
+        this(original.name, original.x, original.y, original.z, original.enable, original.r, original.g, original.b, original.type, original.origin, original.dimensions.first(), original.dimensions);
         this.x = original.x;
         this.y = original.y;
         this.z = original.z;
-        this.lifecycle = original.getLifecycle();
     }
 
     public Waypoint(String name, int posX, int posY, int posZ, Color color, Type type, Integer currentDimension)
@@ -140,8 +124,7 @@ public class Waypoint implements Serializable
         this.r = red;
         this.g = green;
         this.b = blue;
-        this.enabled = enable;
-        this.lifecycle = Lifecycle.PERSISTENT;
+        this.enable = enable;
         this.type = type;
         this.origin = origin;
 
@@ -216,7 +199,7 @@ public class Waypoint implements Serializable
 
     public TextureImpl getTexture()
     {
-        return isDeathPoint() || isTemporary() ? TextureCache.instance().getDeathpoint() : TextureCache.instance().getWaypoint();
+        return isDeathPoint() ? TextureCache.instance().getDeathpoint() : TextureCache.instance().getWaypoint();
     }
 
     public ChunkCoordIntPair getChunkCoordIntPair()
@@ -385,101 +368,14 @@ public class Waypoint implements Serializable
 
     public boolean isEnable()
     {
-        return enabled;
+        return enable;
     }
 
     public void setEnable(boolean enable)
     {
-        if (enable != this.enabled)
+        if (enable != this.enable)
         {
-            this.enabled = enable;
-            this.dirty = true;
-        }
-    }
-
-    public Lifecycle getLifecycle()
-    {
-        return lifecycle == null ? getLegacyLifecycle() : lifecycle;
-    }
-
-    protected Lifecycle getLegacyLifecycle()
-    {
-        if (!persistent && isTemp)
-        {
-            return Lifecycle.TEMPORARY;
-        }
-        if (!persistent)
-        {
-            return Lifecycle.DESTINATION;
-        }
-        return Lifecycle.PERSISTENT;
-    }
-
-    public boolean isPersistent()
-    {
-        return getLifecycle() == Lifecycle.PERSISTENT;
-    }
-
-    public void setPersistent(boolean persistent)
-    {
-        setLifecycle(persistent ? Lifecycle.PERSISTENT : Lifecycle.DESTINATION);
-    }
-
-    public boolean isTemporary()
-    {
-        return getLifecycle() == Lifecycle.TEMPORARY;
-    }
-
-    public void setTemporary(boolean temporary)
-    {
-        if (temporary)
-        {
-            setLifecycle(Lifecycle.TEMPORARY);
-        }
-        else if (isTemporary())
-        {
-            setLifecycle(Lifecycle.PERSISTENT);
-        }
-    }
-
-    public boolean isDestination()
-    {
-        return getLifecycle() == Lifecycle.DESTINATION;
-    }
-
-    public void setDestination(boolean destination)
-    {
-        if (destination)
-        {
-            setLifecycle(Lifecycle.DESTINATION);
-        }
-        else if (isDestination())
-        {
-            setLifecycle(Lifecycle.PERSISTENT);
-        }
-    }
-
-    public void setLifecycle(Lifecycle lifecycle)
-    {
-        Lifecycle nextLifecycle = lifecycle == null ? Lifecycle.PERSISTENT : lifecycle;
-        if (this.lifecycle != nextLifecycle)
-        {
-            this.lifecycle = nextLifecycle;
-            this.dirty = true;
-        }
-    }
-
-    public void setWaypointMode(boolean enabled, Lifecycle lifecycle)
-    {
-        Lifecycle nextLifecycle = lifecycle == null ? Lifecycle.PERSISTENT : lifecycle;
-        if (nextLifecycle != Lifecycle.PERSISTENT)
-        {
-            enabled = true;
-        }
-        if (this.enabled != enabled || getLifecycle() != nextLifecycle)
-        {
-            this.enabled = enabled;
-            this.lifecycle = nextLifecycle;
+            this.enable = enable;
             this.dirty = true;
         }
     }
@@ -553,11 +449,7 @@ public class Waypoint implements Serializable
         {
             return false;
         }
-        if (enabled != waypoint.enabled)
-        {
-            return false;
-        }
-        if (getLifecycle() != waypoint.getLifecycle())
+        if (enable != waypoint.enable)
         {
             return false;
         }
