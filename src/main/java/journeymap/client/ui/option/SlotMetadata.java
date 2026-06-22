@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JourneyMap Mod <journeymap.info> for Minecraft
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
@@ -92,7 +92,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
         }
         else if (defaultValue instanceof Double)
         {
-            valueType = ValueType.Integer;
+            valueType = ValueType.Double;
         }
         else
         {
@@ -208,8 +208,7 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
                 }
 
                 if (button instanceof IntSliderButton || button instanceof DoubleSliderButton
-                        || button instanceof BindingIntSliderButton || button instanceof BindingDoubleSliderButton)
-                {
+                        || button instanceof BindingIntSliderButton || button instanceof BindingDoubleSliderButton) {
                     lines.addAll(getWordWrappedLines(EnumChatFormatting.GRAY.toString() + EnumChatFormatting.ITALIC.toString(),
                             Constants.getString("jm.config.control_arrowkeys")));
                 }
@@ -284,6 +283,6 @@ public class SlotMetadata<T> implements Comparable<SlotMetadata>
 
     public enum ValueType
     {
-        Boolean, Set, Integer, Toolbar
+        Boolean, Set, Integer, Double, Toolbar
     }
 }

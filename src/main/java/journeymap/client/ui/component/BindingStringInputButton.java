@@ -1,4 +1,4 @@
-package journeymap.client.ui.component;
+﻿package journeymap.client.ui.component;
 
 import journeymap.client.api.settings.ExternalSettingEntry.StringBinding;
 import journeymap.client.cartography.RGB;

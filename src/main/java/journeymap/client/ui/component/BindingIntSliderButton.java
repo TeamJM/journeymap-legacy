@@ -1,4 +1,4 @@
-package journeymap.client.ui.component;
+﻿package journeymap.client.ui.component;
 
 import cpw.mods.fml.client.config.GuiUtils;
 import journeymap.client.api.settings.ExternalSettingEntry.IntBinding;
@@ -74,12 +74,6 @@ public class BindingIntSliderButton extends Button implements IPropertyHolder<In
     protected void updateLabel()
     {
         this.displayString = prefix + getPropertyValue() + getSuffix();
-    }
-
-    @Override
-    public void drawButton(Minecraft minecraft, int mouseX, int mouseY)
-    {
-        super.drawButton(minecraft, mouseX, mouseY);
     }
 
     @Override

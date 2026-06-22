@@ -1,4 +1,4 @@
-package journeymap.client.ui.option;
+﻿package journeymap.client.ui.option;
 
 import journeymap.client.Constants;
 import journeymap.client.api.settings.ExternalSettingEntry;
@@ -73,18 +73,17 @@ public class ExternalSettingsCategorySlot extends CategorySlot
     {
         switch (entry.getKind())
         {
-            case ExternalSettingEntry.LABEL:
+            case LABEL:
                 return createLabelSlot(entry);
-            case ExternalSettingEntry.BOOLEAN:
+            case BOOLEAN:
                 return createBooleanSlot(entry);
-            case ExternalSettingEntry.INT_SLIDER:
+            case INT_SLIDER:
                 return createIntSliderSlot(entry);
-            case ExternalSettingEntry.DOUBLE_SLIDER:
+            case DOUBLE_SLIDER:
                 return createDoubleSliderSlot(entry);
-            case ExternalSettingEntry.ENUM_LIST:
-            case ExternalSettingEntry.STRING_LIST:
+            case LIST:
                 return createListSlot(entry);
-            case ExternalSettingEntry.STRING_INPUT:
+            case STRING_INPUT:
                 return createStringInputSlot(entry);
             default:
                 return null;
@@ -168,6 +167,7 @@ public class ExternalSettingsCategorySlot extends CategorySlot
         String value = I18n.format(key);
         return value.equals(key) ? null : value;
     }
+
     protected static String resolveRequired(String key)
     {
         return Constants.getString(key);

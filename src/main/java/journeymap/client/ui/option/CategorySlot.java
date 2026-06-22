@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JourneyMap Mod <journeymap.info> for Minecraft
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
@@ -48,6 +48,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
 
     protected CategorySlot(String name, String tooltip, int sortOrder, String sortKey, boolean advanced)
     {
+        // External settings pages use this path and intentionally do not map to Config.Category.
         this.category = null;
         this.name = name;
         this.sortOrder = sortOrder;
@@ -124,8 +125,7 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
         {
             ButtonListSlot row = new ButtonListSlot(this);
             SlotMetadata.ValueType lastType = null;
-            for (int i = 0; i < columns; i++)
-            {
+            for (int i = 0; i < columns; i++) {
                 if (!remaining.isEmpty())
                 {
                     SlotMetadata.ValueType thisType = remaining.get(0).valueType;
@@ -286,7 +286,6 @@ public class CategorySlot implements ScrollListPane.ISlot, Comparable<CategorySl
     @Override
     public void setEnabled(boolean enabled)
     {
-
     }
 
     public SlotMetadata getLastPressed()

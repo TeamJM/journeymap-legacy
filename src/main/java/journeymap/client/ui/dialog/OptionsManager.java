@@ -1,4 +1,4 @@
-/*
+﻿/*
  * JourneyMap Mod <journeymap.info> for Minecraft
  * Copyright (c) 2011-2017  Techbrew Interactive, LLC <techbrew.net>.  All Rights Reserved.
  */
@@ -43,11 +43,10 @@ import java.util.*;
  */
 public class OptionsManager extends JmUI
 {
-    protected static EnumSet<Config.Category> openCategories = EnumSet.noneOf(Config.Category.class);
     protected static Set<String> openCategoryKeys = new HashSet<String>();
 
     protected final int inGameMinimapId;
-    protected Config.Category[] initialCategories;
+    protected Set<String> initialCategoryKeys;
     protected CheckBox minimap1PreviewButton;
     protected CheckBox minimap2PreviewButton;
     protected Button minimap1KeysButton, minimap2KeysButton;
@@ -74,13 +73,24 @@ public class OptionsManager extends JmUI
 
     public OptionsManager(JmUI returnDisplay)
     {
-        this(returnDisplay, openCategories.toArray(new Config.Category[0]));
+        this(returnDisplay, openCategoryKeys);
     }
 
     public OptionsManager(JmUI returnDisplay, Config.Category... initialCategories)
     {
         super(String.format("JourneyMap %s %s", Journeymap.JM_VERSION, Constants.getString("jm.common.options")), returnDisplay);
-        this.initialCategories = initialCategories;
+        this.initialCategoryKeys = new HashSet<String>();
+        for (Config.Category category : initialCategories)
+        {
+            this.initialCategoryKeys.add(category.name());
+        }
+        this.inGameMinimapId = JourneymapClient.getActiveMinimapId();
+    }
+
+    protected OptionsManager(JmUI returnDisplay, Set<String> initialCategoryKeys)
+    {
+        super(String.format("JourneyMap %s %s", Journeymap.JM_VERSION, Constants.getString("jm.common.options")), returnDisplay);
+        this.initialCategoryKeys = new HashSet<String>(initialCategoryKeys);
         this.inGameMinimapId = JourneymapClient.getActiveMinimapId();
     }
 
@@ -162,24 +172,9 @@ public class OptionsManager extends JmUI
                 optionsListPane = new ScrollListPane<CategorySlot>(this, mc, this.width, this.height, this.headerHeight, this.height - 30, 20);
                 optionsListPane.setAlignTop(true);
                 optionsListPane.setSlots(OptionSlotFactory.getSlots(getToolbars()));
-                if (initialCategories != null)
-                {
-                    for (Config.Category initialCategory : initialCategories)
-                    {
-                        for (CategorySlot categorySlot : optionsListPane.getRootSlots())
-                        {
-                            if (categorySlot.getCategory() == initialCategory)
-                            {
-                                categorySlot.setSelected(true);
-                                categorySlots.add(categorySlot);
-                            }
-                        }
-                    }
-                }
-
                 for (CategorySlot categorySlot : optionsListPane.getRootSlots())
                 {
-                    if (openCategoryKeys.contains(categorySlot.getStateKey()))
+                    if (initialCategoryKeys.contains(categorySlot.getStateKey()))
                     {
                         categorySlot.setSelected(true);
                         categorySlots.add(categorySlot);
@@ -744,17 +739,12 @@ public class OptionsManager extends JmUI
             ((Fullscreen) returnDisplay).reset();
         }
 
-        OptionsManager.openCategories.clear();
         OptionsManager.openCategoryKeys.clear();
         for (CategorySlot categorySlot : optionsListPane.getRootSlots())
         {
             if (categorySlot.isSelected())
             {
                 OptionsManager.openCategoryKeys.add(categorySlot.getStateKey());
-                if (categorySlot.getCategory() != null)
-                {
-                    OptionsManager.openCategories.add(categorySlot.getCategory());
-                }
             }
         }
 
@@ -771,8 +761,7 @@ public class OptionsManager extends JmUI
         }
     }
 
-    Map<Config.Category, List<SlotMetadata>> getToolbars()
-    {
+    Map<Config.Category, List<SlotMetadata>> getToolbars() {
         if (toolbars == null)
         {
             this.toolbars = new HashMap<Config.Category, List<SlotMetadata>>();

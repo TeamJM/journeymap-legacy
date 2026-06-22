@@ -1,4 +1,4 @@
-package journeymap.client.ui.component;
+﻿package journeymap.client.ui.component;
 
 import cpw.mods.fml.client.config.GuiUtils;
 import journeymap.client.api.settings.ExternalSettingEntry.DoubleBinding;

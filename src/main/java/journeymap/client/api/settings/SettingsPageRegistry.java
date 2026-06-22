@@ -1,4 +1,4 @@
-package journeymap.client.api.settings;
+﻿package journeymap.client.api.settings;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +20,7 @@ public class SettingsPageRegistry
     {
         return INSTANCE;
     }
+
     public synchronized void registerPage(SettingsPageDefinition definition)
     {
         if (definition == null || definition.getPageId() == null)
@@ -27,6 +28,7 @@ public class SettingsPageRegistry
             return;
         }
 
+        definition.validate();
         pageDefinitions.put(definition.getPageId(), definition);
     }
 

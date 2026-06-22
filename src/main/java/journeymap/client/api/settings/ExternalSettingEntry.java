@@ -1,4 +1,7 @@
-package journeymap.client.api.settings;
+﻿package journeymap.client.api.settings;
+
+import journeymap.common.Journeymap;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -8,13 +11,17 @@ import java.util.concurrent.Callable;
  */
 public class ExternalSettingEntry
 {
-    public static final int LABEL = 0;
-    public static final int BOOLEAN = 1;
-    public static final int INT_SLIDER = 2;
-    public static final int DOUBLE_SLIDER = 3;
-    public static final int ENUM_LIST = 4;
-    public static final int STRING_LIST = 5;
-    public static final int STRING_INPUT = 6;
+    private static final Logger LOGGER = Journeymap.getLogger();
+
+    public enum Kind
+    {
+        LABEL,
+        BOOLEAN,
+        INT_SLIDER,
+        DOUBLE_SLIDER,
+        LIST,
+        STRING_INPUT
+    }
 
     public static interface BooleanBinding
     {
@@ -84,8 +91,9 @@ public class ExternalSettingEntry
 
         int getMaxLength();
     }
+
     private String id;
-    private int kind;
+    private Kind kind;
     private String titleKey;
     private String tooltipKey;
     private int order;
@@ -98,7 +106,7 @@ public class ExternalSettingEntry
     private ListBinding<?> listBinding;
     private StringBinding stringInputBinding;
 
-    protected ExternalSettingEntry(String id, int kind, String titleKey, String tooltipKey, int order)
+    protected ExternalSettingEntry(String id, Kind kind, String titleKey, String tooltipKey, int order)
     {
         this.id = id;
         this.kind = kind;
@@ -109,47 +117,55 @@ public class ExternalSettingEntry
 
     public static ExternalSettingEntry label(String id, String titleKey, String tooltipKey, int order)
     {
-        return new ExternalSettingEntry(id, LABEL, titleKey, tooltipKey, order);
+        return new ExternalSettingEntry(id, Kind.LABEL, titleKey, tooltipKey, order);
     }
 
     public static ExternalSettingEntry bool(String id, String titleKey, String tooltipKey, int order, BooleanBinding binding)
     {
-        ExternalSettingEntry entry = new ExternalSettingEntry(id, BOOLEAN, titleKey, tooltipKey, order);
+        requireBinding(id, binding);
+        ExternalSettingEntry entry = new ExternalSettingEntry(id, Kind.BOOLEAN, titleKey, tooltipKey, order);
         entry.booleanBinding = binding;
         return entry;
     }
 
     public static ExternalSettingEntry intSlider(String id, String titleKey, String tooltipKey, int order, IntBinding binding)
     {
-        ExternalSettingEntry entry = new ExternalSettingEntry(id, INT_SLIDER, titleKey, tooltipKey, order);
+        requireBinding(id, binding);
+        ExternalSettingEntry entry = new ExternalSettingEntry(id, Kind.INT_SLIDER, titleKey, tooltipKey, order);
         entry.intBinding = binding;
         return entry;
     }
 
     public static ExternalSettingEntry doubleSlider(String id, String titleKey, String tooltipKey, int order, DoubleBinding binding)
     {
-        ExternalSettingEntry entry = new ExternalSettingEntry(id, DOUBLE_SLIDER, titleKey, tooltipKey, order);
+        requireBinding(id, binding);
+        ExternalSettingEntry entry = new ExternalSettingEntry(id, Kind.DOUBLE_SLIDER, titleKey, tooltipKey, order);
         entry.doubleBinding = binding;
+        return entry;
+    }
+
+    public static ExternalSettingEntry list(String id, String titleKey, String tooltipKey, int order, ListBinding<?> binding)
+    {
+        requireBinding(id, binding);
+        ExternalSettingEntry entry = new ExternalSettingEntry(id, Kind.LIST, titleKey, tooltipKey, order);
+        entry.listBinding = binding;
         return entry;
     }
 
     public static ExternalSettingEntry enumList(String id, String titleKey, String tooltipKey, int order, ListBinding<?> binding)
     {
-        ExternalSettingEntry entry = new ExternalSettingEntry(id, ENUM_LIST, titleKey, tooltipKey, order);
-        entry.listBinding = binding;
-        return entry;
+        return list(id, titleKey, tooltipKey, order, binding);
     }
 
     public static ExternalSettingEntry stringList(String id, String titleKey, String tooltipKey, int order, ListBinding<?> binding)
     {
-        ExternalSettingEntry entry = new ExternalSettingEntry(id, STRING_LIST, titleKey, tooltipKey, order);
-        entry.listBinding = binding;
-        return entry;
+        return list(id, titleKey, tooltipKey, order, binding);
     }
 
     public static ExternalSettingEntry stringInput(String id, String titleKey, String tooltipKey, int order, StringBinding binding)
     {
-        ExternalSettingEntry entry = new ExternalSettingEntry(id, STRING_INPUT, titleKey, tooltipKey, order);
+        requireBinding(id, binding);
+        ExternalSettingEntry entry = new ExternalSettingEntry(id, Kind.STRING_INPUT, titleKey, tooltipKey, order);
         entry.stringInputBinding = binding;
         return entry;
     }
@@ -177,7 +193,7 @@ public class ExternalSettingEntry
         return id;
     }
 
-    public int getKind()
+    public Kind getKind()
     {
         return kind;
     }
@@ -237,6 +253,37 @@ public class ExternalSettingEntry
         return stringInputBinding;
     }
 
+    public void validate()
+    {
+        switch (kind)
+        {
+            case BOOLEAN:
+                requireBinding(id, booleanBinding);
+                return;
+            case INT_SLIDER:
+                requireBinding(id, intBinding);
+                return;
+            case DOUBLE_SLIDER:
+                requireBinding(id, doubleBinding);
+                return;
+            case LIST:
+                requireBinding(id, listBinding);
+                return;
+            case STRING_INPUT:
+                requireBinding(id, stringInputBinding);
+                return;
+            default:
+        }
+    }
+
+    protected static void requireBinding(String id, Object binding)
+    {
+        if (binding == null)
+        {
+            throw new IllegalArgumentException("External setting entry '" + id + "' requires a binding");
+        }
+    }
+
     protected boolean resolveCallable(Callable<Boolean> supplier, boolean fallback)
     {
         if (supplier == null)
@@ -248,9 +295,9 @@ public class ExternalSettingEntry
             Boolean value = supplier.call();
             return value == null ? fallback : value;
         }
-        catch (Exception ignored)
+        catch (Exception exception)
         {
-            // A broken integration should not prevent JourneyMap from opening its options GUI.
+            LOGGER.warn("External setting entry '{}' supplier failed", id, exception);
             return fallback;
         }
     }

@@ -1,4 +1,4 @@
-package journeymap.client.api.settings;
+﻿package journeymap.client.api.settings;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,5 +67,21 @@ public class SettingsPageDefinition
     public List<ExternalSettingEntry> getEntries()
     {
         return Collections.unmodifiableList(entries);
+    }
+
+    public void validate()
+    {
+        if (pageId == null || titleKey == null)
+        {
+            throw new IllegalArgumentException("External settings pages require a page id and title key");
+        }
+        for (ExternalSettingEntry entry : entries)
+        {
+            if (entry == null)
+            {
+                throw new IllegalArgumentException("External settings page '" + pageId + "' contains a null entry");
+            }
+            entry.validate();
+        }
     }
 }
