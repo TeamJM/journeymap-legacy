@@ -58,6 +58,18 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
     @Config(category = Waypoint, key = "jm.waypoint.create_deathpoints")
     public final AtomicBoolean createDeathpoints = new AtomicBoolean(true);
 
+    @Config(category = Waypoint, key = "jm.waypoint.delete_deathpoint_on_arrival")
+    public final AtomicBoolean deleteDeathpointOnArrival = new AtomicBoolean(false);
+
+    @Config(category = Waypoint, key = "jm.waypoint.keep_only_latest_deathpoint")
+    public final AtomicBoolean keepOnlyLatestDeathpoint = new AtomicBoolean(false);
+
+    @Config(category = Waypoint, key = "jm.waypoint.arrival_horizontal_range", minValue = 1, maxValue = 50)
+    public final AtomicInteger arrivalHorizontalRange = new AtomicInteger(3);
+
+    @Config(category = Waypoint, key = "jm.waypoint.arrival_vertical_range", minValue = 1, maxValue = 50)
+    public final AtomicInteger arrivalVerticalRange = new AtomicInteger(3);
+
     @Config(category = WaypointBeacon, key = "jm.waypoint.beacon_fade_start", minValue = 0, maxValue = 500, defaultValue = 40)
     public final AtomicInteger beaconFadeStart = new AtomicInteger(40);
 
@@ -104,6 +116,10 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
         result = 31 * result + textureSmall.hashCode();
         result = 31 * result + maxDistance.hashCode();
         result = 31 * result + createDeathpoints.hashCode();
+        result = 31 * result + deleteDeathpointOnArrival.hashCode();
+        result = 31 * result + keepOnlyLatestDeathpoint.hashCode();
+        result = 31 * result + arrivalHorizontalRange.hashCode();
+        result = 31 * result + arrivalVerticalRange.hashCode();
         result = 31 * result + beaconFadeStart.hashCode();
         result = 31 * result + beaconFadeEnd.hashCode();
         result = 31 * result + name.hashCode();
@@ -118,9 +134,13 @@ public class WaypointProperties extends PropertiesBase implements Comparable<Way
                 .add("beaconEnabled", beaconEnabled)
                 .add("boldLabel", boldLabel)
                 .add("createDeathpoints", createDeathpoints)
+                .add("deleteDeathpointOnArrival", deleteDeathpointOnArrival)
                 .add("fontScale", fontScale)
+                .add("keepOnlyLatestDeathpoint", keepOnlyLatestDeathpoint)
                 .add("managerEnabled", managerEnabled)
                 .add("maxDistance", maxDistance)
+                .add("arrivalHorizontalRange", arrivalHorizontalRange)
+                .add("arrivalVerticalRange", arrivalVerticalRange)
                 .add("name", name)
                 .add("showDistance", showDistance)
                 .add("showName", showName)
