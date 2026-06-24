@@ -24,6 +24,7 @@ import journeymap.client.render.draw.WaypointDrawStepFactory;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.texture.TextureCache;
 import journeymap.client.render.texture.TextureImpl;
+import journeymap.client.ui.util.SmoothDoubleState;
 import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -71,6 +72,7 @@ public class MiniMap
     private long initTime;
     private long lastRotationTime = 0;
     private double smoothedRotation = Double.NaN;
+    private SmoothDoubleState visualZoomLevel = new SmoothDoubleState();
 
     /**
      * Default constructor
@@ -183,8 +185,11 @@ public class MiniMap
                 timer.start();
             }
 
+            int zoomLevel = miniMapProperties.zoomLevel.get();
+            double renderZoomScale = visualZoomLevel.getScale(zoomLevel, miniMapProperties.smoothZoom.get());
+
             // Update the grid
-            boolean moved = gridRenderer.center(state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, miniMapProperties.zoomLevel.get());
+            boolean moved = gridRenderer.center(state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, zoomLevel);
             if (moved || doStateRefresh)
             {
                 boolean showCaves = shouldShowCaves();
@@ -256,27 +261,44 @@ public class MiniMap
             {
                 // Move origin to top-left corner
                 GL11.glTranslated(dv.translateX, dv.translateY, 0);
-
-                // Draw grid
-                gridRenderer.draw(dv.terrainAlpha, 0, 0, miniMapProperties.showGrid.get());
-
-                // Draw entities, etc
-
-                gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, dv.fontScale, rotation);
-
-                // Get center of minimap and rect of minimap
-                centerPoint = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
-                centerRect = new Rectangle2D.Double(centerPoint.x - dv.minimapWidth / 2, centerPoint.y - dv.minimapHeight / 2, dv.minimapWidth, dv.minimapHeight);
-
-                // Draw waypoints
-                drawOnMapWaypoints(rotation);
-
-                // Draw player
-                if (miniMapProperties.showSelf.get() && playerLocatorTex != null)
+                gridRenderer.setVisualScale(renderZoomScale);
+                boolean scaleMap = renderZoomScale != 1D;
+                if (scaleMap)
                 {
-                    if (centerPoint != null)
+                    GL11.glPushMatrix();
+                }
+                try
+                {
+                    if (scaleMap)
+                    {
+                        applyMapZoomScale(mc.displayWidth / 2D, mc.displayHeight / 2D, renderZoomScale);
+                    }
+                    gridRenderer.updateRotation(rotation);
+
+                    // Draw grid
+                    gridRenderer.draw(dv.terrainAlpha, 0, 0, miniMapProperties.showGrid.get());
+
+                    // Draw entities, etc
+                    gridRenderer.draw(state.getDrawSteps(), 0, 0, dv.drawScale, dv.fontScale, rotation);
+
+                    // Get center of minimap and rect of minimap
+                    centerPoint = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
+                    centerRect = new Rectangle2D.Double(centerPoint.x - dv.minimapWidth / 2, centerPoint.y - dv.minimapHeight / 2, dv.minimapWidth, dv.minimapHeight);
+
+                    // Draw waypoints
+                    drawOnMapWaypoints(rotation);
+
+                    // Draw player
+                    if (miniMapProperties.showSelf.get() && playerLocatorTex != null && centerPoint != null)
                     {
                         DrawUtil.drawEntity(centerPoint.getX(), centerPoint.getY(), playerHeading, false, playerLocatorTex, dv.drawScale, rotation);
+                    }
+                }
+                finally
+                {
+                    if (scaleMap)
+                    {
+                        GL11.glPopMatrix();
                     }
                 }
 
@@ -372,6 +394,7 @@ public class MiniMap
                 }
 
             }
+
             finally
             {
                 /***** END MATRIX: ROTATION *****/
@@ -446,6 +469,7 @@ public class MiniMap
         }
     }
 
+
     private void startMapRotation(double rotation)
     {
         GL11.glPushMatrix();
@@ -485,6 +509,17 @@ public class MiniMap
         smoothedRotation = normalizeAngle(smoothedRotation + normalizeAngle(targetRotation - smoothedRotation) * alpha);
         lastRotationTime = now;
         return smoothedRotation;
+    }
+
+    private void applyMapZoomScale(double centerX, double centerY, double scale)
+    {
+        if (scale == 1D)
+        {
+            return;
+        }
+        GL11.glTranslated(centerX, centerY, 0);
+        GL11.glScaled(scale, scale, 1D);
+        GL11.glTranslated(-centerX, -centerY, 0);
     }
 
     private float getInterpolatedPlayerYawHead(float partialTicks)
@@ -530,11 +565,17 @@ public class MiniMap
     {
         if (dv.shape == Shape.Circle)
         {
-            return centerPixel.distance(objectPixel) < dv.minimapWidth / 2;
+            return centerPixel.distance(objectPixel) < (dv.minimapWidth / 2D) / gridRenderer.getVisualScale();
         }
         else
         {
-            return centerRect.contains(gridRenderer.getWindowPosition(objectPixel));
+            double visualScale = gridRenderer.getVisualScale();
+            Rectangle2D.Double scaledCenterRect = new Rectangle2D.Double(
+                    centerPixel.getX() - (dv.minimapWidth / 2D) / visualScale,
+                    centerPixel.getY() - (dv.minimapHeight / 2D) / visualScale,
+                    dv.minimapWidth / visualScale,
+                    dv.minimapHeight / visualScale);
+            return scaledCenterRect.contains(objectPixel);
         }
     }
 
@@ -542,7 +583,6 @@ public class MiniMap
     {
         if (dv.shape == Shape.Circle)
         {
-
             // Get the bearing from center to object
             double bearing = Math.atan2(
                     objectPixel.getY() - centerPixel.getY(),
@@ -635,6 +675,7 @@ public class MiniMap
             renderHelper.glClearColor(1, 1, 1, 1f); // defensive against shaders
 
         }
+
         catch (Throwable t)
         {
             JMLogger.logOnce("Error during MiniMap.cleanup()", t);
@@ -646,6 +687,8 @@ public class MiniMap
         initTime = System.currentTimeMillis();
         lastRotationTime = 0;
         smoothedRotation = Double.NaN;
+        visualZoomLevel.clear();
+        visualZoomLevel.snapTo(miniMapProperties.zoomLevel.get());
         initGridRenderer();
         updateDisplayVars(miniMapProperties.shape.get(), miniMapProperties.position.get(), true);
         MiniMapOverlayHandler.checkEventConfig();
@@ -732,8 +775,8 @@ public class MiniMap
             if (mc.theWorld != null && mc.thePlayer != null)
             {
                 BiomeGenBase biome = mc.theWorld.getBiomeGenForCoords(
-                    MathHelper.floor_double(mc.thePlayer.posX),
-                    MathHelper.floor_double(mc.thePlayer.posZ)
+                        MathHelper.floor_double(mc.thePlayer.posX),
+                        MathHelper.floor_double(mc.thePlayer.posZ)
                 );
                 biomeLabelText = biome != null ? biome.biomeName : "?";
             }
@@ -748,17 +791,20 @@ public class MiniMap
             long minutes = (worldTime % 1000L) * 60L / 1000L;
 
             String am_pm = "AM";
-            if (hours > 12) {
+            if (hours > 12)
+            {
                 hours -= 12;
                 am_pm = "PM";
-            } else if (hours == 12) {
+            }
+            else if (hours == 12)
+            {
                 am_pm = "PM";
             }
             timeLabelText = dv.timeFormatKeys.format(
-                String.format("%d", days),
-                String.format("%02d", hours),
-                String.format("%02d", minutes),
-                am_pm
+                    String.format("%d", days),
+                    String.format("%02d", hours),
+                    String.format("%02d", minutes),
+                    am_pm
             );
         }
 

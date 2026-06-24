@@ -58,6 +58,7 @@ public class GridRenderer
     private double srcSizeHeight, srcSizeWidth; // Total pixel height/width of the loaded grid tiles
     private Rectangle2D.Double viewPort = null;
     private Rectangle2D.Double screenBounds = null;
+    private double visualScale = 1D;
     private int lastHeight = -1;
     private int lastWidth = -1;
     private MapType mapType;
@@ -116,6 +117,23 @@ public class GridRenderer
         this.viewPort = viewPort;
         this.screenBounds = null;
         updateBounds(lastWidth, lastHeight);
+    }
+
+    public void setVisualScale(double visualScale)
+    {
+        if (Double.isNaN(visualScale) || Double.isInfinite(visualScale) || visualScale <= 0D)
+        {
+            this.visualScale = 1D;
+            updateGridSize();
+            return;
+        }
+        this.visualScale = visualScale;
+        updateGridSize();
+    }
+
+    public double getVisualScale()
+    {
+        return visualScale;
     }
 
     private void populateGrid(Tile centerTile)
@@ -324,13 +342,14 @@ public class GridRenderer
 
     public BlockCoordIntPair getBlockUnderMouse(double mouseX, double mouseY, int screenWidth, int screenHeight)
     {
+        Point2D.Double logicalMouse = fromVisualPosition(new Point2D.Double(mouseX, mouseY));
         double centerPixelX = screenWidth / 2.0;
         double centerPixelZ = screenHeight / 2.0;
 
         double blockSize = (int) Math.pow(2, zoom);
 
-        double deltaX = (centerPixelX - mouseX) / blockSize;
-        double deltaZ = (centerPixelZ - mouseY) / blockSize;
+        double deltaX = (centerPixelX - logicalMouse.getX()) / blockSize;
+        double deltaZ = (centerPixelZ - logicalMouse.getY()) / blockSize;
 
         int x = MathHelper.floor_double(centerBlockX - deltaX);
         int z = MathHelper.floor_double(centerBlockZ + deltaZ);
@@ -339,7 +358,6 @@ public class GridRenderer
 
     public Point2D.Double getBlockPixelInGrid(double x, double z)
     {
-
         double localBlockX = x - centerBlockX;
         double localBlockZ = z - centerBlockZ;
 
@@ -450,6 +468,34 @@ public class GridRenderer
         }
     }
 
+    private Point2D.Double toVisualPosition(Point2D.Double pixel)
+    {
+        if (screenBounds == null || visualScale == 1D)
+        {
+            return new Point2D.Double(pixel.getX(), pixel.getY());
+        }
+
+        double centerX = screenBounds.getCenterX();
+        double centerY = screenBounds.getCenterY();
+        return new Point2D.Double(
+                centerX + ((pixel.getX() - centerX) * visualScale),
+                centerY + ((pixel.getY() - centerY) * visualScale));
+    }
+
+    private Point2D.Double fromVisualPosition(Point2D.Double pixel)
+    {
+        if (screenBounds == null || visualScale == 1D)
+        {
+            return new Point2D.Double(pixel.getX(), pixel.getY());
+        }
+
+        double centerX = screenBounds.getCenterX();
+        double centerY = screenBounds.getCenterY();
+        return new Point2D.Double(
+                centerX + ((pixel.getX() - centerX) / visualScale),
+                centerY + ((pixel.getY() - centerY) / visualScale));
+    }
+
     /**
      * Returns a pixel Point2D.Double if on screen, null if not.
      *
@@ -480,7 +526,9 @@ public class GridRenderer
             return;
         }
 
-        double x = pixel.getX();
+        Point2D.Double visualPixel = toVisualPosition(new Point2D.Double(pixel.getX(), pixel.getY()));
+
+        double x = visualPixel.getX();
         if (x < screenBounds.x)
         {
             x = screenBounds.x;
@@ -490,7 +538,7 @@ public class GridRenderer
             x = screenBounds.getMaxX();
         }
 
-        double y = pixel.getY();
+        double y = visualPixel.getY();
         if (y < screenBounds.y)
         {
             y = screenBounds.y;
@@ -500,7 +548,8 @@ public class GridRenderer
             y = screenBounds.getMaxY();
         }
 
-        pixel.setLocation(x, y);
+        Point2D.Double clamped = fromVisualPosition(new Point2D.Double(x, y));
+        pixel.setLocation(clamped.getX(), clamped.getY());
     }
 
     /**
@@ -523,7 +572,7 @@ public class GridRenderer
      */
     public boolean isOnScreen(Point2D.Double pixel)
     {
-        return screenBounds.contains(pixel);
+        return screenBounds != null && screenBounds.contains(toVisualPosition(pixel));
     }
 
     /**
@@ -535,7 +584,7 @@ public class GridRenderer
      */
     public boolean isOnScreen(double x, double y)
     {
-        return screenBounds.contains(x, y);
+        return screenBounds != null && screenBounds.contains(toVisualPosition(new Point2D.Double(x, y)));
     }
 
     /**
@@ -549,7 +598,6 @@ public class GridRenderer
      */
     public boolean isOnScreen(double startX, double startY, int width, int height)
     {
-
         if (screenBounds == null)
         {
             return false;
@@ -589,9 +637,20 @@ public class GridRenderer
         }
     }
 
-    private void updateGridSize() {
-        int newGridSizeHeight = (int) Math.ceil(screenBounds.height / Tile.TILESIZE) + 1;
-        int newGridSizeWidth = (int) Math.ceil(screenBounds.width / Tile.TILESIZE) + 1;
+    private void updateGridSize()
+    {
+        if (screenBounds == null)
+        {
+            return;
+        }
+
+        // When the map is scaled down during a zoom transition, the logical viewport is larger than the screen.
+        double viewportScale = Math.min(visualScale, 1D);
+        double effectiveHeight = screenBounds.height / viewportScale;
+        double effectiveWidth = screenBounds.width / viewportScale;
+
+        int newGridSizeHeight = (int) Math.ceil(effectiveHeight / Tile.TILESIZE) + 1;
+        int newGridSizeWidth = (int) Math.ceil(effectiveWidth / Tile.TILESIZE) + 1;
 
         setGridSizes(newGridSizeHeight, newGridSizeWidth);
     }
@@ -642,18 +701,19 @@ public class GridRenderer
     {
         if (currentRotation % 360 == 0)
         {
-            return matrixPixel;
+            return toVisualPosition(matrixPixel);
         }
         else
         {
             GLU.gluProject((float) matrixPixel.getX(), (float) matrixPixel.getY(), 0f, modelMatrixBuf, projMatrixBuf, viewportBuf, winPosBuf);
-            return new Point2D.Double(winPosBuf.get(0), winPosBuf.get(1));
+            return toVisualPosition(new Point2D.Double(winPosBuf.get(0), winPosBuf.get(1)));
         }
     }
 
     public Point2D.Double getMatrixPosition(Point2D.Double windowPixel)
     {
-        GLU.gluUnProject((float) windowPixel.x, (float) windowPixel.y, 0, modelMatrixBuf, projMatrixBuf, viewportBuf, objPosBuf);
+        Point2D.Double logicalPixel = fromVisualPosition(windowPixel);
+        GLU.gluUnProject((float) logicalPixel.x, (float) logicalPixel.y, 0, modelMatrixBuf, projMatrixBuf, viewportBuf, objPosBuf);
         return new Point2D.Double(objPosBuf.get(0), objPosBuf.get(1));
     }
 
@@ -691,6 +751,7 @@ public class GridRenderer
     {
         grid.clear();
         messages.clear();
+        visualScale = 1D;
     }
 
     public int getWidth()
