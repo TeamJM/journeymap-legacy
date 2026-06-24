@@ -48,6 +48,11 @@ public class WaypointLayer implements LayerDelegate.Layer
     {
     }
 
+    public Waypoint getSelectedWaypoint()
+    {
+        return selected;
+    }
+
     @Override
     public List<DrawStep> onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {

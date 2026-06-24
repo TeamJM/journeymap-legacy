@@ -58,6 +58,10 @@ public class Constants
     public static KeyBinding KB_MAP_SWITCH_TYPE;
     public static KeyBinding KB_MINIMAP_PRESET;
     public static KeyBinding KB_WAYPOINT;
+    public static KeyBinding KB_FULLSCREEN_TELEPORT;
+    public static KeyBinding KB_FULLSCREEN_TOGGLE_WAYPOINT;
+    public static KeyBinding KB_FULLSCREEN_DELETE_WAYPOINT;
+    public static KeyBinding KB_FULLSCREEN_EDIT_WAYPOINT;
     private static String ICON_DIR = path.join(JOURNEYMAP_DIR, "icon");
     public static String ENTITY_ICON_DIR = path.join(ICON_DIR, "entity", END);
     public static String WAYPOINT_ICON_DIR = path.join(ICON_DIR, "waypoint", END);
@@ -82,7 +86,20 @@ public class Constants
         KB_MAP_SWITCH_TYPE = new KeyBinding("key.journeymap.minimap_type", Keyboard.KEY_LBRACKET, KEYBINDING_CATEGORY);
         KB_MINIMAP_PRESET = new KeyBinding("key.journeymap.minimap_preset", Keyboard.KEY_BACKSLASH, KEYBINDING_CATEGORY);
         KB_WAYPOINT = new KeyBinding("key.journeymap.create_waypoint", Keyboard.KEY_B, KEYBINDING_CATEGORY);
-        return Arrays.asList(KB_MAP, KB_MAP_ZOOMIN, KB_MAP_ZOOMOUT, KB_MAP_SWITCH_TYPE, KB_MINIMAP_PRESET, KB_WAYPOINT);
+        KB_FULLSCREEN_TELEPORT = new KeyBinding("key.journeymap.fullscreen_teleport", Keyboard.KEY_T, KEYBINDING_CATEGORY);
+        KB_FULLSCREEN_TOGGLE_WAYPOINT = new KeyBinding("key.journeymap.fullscreen_toggle_waypoint", Keyboard.KEY_H, KEYBINDING_CATEGORY);
+        KB_FULLSCREEN_DELETE_WAYPOINT = new KeyBinding("key.journeymap.fullscreen_delete_waypoint", Keyboard.KEY_DELETE, KEYBINDING_CATEGORY);
+        KB_FULLSCREEN_EDIT_WAYPOINT = new KeyBinding("key.journeymap.fullscreen_edit_waypoint", Keyboard.KEY_E, KEYBINDING_CATEGORY);
+        return Arrays.asList(KB_MAP,
+                KB_MAP_ZOOMIN,
+                KB_MAP_ZOOMOUT,
+                KB_MAP_SWITCH_TYPE,
+                KB_MINIMAP_PRESET,
+                KB_WAYPOINT,
+                KB_FULLSCREEN_TELEPORT,
+                KB_FULLSCREEN_TOGGLE_WAYPOINT,
+                KB_FULLSCREEN_DELETE_WAYPOINT,
+                KB_FULLSCREEN_EDIT_WAYPOINT);
     }
 
     /**
