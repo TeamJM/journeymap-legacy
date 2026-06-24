@@ -89,6 +89,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
                 mc.mcProfiler.startSection("mainTasks");
                 JourneymapClient.getInstance().performMainThreadTasks();
                 removeArrivedTemporaryWaypoints();
+                removeArrivedDeathpoints();
                 counter = 0;
                 mc.mcProfiler.endSection();
             }
@@ -134,6 +135,10 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             if (doCreate)
             {
                 Waypoint deathpoint = Waypoint.at(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ), Waypoint.Type.Death, ForgeHelper.INSTANCE.getPlayerDimension());
+                if (waypointProperties.keepOnlyLatestDeathpoint.get())
+                {
+                    removePreviousDeathpoints(deathpoint);
+                }
                 WaypointStore.instance().save(deathpoint);
             }
 
@@ -144,9 +149,21 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
                     MathHelper.floor_double(player.posZ), doCreate);
 
         }
+
         catch (Throwable t)
         {
             Journeymap.getLogger().error("Unexpected Error in createDeathpoint(): {}", LogFormatter.toString(t));
+        }
+    }
+
+    private void removePreviousDeathpoints(Waypoint latestDeathpoint)
+    {
+        for (Waypoint waypoint : new ArrayList<Waypoint>(WaypointStore.instance().getAll()))
+        {
+            if (waypoint.isDeathPoint() && !waypoint.getId().equals(latestDeathpoint.getId()))
+            {
+                WaypointStore.instance().remove(waypoint);
+            }
         }
     }
 
@@ -159,10 +176,27 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         }
 
         WaypointProperties properties = JourneymapClient.getWaypointProperties();
+        removeArrivedWaypoints(properties, player, false);
+    }
+
+    private void removeArrivedDeathpoints()
+    {
+        EntityPlayer player = mc.thePlayer;
+        WaypointProperties properties = JourneymapClient.getWaypointProperties();
+        if (player == null || player.isDead || !properties.deleteDeathpointOnArrival.get())
+        {
+            return;
+        }
+
+        removeArrivedWaypoints(properties, player, true);
+    }
+
+    private void removeArrivedWaypoints(WaypointProperties properties, EntityPlayer player, boolean deathpoint)
+    {
         List<Waypoint> pendingRemovals = null;
         for (Waypoint waypoint : WaypointStore.instance().getAll())
         {
-            if (waypoint.isTemporary() && shouldRemoveOnArrival(waypoint, properties, player))
+            if (isArrivedRemovalTarget(waypoint, deathpoint) && shouldRemoveOnArrival(waypoint, properties, player))
             {
                 if (pendingRemovals == null)
                 {
@@ -179,6 +213,15 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
                 WaypointStore.instance().remove(waypoint);
             }
         }
+    }
+
+    private boolean isArrivedRemovalTarget(Waypoint waypoint, boolean deathpoint)
+    {
+        if (deathpoint)
+        {
+            return waypoint.isDeathPoint();
+        }
+        return waypoint.isTemporary();
     }
 
     private boolean shouldRemoveOnArrival(Waypoint waypoint, WaypointProperties properties, EntityPlayer player)
