@@ -18,6 +18,7 @@ import journeymap.client.ui.fullscreen.Fullscreen;
 import journeymap.client.ui.minimap.MiniMap;
 import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.Toolkit;
@@ -102,11 +103,11 @@ public class JourneyMapFullscreenContextMenuProvider implements FullscreenContex
     public boolean keyTyped(FullscreenContextMenuContext context, int keyCode)
     {
         boolean controlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
-        if (!controlDown && keyCode == Constants.KB_WAYPOINT.getKeyCode())
+        if (!controlDown && matchesKey(Constants.KB_WAYPOINT, keyCode))
         {
             return onMenuItemClicked(context, CREATE_WAYPOINT);
         }
-        if (controlDown && keyCode == Constants.KB_WAYPOINT.getKeyCode())
+        if (controlDown && matchesKey(Constants.KB_WAYPOINT, keyCode))
         {
             return onMenuItemClicked(context, OPEN_WAYPOINT_MANAGER);
         }
@@ -114,19 +115,28 @@ public class JourneyMapFullscreenContextMenuProvider implements FullscreenContex
         {
             return onMenuItemClicked(context, OPEN_SETTINGS);
         }
-        if (context.hasWaypoint() && keyCode == Keyboard.KEY_E)
+        if (context.hasWaypoint() && matchesKey(Constants.KB_FULLSCREEN_EDIT_WAYPOINT, keyCode))
         {
             return onMenuItemClicked(context, EDIT_WAYPOINT);
         }
-        if (context.hasWaypoint() && keyCode == Keyboard.KEY_DELETE)
+        if (context.hasWaypoint() && matchesKey(Constants.KB_FULLSCREEN_TOGGLE_WAYPOINT, keyCode))
+        {
+            return onMenuItemClicked(context, TOGGLE_WAYPOINT);
+        }
+        if (context.hasWaypoint() && matchesKey(Constants.KB_FULLSCREEN_DELETE_WAYPOINT, keyCode))
         {
             return onMenuItemClicked(context, DELETE_WAYPOINT);
         }
-        if (!context.hasWaypoint() && keyCode == Keyboard.KEY_T)
+        if (!context.hasWaypoint() && matchesKey(Constants.KB_FULLSCREEN_TELEPORT, keyCode))
         {
             return onMenuItemClicked(context, TELEPORT_HERE);
         }
         return false;
+    }
+
+    private boolean matchesKey(KeyBinding keyBinding, int keyCode)
+    {
+        return keyBinding != null && keyBinding.getKeyCode() != 0 && keyCode == keyBinding.getKeyCode();
     }
 
     private List<FullscreenContextMenuEntry> getLocationItems(FullscreenContextMenuContext context)
@@ -139,7 +149,7 @@ public class JourneyMapFullscreenContextMenuProvider implements FullscreenContex
         items.add(FullscreenContextMenuEntry.action(CREATE_WAYPOINT, Constants.getString("jm.fullscreen.context.create_waypoint"))
                 .withShortcut(Constants.getKeyName(Constants.KB_WAYPOINT)).withOrder(400));
         items.add(FullscreenContextMenuEntry.action(TELEPORT_HERE, Constants.getString("jm.fullscreen.context.teleport_here"))
-                .withShortcut(Keyboard.getKeyName(Keyboard.KEY_T)).withOrder(600));
+                .withShortcut(Constants.getKeyName(Constants.KB_FULLSCREEN_TELEPORT)).withOrder(600));
         items.add(FullscreenContextMenuEntry.action(OPEN_WAYPOINT_MANAGER, Constants.getString("jm.fullscreen.context.open_waypoint_manager"))
                 .withShortcut("Ctrl+" + Constants.getKeyName(Constants.KB_WAYPOINT)).withOrder(800));
         items.add(FullscreenContextMenuEntry.action(OPEN_SETTINGS, Constants.getString("jm.fullscreen.context.open_settings"))
@@ -155,13 +165,14 @@ public class JourneyMapFullscreenContextMenuProvider implements FullscreenContex
                 .withBackgroundColor(waypoint.getColor()).withOrder(100));
         items.add(FullscreenContextMenuEntry.info(formatCoordinates(waypoint.getX(), waypoint.getY(), waypoint.getZ())).withOrder(200));
         items.add(FullscreenContextMenuEntry.action(EDIT_WAYPOINT, Constants.getString("jm.waypoint.edit"))
-                .withShortcut(Keyboard.getKeyName(Keyboard.KEY_E)).withOrder(300));
+                .withShortcut(Constants.getKeyName(Constants.KB_FULLSCREEN_EDIT_WAYPOINT)).withOrder(300));
         items.add(FullscreenContextMenuEntry.action(COPY_COORDINATES, Constants.getString("jm.fullscreen.context.copy_coordinates")).withOrder(400));
         items.add(FullscreenContextMenuEntry.action(CREATE_WAYPOINT, Constants.getString("jm.fullscreen.context.create_waypoint"))
                 .withShortcut(Constants.getKeyName(Constants.KB_WAYPOINT)).withOrder(500));
-        items.add(FullscreenContextMenuEntry.action(TOGGLE_WAYPOINT, getToggleLabel(waypoint)).withOrder(700));
+        items.add(FullscreenContextMenuEntry.action(TOGGLE_WAYPOINT, getToggleLabel(waypoint))
+                .withShortcut(Constants.getKeyName(Constants.KB_FULLSCREEN_TOGGLE_WAYPOINT)).withOrder(700));
         items.add(FullscreenContextMenuEntry.action(DELETE_WAYPOINT, Constants.getString("jm.fullscreen.context.delete_waypoint"))
-                .withShortcut(Keyboard.getKeyName(Keyboard.KEY_DELETE)).withOrder(800));
+                .withShortcut(Constants.getKeyName(Constants.KB_FULLSCREEN_DELETE_WAYPOINT)).withOrder(800));
         return items;
     }
 
