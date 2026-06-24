@@ -28,6 +28,7 @@ import journeymap.client.render.draw.WaypointDrawStepFactory;
 import journeymap.client.render.map.GridRenderer;
 import journeymap.client.render.map.Tile;
 import journeymap.client.render.texture.TextureCache;
+import journeymap.client.render.texture.TextureImpl;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.component.Button;
 import journeymap.client.ui.component.ButtonList;
@@ -41,6 +42,7 @@ import journeymap.client.ui.theme.Theme;
 import journeymap.client.ui.theme.ThemeButton;
 import journeymap.client.ui.theme.ThemeToggle;
 import journeymap.client.ui.theme.ThemeToolbar;
+import journeymap.client.ui.util.SmoothDoubleState;
 import journeymap.common.Journeymap;
 import journeymap.common.version.VersionCheck;
 import net.minecraft.client.Minecraft;
@@ -54,6 +56,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.geom.Point2D;
 import java.util.Arrays;
@@ -72,6 +75,7 @@ public class Fullscreen extends JmUI
     final RadarDrawStepFactory radarRenderer = new RadarDrawStepFactory();
     final LayerDelegate layerDelegate = new LayerDelegate();
     FullMapProperties fullMapProperties = JourneymapClient.getFullMapProperties();
+    private TextureImpl playerLocatorTex;
     boolean firstLayoutPass = true;
     boolean hideOptionsToolbar = false;
     Boolean isScrolling = false;
@@ -92,6 +96,7 @@ public class Fullscreen extends JmUI
     StatTimer drawMapTimer = StatTimer.get("Fullscreen.drawScreen.drawMap", 50);
     StatTimer drawMapTimerWithRefresh = StatTimer.get("Fullscreen.drawMap+refreshState", 5);
     LocationFormat locationFormat = new LocationFormat();
+    private SmoothDoubleState visualZoomLevel = new SmoothDoubleState();
 
     /**
      * Default constructor
@@ -105,6 +110,8 @@ public class Fullscreen extends JmUI
         boolean showCaves = state.isCaveMappingAllowed() && fullMapProperties.showCaves.get();
         gridRenderer.setContext(state.getWorldDir(), state.getMapType(showCaves));
         gridRenderer.setZoom(fullMapProperties.zoomLevel.get());
+        visualZoomLevel.snapTo(fullMapProperties.zoomLevel.get());
+        playerLocatorTex = TextureCache.instance().getPlayerLocatorSmall();
     }
 
     public static synchronized MapState state()
@@ -117,6 +124,9 @@ public class Fullscreen extends JmUI
         state.requireRefresh();
         gridRenderer.clear();
         buttonList.clear();
+        visualZoomLevel.clear();
+        visualZoomLevel.snapTo(fullMapProperties.zoomLevel.get());
+        playerLocatorTex = TextureCache.instance().getPlayerLocatorSmall();
     }
 
     @Override
@@ -191,6 +201,7 @@ public class Fullscreen extends JmUI
             }
 
         }
+
         catch (Throwable e)
         {
             logger.error("Unexpected exception in jm.fullscreen.drawScreen(): {}", LogFormatter.toString(e));
@@ -569,7 +580,6 @@ public class Fullscreen extends JmUI
     {
         if (hideOptionsToolbar)
         {
-
             int toolbarsWidth = mapTypeToolbar.getWidth() + optionsToolbar.getWidth() + margin + padding;
             int startX = (width - toolbarsWidth) / 2;
 
@@ -579,6 +589,7 @@ public class Fullscreen extends JmUI
             menuToolbar.layoutCenteredVertical(width - menuToolbar.getWidth(), height / 2, true, padding);
 
         }
+
         else
         {
             optionsToolbar.layoutCenteredHorizontal((width / 2), topY, true, padding);
@@ -597,9 +608,7 @@ public class Fullscreen extends JmUI
             //return;
         }
 
-        // Scale mouse position to Gui Scale coords
-        mx = (Mouse.getEventX() * width) / mc.displayWidth;
-        my = height - (Mouse.getEventY() * height) / mc.displayHeight - 1;
+        updateMousePosition();
 
         if (Mouse.getEventButtonState())
         {
@@ -633,6 +642,7 @@ public class Fullscreen extends JmUI
         {
             chat.mouseClicked(mouseX, mouseY, mouseButton);
         }
+
 
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
@@ -746,6 +756,7 @@ public class Fullscreen extends JmUI
             chat.keyTyped(c, i);
             return;
         }
+
 
         if (i == Keyboard.KEY_O)
         {
@@ -878,12 +889,15 @@ public class Fullscreen extends JmUI
         {
             sizeDisplay(false);
 
+            int zoomLevel = fullMapProperties.zoomLevel.get();
+            double renderZoomScale = visualZoomLevel.getScale(zoomLevel, fullMapProperties.smoothZoom.get());
+
             int xOffset = 0;
             int yOffset = 0;
 
             if (isScrolling)
             {
-                int blockSize = (int) Math.pow(2, fullMapProperties.zoomLevel.get());
+                int blockSize = (int) Math.pow(2, zoomLevel);
 
                 int mouseDragX = (mx - msx) * Math.max(1, scaleFactor) / blockSize;
                 int mouseDragY = (my - msy) * Math.max(1, scaleFactor) / blockSize;
@@ -892,6 +906,7 @@ public class Fullscreen extends JmUI
                 yOffset = (mouseDragY * blockSize);
 
             }
+
             else
             {
                 if (refreshReady)
@@ -908,27 +923,51 @@ public class Fullscreen extends JmUI
             gridRenderer.clearGlErrors(false);
 
             gridRenderer.updateRotation(0);
+            gridRenderer.setVisualScale(renderZoomScale);
             float drawScale = fullMapProperties.textureSmall.get() ? 1f : 2f;
 
             if (state.follow.get())
             {
-                gridRenderer.center(state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, fullMapProperties.zoomLevel.get());
+                gridRenderer.center(state.getCurrentMapType(), mc.thePlayer.posX, mc.thePlayer.posZ, zoomLevel);
             }
             gridRenderer.updateTiles(state.getCurrentMapType(), state.getZoom(), state.isHighQuality(), mc.displayWidth, mc.displayHeight, false, 0, 0);
-            gridRenderer.draw(1f, xOffset, yOffset, fullMapProperties.showGrid.get());
-            gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
-            gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
-
-            if (fullMapProperties.showSelf.get())
+            boolean scaleMap = renderZoomScale != 1D;
+            if (scaleMap)
             {
-                Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
-                if (playerPixel != null)
+                GL11.glPushMatrix();
+            }
+            try
+            {
+                if (scaleMap)
                 {
-                    DrawUtil.drawEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, mc.thePlayer.rotationYawHead, false, TextureCache.instance().getPlayerLocatorSmall(), drawScale, 0);
+                    applyMapZoomScale(renderZoomScale);
+                }
+                gridRenderer.updateRotation(0);
+                gridRenderer.draw(1f, xOffset, yOffset, fullMapProperties.showGrid.get());
+                gridRenderer.draw(state.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
+                gridRenderer.draw(state.getDrawWaypointSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
+
+                if (fullMapProperties.showSelf.get())
+                {
+                    Point2D playerPixel = gridRenderer.getPixel(mc.thePlayer.posX, mc.thePlayer.posZ);
+                    if (playerPixel != null && playerLocatorTex != null)
+                    {
+                        DrawUtil.drawEntity(playerPixel.getX() + xOffset, playerPixel.getY() + yOffset, mc.thePlayer.rotationYawHead, false, playerLocatorTex, drawScale, 0);
+                    }
+                }
+
+                gridRenderer.draw(layerDelegate.getMapDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
+            }
+            finally
+            {
+                if (scaleMap)
+                {
+                    GL11.glPopMatrix();
                 }
             }
 
-            gridRenderer.draw(layerDelegate.getDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
+            // Draw fixed HUD overlays after the map matrix has been restored.
+            gridRenderer.draw(layerDelegate.getScreenDrawSteps(), xOffset, yOffset, drawScale, getMapFontScale(), 0);
 
             DrawUtil.drawLabel(state.playerLastPos, mc.displayWidth / 2, mc.displayHeight, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above,
                     statusBackgroundColor, statusBackgroundAlpha, statusForegroundColor, statusForegroundAlpha, getMapFontScale(), true);
@@ -956,6 +995,19 @@ public class Fullscreen extends JmUI
         return (fullMapProperties.fontScale.get());
     }
 
+    private void applyMapZoomScale(double scale)
+    {
+        if (scale == 1D)
+        {
+            return;
+        }
+        double centerX = mc.displayWidth / 2D;
+        double centerY = mc.displayHeight / 2D;
+        GL11.glTranslated(centerX, centerY, 0);
+        GL11.glScaled(scale, scale, 1D);
+        GL11.glTranslated(-centerX, -centerY, 0);
+    }
+
     public void centerOn(Waypoint waypoint)
     {
         if (waypoint.getDimensions().contains(mc.thePlayer.dimension))
@@ -970,6 +1022,7 @@ public class Fullscreen extends JmUI
             updateScreen();
         }
     }
+
 
     /**
      * Get a snapshot of the player's biome, effective map state, etc.
