@@ -1,4 +1,4 @@
-﻿package journeymap.client.api.fullscreen.context;
+package journeymap.client.api.fullscreen.context;
 
 import java.util.Collections;
 import java.util.List;

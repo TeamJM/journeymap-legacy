@@ -1,4 +1,4 @@
-﻿package journeymap.client.api.fullscreen.context;
+package journeymap.client.api.fullscreen.context;
 
 import journeymap.client.model.Waypoint;
 

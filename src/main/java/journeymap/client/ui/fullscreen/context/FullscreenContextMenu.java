@@ -13,6 +13,7 @@ import journeymap.client.cartography.RGB;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.render.draw.DrawUtil;
+import journeymap.client.ui.component.JmUI;
 import journeymap.common.Journeymap;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderHelper;
@@ -41,6 +42,7 @@ public class FullscreenContextMenu
     private static final int TEXT_SHORTCUT = 0x8CE86D;
 
     private final Logger logger = Journeymap.getLogger();
+    private final JourneyMapFullscreenContextMenuProvider defaultProvider;
     private final FullscreenContextMenuContext context;
     private final List<MenuItem> items = new ArrayList<MenuItem>();
     private int x;
@@ -49,9 +51,10 @@ public class FullscreenContextMenu
     private int height;
     private int rowHeight;
 
-    public FullscreenContextMenu(FullscreenContextMenuContext context, int mouseX, int mouseY, int screenWidth, int screenHeight)
+    public FullscreenContextMenu(FullscreenContextMenuContext context, JmUI returnDisplay, int mouseX, int mouseY, int screenWidth, int screenHeight)
     {
         this.context = context;
+        this.defaultProvider = new JourneyMapFullscreenContextMenuProvider(returnDisplay);
         collectItems();
         layout(mouseX, mouseY, screenWidth, screenHeight);
     }
@@ -139,11 +142,17 @@ public class FullscreenContextMenu
         return true;
     }
 
+    public boolean keyTyped(char c, int keyCode)
+    {
+        return defaultProvider.keyTyped(context, keyCode);
+    }
+
     /**
      * Providers are isolated so a bad integration cannot break the fullscreen map UI.
      */
     private void collectItems()
     {
+        addProviderItems(defaultProvider);
         List<FullscreenContextMenuProvider> providers = FullscreenContextMenuRegistry.getInstance().getProviders();
         for (FullscreenContextMenuProvider provider : providers)
         {

@@ -740,7 +740,7 @@ public class Fullscreen extends JmUI
     private boolean openContextMenu(BlockCoordIntPair blockCoord, int mouseX, int mouseY)
     {
         FullscreenContextMenuContext context = createContextMenuContext(blockCoord);
-        FullscreenContextMenu menu = new FullscreenContextMenu(context, mouseX, mouseY, width, height);
+        FullscreenContextMenu menu = new FullscreenContextMenu(context, this, mouseX, mouseY, width, height);
         if (menu.isEmpty())
         {
             return false;
@@ -841,10 +841,13 @@ public class Fullscreen extends JmUI
             return;
         }
 
-        if (contextMenu != null && i == Keyboard.KEY_ESCAPE)
+        if (contextMenu != null)
         {
-            contextMenu = null;
-            return;
+            if (i == Keyboard.KEY_ESCAPE || contextMenu.keyTyped(c, i))
+            {
+                contextMenu = null;
+                return;
+            }
         }
 
         if (i == Keyboard.KEY_ESCAPE || Constants.isPressed(Constants.KB_MAP))

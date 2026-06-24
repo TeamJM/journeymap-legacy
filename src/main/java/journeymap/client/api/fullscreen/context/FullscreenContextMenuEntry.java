@@ -1,4 +1,4 @@
-﻿package journeymap.client.api.fullscreen.context;
+package journeymap.client.api.fullscreen.context;
 
 /**
  * Describes one entry in the fullscreen map context menu.
