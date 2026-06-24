@@ -155,6 +155,22 @@ public class MapState
         }
         else if (currentMapType.isNight())
         {
+            if (!ForgeHelper.INSTANCE.hasNoSky(playerEntity))
+            {
+                setMapType(MapType.topo(player));
+            }
+            else if (underground && caveMappingAllowed)
+            {
+                lastMapProperties.showCaves.set(true);
+                setMapType(MapType.underground(player));
+            }
+            else
+            {
+                setMapType(MapType.day(player));
+            }
+        }
+        else if (currentMapType.isTopo())
+        {
             if (underground && caveMappingAllowed)
             {
                 lastMapProperties.showCaves.set(true);

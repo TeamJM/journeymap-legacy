@@ -10,6 +10,7 @@ import journeymap.client.cartography.render.CaveRenderer;
 import journeymap.client.cartography.render.EndRenderer;
 import journeymap.client.cartography.render.NetherRenderer;
 import journeymap.client.cartography.render.SurfaceRenderer;
+import journeymap.client.cartography.render.TopoRenderer;
 import journeymap.client.io.RegionImageHandler;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.*;
@@ -29,9 +30,11 @@ public class ChunkRenderController
     private final IChunkRenderer endRenderer;
     private final SurfaceRenderer overWorldSurfaceRenderer;
     private final IChunkRenderer overWorldCaveRenderer;
+    private final TopoRenderer overWorldTopoRenderer;
     private final BufferedImage reusableBuffer1;
     private final BufferedImage reusableBuffer2;
     private final BufferedImage reusableBuffer3;
+    private final BufferedImage reusableBuffer4;
 
     public ChunkRenderController()
     {
@@ -41,9 +44,11 @@ public class ChunkRenderController
         overWorldSurfaceRenderer = surfaceRenderer;
         overWorldCaveRenderer = new CaveRenderer(surfaceRenderer);
         //standardRenderer = new ChunkTopoRenderer();
+        overWorldTopoRenderer = new TopoRenderer();
         reusableBuffer1 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
         reusableBuffer2 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
         reusableBuffer3 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        reusableBuffer4 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
     }
 
     public boolean renderChunk(RegionCoord rCoord, MapType mapType, ChunkMD chunkMd)
@@ -56,6 +61,7 @@ public class ChunkRenderController
         ChunkPainter undergroundG2D = null;
         ChunkPainter dayG2D = null;
         ChunkPainter nightG2D = null;
+        ChunkPainter topoG2D = null;
         boolean renderOkay = false;
 
         try
@@ -91,6 +97,20 @@ public class ChunkRenderController
                     }
                 }
             }
+            else if (mapType.isTopo())
+            {
+                MapType topoMapType = MapType.topo(rCoord.dimension);
+                BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, topoMapType);
+                if (imageTopo != null)
+                {
+                    topoG2D = new ChunkPainter(reusableBuffer4, RegionImageHandler.initRenderingHints(imageTopo.createGraphics()));
+                    renderOkay = overWorldTopoRenderer.render(topoG2D, chunkMd, null);
+                    if (renderOkay)
+                    {
+                        regionImageSet.setChunkImage(chunkMd, topoMapType, imageTopo);
+                    }
+                }
+            }
             else
             {
                 BufferedImage imageDay = regionImageSet.getChunkImage(chunkMd, MapType.day(rCoord.dimension));
@@ -112,6 +132,17 @@ public class ChunkRenderController
                 {
                     regionImageSet.setChunkImage(chunkMd, MapType.day(rCoord.dimension), imageDay);
                     regionImageSet.setChunkImage(chunkMd, MapType.night(rCoord.dimension), imageNight);
+
+                    MapType topoMapType = MapType.topo(rCoord.dimension);
+                    BufferedImage imageTopo = regionImageSet.getChunkImage(chunkMd, topoMapType);
+                    if (imageTopo != null)
+                    {
+                        topoG2D = new ChunkPainter(reusableBuffer4, RegionImageHandler.initRenderingHints(imageTopo.createGraphics()));
+                        if (overWorldTopoRenderer.render(topoG2D, chunkMd, null))
+                        {
+                            regionImageSet.setChunkImage(chunkMd, topoMapType, imageTopo);
+                        }
+                    }
                 }
             }
 
@@ -142,6 +173,10 @@ public class ChunkRenderController
             if (undergroundG2D != null)
             {
                 undergroundG2D.finishPainting();
+            }
+            if (topoG2D != null)
+            {
+                topoG2D.finishPainting();
             }
         }
 

@@ -24,7 +24,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.MathHelper;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
 // 1.8
 //import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -86,6 +88,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             {
                 mc.mcProfiler.startSection("mainTasks");
                 JourneymapClient.getInstance().performMainThreadTasks();
+                removeArrivedDeathpoints();
                 counter = 0;
                 mc.mcProfiler.endSection();
             }
@@ -131,6 +134,10 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             if (doCreate)
             {
                 Waypoint deathpoint = Waypoint.at(MathHelper.floor_double(player.posX), MathHelper.floor_double(player.posY), MathHelper.floor_double(player.posZ), Waypoint.Type.Death, ForgeHelper.INSTANCE.getPlayerDimension());
+                if (waypointProperties.keepOnlyLatestDeathpoint.get())
+                {
+                    removePreviousDeathpoints(deathpoint);
+                }
                 WaypointStore.instance().save(deathpoint);
             }
 
@@ -141,10 +148,72 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
                     MathHelper.floor_double(player.posZ), doCreate);
 
         }
+
         catch (Throwable t)
         {
             Journeymap.getLogger().error("Unexpected Error in createDeathpoint(): {}", LogFormatter.toString(t));
         }
+    }
+
+    private void removePreviousDeathpoints(Waypoint latestDeathpoint)
+    {
+        for (Waypoint waypoint : new ArrayList<Waypoint>(WaypointStore.instance().getAll()))
+        {
+            if (waypoint.isDeathPoint() && !waypoint.getId().equals(latestDeathpoint.getId()))
+            {
+                WaypointStore.instance().remove(waypoint);
+            }
+        }
+    }
+
+    private void removeArrivedDeathpoints()
+    {
+        EntityPlayer player = mc.thePlayer;
+        WaypointProperties properties = JourneymapClient.getWaypointProperties();
+        if (player == null || player.isDead || !properties.deleteDeathpointOnArrival.get())
+        {
+            return;
+        }
+
+        List<Waypoint> pendingRemovals = null;
+        for (Waypoint waypoint : WaypointStore.instance().getAll())
+        {
+            if (waypoint.isDeathPoint() && shouldRemoveOnArrival(waypoint, properties, player))
+            {
+                if (pendingRemovals == null)
+                {
+                    pendingRemovals = new ArrayList<Waypoint>();
+                }
+                pendingRemovals.add(waypoint);
+            }
+        }
+
+        if (pendingRemovals != null)
+        {
+            for (Waypoint waypoint : pendingRemovals)
+            {
+                WaypointStore.instance().remove(waypoint);
+            }
+        }
+    }
+
+    private boolean shouldRemoveOnArrival(Waypoint waypoint, WaypointProperties properties, EntityPlayer player)
+    {
+        // Negative Y is used for map-selected waypoints where the actual height is unknown.
+        if (waypoint.getY() < 0)
+        {
+            return false;
+        }
+        int horizontalRange = properties.arrivalHorizontalRange.get();
+        int verticalRange = properties.arrivalVerticalRange.get();
+        int playerX = MathHelper.floor_double(player.posX);
+        int playerY = MathHelper.floor_double(player.posY);
+        int playerZ = MathHelper.floor_double(player.posZ);
+        int dx = playerX - waypoint.getX();
+        int dz = playerZ - waypoint.getZ();
+        int dy = Math.abs(playerY - waypoint.getY());
+        int horizontalDistanceSquared = dx * dx + dz * dz;
+        return horizontalDistanceSquared <= horizontalRange * horizontalRange && dy <= verticalRange;
     }
 
     private void checkJava()
