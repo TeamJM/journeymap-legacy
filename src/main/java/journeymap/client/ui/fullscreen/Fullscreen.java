@@ -1039,6 +1039,12 @@ public class Fullscreen extends JmUI
         GL11.glTranslated(-centerX, -centerY, 0);
     }
 
+    private void updateMousePosition()
+    {
+        mx = (Mouse.getX() * width) / mc.displayWidth;
+        my = height - (Mouse.getY() * height) / mc.displayHeight - 1;
+    }
+
     public void centerOn(Waypoint waypoint)
     {
         if (waypoint.getDimensions().contains(mc.thePlayer.dimension))
