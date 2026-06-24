@@ -54,6 +54,9 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
     @Config(category = Inherit, key = "jm.common.entity_blur")
     public final AtomicBoolean entityBlur = new AtomicBoolean(true);
 
+    @Config(category = Inherit, key = "jm.common.smooth_zoom", defaultBoolean = true)
+    public final AtomicBoolean smoothZoom = new AtomicBoolean(true);
+
     public final AtomicInteger zoomLevel = new AtomicInteger(0);
 
     protected MapProperties()
@@ -93,6 +96,7 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
         result = 31 * result + getEntityIconSetName().hashCode();
         result = 31 * result + entityScale.hashCode();
         result = 31 * result + entityBlur.hashCode();
+        result = 31 * result + smoothZoom.hashCode();
         return result;
     }
 
@@ -115,7 +119,8 @@ public abstract class MapProperties extends PropertiesBase implements Comparable
                 .add("showWaypoints", showWaypoints)
                 .add("zoomLevel", zoomLevel)
                 .add("entityScale", entityScale)
-                .add("entityBlur", entityBlur);
+                .add("entityBlur", entityBlur)
+                .add("smoothZoom", smoothZoom);
     }
 
 
