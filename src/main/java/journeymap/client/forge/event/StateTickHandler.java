@@ -88,6 +88,7 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             {
                 mc.mcProfiler.startSection("mainTasks");
                 JourneymapClient.getInstance().performMainThreadTasks();
+                removeArrivedTemporaryWaypoints();
                 removeArrivedDeathpoints();
                 counter = 0;
                 mc.mcProfiler.endSection();
@@ -166,6 +167,18 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
         }
     }
 
+    private void removeArrivedTemporaryWaypoints()
+    {
+        EntityPlayer player = mc.thePlayer;
+        if (player == null || player.isDead)
+        {
+            return;
+        }
+
+        WaypointProperties properties = JourneymapClient.getWaypointProperties();
+        removeArrivedWaypoints(properties, player, false);
+    }
+
     private void removeArrivedDeathpoints()
     {
         EntityPlayer player = mc.thePlayer;
@@ -175,10 +188,15 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             return;
         }
 
+        removeArrivedWaypoints(properties, player, true);
+    }
+
+    private void removeArrivedWaypoints(WaypointProperties properties, EntityPlayer player, boolean deathpoint)
+    {
         List<Waypoint> pendingRemovals = null;
         for (Waypoint waypoint : WaypointStore.instance().getAll())
         {
-            if (waypoint.isDeathPoint() && shouldRemoveOnArrival(waypoint, properties, player))
+            if (isArrivedRemovalTarget(waypoint, deathpoint) && shouldRemoveOnArrival(waypoint, properties, player))
             {
                 if (pendingRemovals == null)
                 {
@@ -195,6 +213,15 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
                 WaypointStore.instance().remove(waypoint);
             }
         }
+    }
+
+    private boolean isArrivedRemovalTarget(Waypoint waypoint, boolean deathpoint)
+    {
+        if (deathpoint)
+        {
+            return waypoint.isDeathPoint();
+        }
+        return waypoint.isTemporary();
     }
 
     private boolean shouldRemoveOnArrival(Waypoint waypoint, WaypointProperties properties, EntityPlayer player)
