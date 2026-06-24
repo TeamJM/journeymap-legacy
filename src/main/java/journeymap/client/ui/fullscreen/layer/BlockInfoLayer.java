@@ -100,7 +100,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
         return Collections.EMPTY_LIST;
     }
 
-    class BlockInfoStep implements DrawStep
+    private class BlockInfoStep implements ScreenLayerDrawStep
     {
 
         Integer bgColor = RGB.DARK_GRAY_RGB;
@@ -131,6 +131,7 @@ public class BlockInfoLayer implements LayerDelegate.Layer
             }
             if (alpha > 10 && text != null)
             {
+                // This is a HUD label, so it uses fixed screen coordinates instead of map coordinates.
                 DrawUtil.drawLabel(text, x, y, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, bgColor, Math.max(0, alpha), fgColor, Math.max(0, alpha), getMapFontScale(), fontShadow);
             }
 

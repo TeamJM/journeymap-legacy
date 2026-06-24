@@ -21,22 +21,26 @@ public class LayerDelegate
 {
 
     private List<DrawStep> drawSteps = new ArrayList<DrawStep>();
+    private List<DrawStep> mapDrawSteps = new ArrayList<DrawStep>();
+    private List<DrawStep> screenDrawSteps = new ArrayList<DrawStep>();
     private List<Layer> layers = new ArrayList<Layer>();
+    private WaypointLayer waypointLayer;
 
     public LayerDelegate()
     {
         layers.add(new BlockInfoLayer());
-        layers.add(new WaypointLayer());
+        waypointLayer = new WaypointLayer();
+        layers.add(waypointLayer);
     }
 
     public void onMouseMove(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord)
     {
-        drawSteps.clear();
+        clearDrawSteps();
         for (Layer layer : layers)
         {
             try
             {
-                drawSteps.addAll(layer.onMouseMove(mc, mouseX, mouseY, gridWidth, gridHeight, blockCoord));
+                addDrawSteps(layer.onMouseMove(mc, mouseX, mouseY, gridWidth, gridHeight, blockCoord));
             }
             catch (Exception e)
             {
@@ -47,12 +51,12 @@ public class LayerDelegate
 
     public void onMouseClicked(Minecraft mc, double mouseX, double mouseY, int gridWidth, int gridHeight, BlockCoordIntPair blockCoord, int mouseButton)
     {
-        drawSteps.clear();
+        clearDrawSteps();
         for (Layer layer : layers)
         {
             try
             {
-                drawSteps.addAll(layer.onMouseClick(mc, mouseX, mouseY, gridWidth, gridHeight, blockCoord));
+                addDrawSteps(layer.onMouseClick(mc, mouseX, mouseY, gridWidth, gridHeight, blockCoord));
             }
             catch (Exception e)
             {
@@ -61,10 +65,45 @@ public class LayerDelegate
         }
     }
 
+    private void clearDrawSteps()
+    {
+        drawSteps.clear();
+        mapDrawSteps.clear();
+        screenDrawSteps.clear();
+    }
+
+    private void addDrawSteps(List<DrawStep> steps)
+    {
+        for (DrawStep drawStep : steps)
+        {
+            drawSteps.add(drawStep);
+            // Map steps inherit pan/zoom transforms; screen steps stay aligned to the GUI.
+            if (drawStep instanceof ScreenLayerDrawStep)
+            {
+                screenDrawSteps.add(drawStep);
+            }
+            else
+            {
+                mapDrawSteps.add(drawStep);
+            }
+        }
+    }
+
     public List<DrawStep> getDrawSteps()
     {
         return drawSteps;
     }
+
+    public List<DrawStep> getMapDrawSteps()
+    {
+        return mapDrawSteps;
+    }
+
+    public List<DrawStep> getScreenDrawSteps()
+    {
+        return screenDrawSteps;
+    }
+
 
     public interface Layer
     {
