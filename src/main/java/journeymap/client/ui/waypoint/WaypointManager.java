@@ -19,6 +19,7 @@ import journeymap.client.ui.option.SlotMetadata;
 import journeymap.client.waypoint.WaypointStore;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
@@ -56,6 +57,8 @@ public class WaypointManager extends JmUI
     private ButtonList bottomButtonsMainList;
     private ButtonList bottomButtonsConfirmList;
     private Waypoint focusWaypoint;
+    private GuiTextField searchBox;
+    private String searchQuery = "";
     private ArrayList<WaypointManagerItem> items = new ArrayList<WaypointManagerItem>();
 
     public WaypointManager()
@@ -105,6 +108,13 @@ public class WaypointManager extends JmUI
             {
                 buttonRemoveAllWaypoints = new Button(Constants.getString("jm.common.remove_all"));
                 buttonRemoveAllWaypoints.fitWidth(getFontRenderer());
+            }
+
+            Keyboard.enableRepeatEvents(true);
+            if (searchBox == null)
+            {
+                searchBox = new GuiTextField(getFontRenderer(), 0, 0, 140, 14);
+                searchBox.setFocused(false);
             }
 
             buttonClose = new Button(Constants.getString("jm.common.close"));
@@ -272,6 +282,28 @@ public class WaypointManager extends JmUI
 
             super.drawScreen(x, y, par3);
 
+            // search bar
+            if (searchBox != null)
+            {
+                // should keeps the searchbox inline with the margins of the ui
+                int rightGap = 10;
+                int rightEdge = width - getMargin() - rightGap;
+
+                int boxWidth = 120;
+                int minWidth = 80;
+
+                if (rightEdge - boxWidth < 0)
+                {
+                    boxWidth = Math.max(minWidth, rightEdge);
+                }
+
+                searchBox.width = boxWidth;
+                searchBox.xPosition = rightEdge - boxWidth;
+                searchBox.yPosition = headerHeight - 18;
+
+                searchBox.drawTextBox();
+            }
+
             // Header buttons
 
             if (!items.isEmpty())
@@ -328,6 +360,12 @@ public class WaypointManager extends JmUI
     protected void mouseClicked(int mouseX, int mouseY, int mouseEvent)
     {
         super.mouseClicked(mouseX, mouseY, mouseEvent);
+
+        if (searchBox != null)
+        {
+            searchBox.mouseClicked(mouseX, mouseY, mouseEvent);
+        }
+
         boolean pressed = itemScrollPane.mousePressed(mouseX, mouseY, mouseEvent);
         if (pressed)
         {
@@ -473,6 +511,27 @@ public class WaypointManager extends JmUI
             }
         }
 
+        if (searchBox != null && searchBox.isFocused())
+        {
+            searchBox.textboxKeyTyped(c, i);
+            String newQuery = searchBox.getText().trim().toLowerCase();
+            if (!newQuery.equals(searchQuery))
+            {
+                searchQuery = newQuery;
+                updateItems();
+                if (itemScrollPane != null)
+                {
+                    itemScrollPane.setSlots(items);
+                    // scroll list to top on each search, fixes an issue with the list's filtering options moving around
+                    if (!items.isEmpty())
+                    {
+                        itemScrollPane.scrollTo(items.get(0));
+                    }
+                }
+            }
+            return;
+        }
+
         boolean keyUsed = itemScrollPane.keyTyped(c, i);
         if (keyUsed)
         {
@@ -517,13 +576,17 @@ public class WaypointManager extends JmUI
         FontRenderer fr = getFontRenderer();
         itemWidth = 0;
 
+        String q = searchQuery.trim().toLowerCase();
+
         Collection<Waypoint> waypoints = WaypointStore.instance().getAll();
         boolean allOn = true;
         for (Waypoint waypoint : waypoints)
         {
             WaypointManagerItem item = new WaypointManagerItem(waypoint, fr, this);
             item.getDistanceTo(mc.thePlayer);
-            if (currentDim == null || item.waypoint.getDimensions().contains(currentDim))
+
+            if ((q.isEmpty() || waypoint.getName().toLowerCase().contains(q))
+                    && (currentDim == null || item.waypoint.getDimensions().contains(currentDim)))
             {
                 items.add(item);
                 if (allOn)
@@ -624,6 +687,8 @@ public class WaypointManager extends JmUI
         WaypointStore.instance().bulkSave();
         Fullscreen.state().requireRefresh();
         bottomButtons.setEnabled(true);
+
+        Keyboard.enableRepeatEvents(false);
 
         if (returnDisplay == null)
         {
