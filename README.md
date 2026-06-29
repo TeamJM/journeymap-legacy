@@ -17,7 +17,8 @@ When submitting a pull request, please follow these guidelines:
 
 - Make sure to describe your changes in the pull request description.
 - Make sure to run your code locally to ensure that your changes are functioning correctly and have not broken anything. See the section below for instructions on how to do this.
-
+- Make sure to update doc/changelog.html with your change. Prefix the change line with "Added:", "Fixed:", "Changed:", or "Removed:". 
+  
 ## Environment Setup
 
 ### 1. Git the JourneyMap source
