@@ -325,6 +325,10 @@ public class Fullscreen extends JmUI
                 @Override
                 public boolean onToggle(OnOffButton button, boolean toggled)
                 {
+                    MapType newMapType = state.getMapType(toggled);
+                    buttonDay.setToggled(newMapType.isDay(), false);
+                    buttonNight.setToggled(newMapType.isNight(), false);
+                    buttonTopo.setToggled(newMapType.isTopo(), false);
                     state.requireRefresh();
                     return true;
                 }
