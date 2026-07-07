@@ -459,4 +459,10 @@ public class GridEditor extends JmUI
             UIManager.getInstance().open(returnDisplay);
         }
     }
+
+    @Override
+    public void onGuiClosed()
+    {
+        Keyboard.enableRepeatEvents(false);
+    }
 }

@@ -682,6 +682,12 @@ public class WaypointEditor extends JmUI
         }
     }
 
+    @Override
+    public void onGuiClosed()
+    {
+        Keyboard.enableRepeatEvents(false);
+    }
+
     static class DimensionButton extends OnOffButton
     {
         public final int dimension;
