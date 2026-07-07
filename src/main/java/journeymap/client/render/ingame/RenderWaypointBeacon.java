@@ -310,6 +310,7 @@ public class RenderWaypointBeacon
             renderHelper.glDepthMask(true);
             renderHelper.glEnableCull();
             renderHelper.glDisableBlend();
+            renderHelper.glBlendFunc(770, 771, 1, 0);
             renderHelper.glDisableFog();
 
             RenderHelper.disableStandardItemLighting();
