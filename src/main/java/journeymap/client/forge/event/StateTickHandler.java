@@ -175,10 +175,11 @@ public class StateTickHandler implements EventHandlerManager.EventHandler
             return;
         }
 
+        final int playerDim = ForgeHelper.INSTANCE.getPlayerDimension();
         List<Waypoint> pendingRemovals = null;
         for (Waypoint waypoint : WaypointStore.instance().getAll())
         {
-            if (waypoint.isDeathPoint() && shouldRemoveOnArrival(waypoint, properties, player))
+            if (waypoint.isDeathPoint() && waypoint.getDimensions().contains(playerDim) && shouldRemoveOnArrival(waypoint, properties, player))
             {
                 if (pendingRemovals == null)
                 {
