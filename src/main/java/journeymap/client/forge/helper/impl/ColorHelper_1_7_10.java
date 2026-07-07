@@ -356,16 +356,29 @@ public class ColorHelper_1_7_10 implements IColorHelper
 
             int blocksTexId = ForgeHelper.INSTANCE.getClient().getTextureMapBlocks().getGlTextureId();
             ForgeHelper.INSTANCE.getRenderHelper().glBindTexture(blocksTexId);
+            final int packAlignment = GL11.glGetInteger(GL11.GL_PACK_ALIGNMENT);
+            final int unpackAlignment = GL11.glGetInteger(GL11.GL_UNPACK_ALIGNMENT);
             GL11.glPixelStorei(GL11.GL_PACK_ALIGNMENT, 1);
             GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
 
             final int miplevel = 0;
-            final int width = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, miplevel, GL11.GL_TEXTURE_WIDTH);
-            final int height = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, miplevel, GL11.GL_TEXTURE_HEIGHT);
-            final IntBuffer intbuffer = BufferUtils.createIntBuffer(width * height);
-            GL11.glGetTexImage(GL11.GL_TEXTURE_2D, miplevel, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, intbuffer);
-            final int[] pixels = new int[width * height];
-            intbuffer.get(pixels);
+            final int width;
+            final int height;
+            final int[] pixels;
+            try
+            {
+                width = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, miplevel, GL11.GL_TEXTURE_WIDTH);
+                height = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, miplevel, GL11.GL_TEXTURE_HEIGHT);
+                final IntBuffer intbuffer = BufferUtils.createIntBuffer(width * height);
+                GL11.glGetTexImage(GL11.GL_TEXTURE_2D, miplevel, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, intbuffer);
+                pixels = new int[width * height];
+                intbuffer.get(pixels);
+            }
+            finally
+            {
+                GL11.glPixelStorei(GL11.GL_PACK_ALIGNMENT, packAlignment);
+                GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, unpackAlignment);
+            }
 
             blocksTexture = new ArgbImage(pixels, width, height);
 
