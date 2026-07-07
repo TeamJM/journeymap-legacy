@@ -965,11 +965,12 @@ public class Fullscreen extends JmUI
                     statusBackgroundColor, statusBackgroundAlpha, statusForegroundColor, statusForegroundAlpha, getMapFontScale(), true);
 
             drawLogo();
-
-            sizeDisplay(true);
         }
         finally
         {
+            // Return resolution to normal scaling, even if drawing failed
+            sizeDisplay(true);
+
             timer.stop();
 
             // Clear GL error queue of anything that happened during JM drawing and report them
