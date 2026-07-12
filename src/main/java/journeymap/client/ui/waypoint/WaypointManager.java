@@ -454,6 +454,7 @@ public class WaypointManager extends JmUI
         }
         if (guibutton == buttonAdd)
         {
+            searchBox.setFocused(false);
             Waypoint waypoint = Waypoint.of(mc.thePlayer);
             UIManager.getInstance().openWaypointEditor(waypoint, true, this);
             return;
