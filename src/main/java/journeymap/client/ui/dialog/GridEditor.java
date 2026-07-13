@@ -70,8 +70,6 @@ public class GridEditor extends JmUI
 
         activeMapType = MapType.day(0);
         this.activeColor = this.gridSpecs.getSpec(activeMapType).getColor();
-
-        Keyboard.enableRepeatEvents(true);
     }
 
     /**
@@ -82,6 +80,8 @@ public class GridEditor extends JmUI
     {
         try
         {
+            Keyboard.enableRepeatEvents(true);
+
             if (this.buttonList.isEmpty())
             {
                 GridSpec spec = gridSpecs.getSpec(activeMapType);
@@ -458,5 +458,11 @@ public class GridEditor extends JmUI
         {
             UIManager.getInstance().open(returnDisplay);
         }
+    }
+
+    @Override
+    public void onGuiClosed()
+    {
+        Keyboard.enableRepeatEvents(false);
     }
 }

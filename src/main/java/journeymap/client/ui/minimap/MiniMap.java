@@ -151,6 +151,7 @@ public class MiniMap
     public void drawMap(boolean preview, float partialTicks)
     {
         StatTimer timer = drawTimer;
+        boolean displayResized = false;
 
         RenderHelper.disableStandardItemLighting();
 
@@ -211,6 +212,7 @@ public class MiniMap
 
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
             DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
+            displayResized = true;
 
             // Experimental fix for overly-dark screens with some graphics cards
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightmapS, lightmapT);
@@ -296,9 +298,15 @@ public class MiniMap
                     {
                         /***** BEGIN MATRIX: ROTATION *****/
                         startMapRotation(playerHeading);
-                        dv.minimapFrame.drawReticle();
-                        /***** END MATRIX: ROTATION *****/
-                        stopMapRotation(playerHeading);
+                        try
+                        {
+                            dv.minimapFrame.drawReticle();
+                        }
+                        finally
+                        {
+                            /***** END MATRIX: ROTATION *****/
+                            stopMapRotation(playerHeading);
+                        }
                     }
                 }
 
@@ -307,24 +315,50 @@ public class MiniMap
                 if (now - lastMapChangeTime <= 1000)
                 {
                     stopMapRotation(rotation);
-                    GL11.glTranslated(dv.translateX, dv.translateY, 0);
-                    int alpha = (int) Math.min(255, Math.max(0, 1100 - (now - lastMapChangeTime)));
-                    Point2D.Double windowCenter = gridRenderer.getWindowPosition(centerPoint);
-                    dv.getMapTypeStatus(state.getCurrentMapType()).draw(windowCenter, alpha, 0);
-                    GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
-                    startMapRotation(rotation);
+                    try
+                    {
+                        GL11.glPushMatrix();
+                        try
+                        {
+                            GL11.glTranslated(dv.translateX, dv.translateY, 0);
+                            int alpha = (int) Math.min(255, Math.max(0, 1100 - (now - lastMapChangeTime)));
+                            Point2D.Double windowCenter = gridRenderer.getWindowPosition(centerPoint);
+                            dv.getMapTypeStatus(state.getCurrentMapType()).draw(windowCenter, alpha, 0);
+                        }
+                        finally
+                        {
+                            GL11.glPopMatrix();
+                        }
+                    }
+                    finally
+                    {
+                        startMapRotation(rotation);
+                    }
                 }
 
                 // Draw Minimap Preset Id
                 if (now - initTime <= 1000)
                 {
                     stopMapRotation(rotation);
-                    GL11.glTranslated(dv.translateX, dv.translateY, 0);
-                    int alpha = (int) Math.min(255, Math.max(0, 1100 - (now - initTime)));
-                    Point2D.Double windowCenter = gridRenderer.getWindowPosition(centerPoint);
-                    dv.getMapPresetStatus(state.getCurrentMapType(), miniMapProperties.getId()).draw(windowCenter, alpha, 0);
-                    GL11.glTranslated(-dv.translateX, -dv.translateY, 0);
-                    startMapRotation(rotation);
+                    try
+                    {
+                        GL11.glPushMatrix();
+                        try
+                        {
+                            GL11.glTranslated(dv.translateX, dv.translateY, 0);
+                            int alpha = (int) Math.min(255, Math.max(0, 1100 - (now - initTime)));
+                            Point2D.Double windowCenter = gridRenderer.getWindowPosition(centerPoint);
+                            dv.getMapPresetStatus(state.getCurrentMapType(), miniMapProperties.getId()).draw(windowCenter, alpha, 0);
+                        }
+                        finally
+                        {
+                            GL11.glPopMatrix();
+                        }
+                    }
+                    finally
+                    {
+                        startMapRotation(rotation);
+                    }
                 }
 
                 // Finish stencil
@@ -396,8 +430,6 @@ public class MiniMap
                 dv.labelTime.draw(timeLabelText);
             }
 
-            // Return resolution to how it is normally scaled
-            DrawUtil.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
         }
         catch (Throwable t)
         {
@@ -405,6 +437,11 @@ public class MiniMap
         }
         finally
         {
+            // Return resolution to how it is normally scaled, even if drawing failed
+            if (displayResized)
+            {
+                DrawUtil.sizeDisplay(dv.scaledResolution.getScaledWidth_double(), dv.scaledResolution.getScaledHeight_double());
+            }
             cleanup();
             timer.stop();
 

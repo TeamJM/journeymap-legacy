@@ -325,6 +325,10 @@ public class Fullscreen extends JmUI
                 @Override
                 public boolean onToggle(OnOffButton button, boolean toggled)
                 {
+                    MapType newMapType = state.getMapType(toggled);
+                    buttonDay.setToggled(newMapType.isDay(), false);
+                    buttonNight.setToggled(newMapType.isNight(), false);
+                    buttonTopo.setToggled(newMapType.isTopo(), false);
                     state.requireRefresh();
                     return true;
                 }
@@ -965,11 +969,12 @@ public class Fullscreen extends JmUI
                     statusBackgroundColor, statusBackgroundAlpha, statusForegroundColor, statusForegroundAlpha, getMapFontScale(), true);
 
             drawLogo();
-
-            sizeDisplay(true);
         }
         finally
         {
+            // Return resolution to normal scaling, even if drawing failed
+            sizeDisplay(true);
+
             timer.stop();
 
             // Clear GL error queue of anything that happened during JM drawing and report them

@@ -245,35 +245,39 @@ public class RenderWaypointBeacon
 
                     // Start drawing
                     GL11.glPushMatrix();
+                    try
+                    {
+                        // Lighting
+                        renderHelper.glDisableLighting();
+                        GL11.glNormal3d(0, 0, -1.0F * scale);
 
-                    // Lighting
-                    renderHelper.glDisableLighting();
-                    GL11.glNormal3d(0, 0, -1.0F * scale);
+                        // Position
+                        GL11.glTranslated(shiftX, shiftY, shiftZ);
+                        GL11.glRotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+                        GL11.glRotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+                        renderHelper.glScaled(-scale, -scale, scale);
 
-                    // Position
-                    GL11.glTranslated(shiftX, shiftY, shiftZ);
-                    GL11.glRotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-                    GL11.glRotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-                    renderHelper.glScaled(-scale, -scale, scale);
+                        renderHelper.glDepthMask(true);
+                        renderHelper.glEnableDepth();
 
-                    renderHelper.glDepthMask(true);
-                    renderHelper.glEnableDepth();
+                        final int fontScale = waypointProperties.fontScale.get();
 
-                    final int fontScale = waypointProperties.fontScale.get();
+                        // Adjust above icon
+                        double labelY = (0 - halfTexHeight) - 8;
 
-                    // Adjust above icon
-                    double labelY = (0 - halfTexHeight) - 8;
+                        // Depth label
+                        DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, depthShadowAlpha, waypoint.getSafeColor(), textAlpha, fontScale, false);
 
-                    // Depth label
-                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, depthShadowAlpha, waypoint.getSafeColor(), textAlpha, fontScale, false);
+                        renderHelper.glDisableDepth();
+                        renderHelper.glDepthMask(false);
 
-                    renderHelper.glDisableDepth();
-                    renderHelper.glDepthMask(false);
-
-                    // Front label
-                    DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, frontShadowAlpha, waypoint.getSafeColor(), textAlpha, fontScale, false);
-
-                    GL11.glPopMatrix();
+                        // Front label
+                        DrawUtil.drawLabel(label, 1, labelY, DrawUtil.HAlign.Center, DrawUtil.VAlign.Above, RGB.BLACK_RGB, frontShadowAlpha, waypoint.getSafeColor(), textAlpha, fontScale, false);
+                    }
+                    finally
+                    {
+                        GL11.glPopMatrix();
+                    }
                 }
             }
 
@@ -281,25 +285,29 @@ public class RenderWaypointBeacon
             if (viewDistance > .1 && waypointProperties.showTexture.get())
             {
                 GL11.glPushMatrix();
+                try
+                {
+                    renderHelper.glDisableLighting();
+                    GL11.glNormal3d(0, 0, -1.0F * scale);
 
-                renderHelper.glDisableLighting();
-                GL11.glNormal3d(0, 0, -1.0F * scale);
+                    renderHelper.glDisableDepth();
+                    renderHelper.glDepthMask(false);
 
-                renderHelper.glDisableDepth();
-                renderHelper.glDepthMask(false);
+                    scale = scale * (waypointProperties.textureSmall.get() ? 1 : 2);
 
-                scale = scale * (waypointProperties.textureSmall.get() ? 1 : 2);
+                    GL11.glTranslated(shiftX, shiftY, shiftZ);
+                    GL11.glRotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+                    GL11.glRotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+                    renderHelper.glScaled(-scale, -scale, scale);
+                    GL11.glNormal3d(0, 0, -1.0F * scale);
 
-                GL11.glTranslated(shiftX, shiftY, shiftZ);
-                GL11.glRotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-                GL11.glRotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-                renderHelper.glScaled(-scale, -scale, scale);
-                GL11.glNormal3d(0, 0, -1.0F * scale);
-
-                // The .5 and .2 below centers the waypoint diamond icon
-                DrawUtil.drawColoredImage(texture, iconAlpha, waypoint.getColor(), 0 - (texture.getWidth() / 2) + .5, 0 - halfTexHeight + .2, 0);
-
-                GL11.glPopMatrix();
+                    // The .5 and .2 below centers the waypoint diamond icon
+                    DrawUtil.drawColoredImage(texture, iconAlpha, waypoint.getColor(), 0 - (texture.getWidth() / 2) + .5, 0 - halfTexHeight + .2, 0);
+                }
+                finally
+                {
+                    GL11.glPopMatrix();
+                }
             }
         }
         finally
@@ -310,6 +318,7 @@ public class RenderWaypointBeacon
             renderHelper.glDepthMask(true);
             renderHelper.glEnableCull();
             renderHelper.glDisableBlend();
+            renderHelper.glBlendFunc(770, 771, 1, 0);
             renderHelper.glDisableFog();
 
             RenderHelper.disableStandardItemLighting();

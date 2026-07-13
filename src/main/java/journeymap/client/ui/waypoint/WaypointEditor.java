@@ -91,7 +91,6 @@ public class WaypointEditor extends JmUI
         this.colorPickTexture = TextureCache.instance().getColorPicker();
         this.colorPickRect = new Rectangle2D.Double(0, 0, colorPickTexture.getWidth(), colorPickTexture.getHeight());
         this.colorPickImg = colorPickTexture.getImage();
-        Keyboard.enableRepeatEvents(true);
     }
 
     /**
@@ -102,6 +101,8 @@ public class WaypointEditor extends JmUI
     {
         try
         {
+            Keyboard.enableRepeatEvents(true);
+
             FullMapProperties fullMapProperties = JourneymapClient.getFullMapProperties();
             LocationFormat locationFormat = new LocationFormat();
             locationFormatKeys = locationFormat.getFormatKeys(fullMapProperties.locationFormat.get());
@@ -680,6 +681,12 @@ public class WaypointEditor extends JmUI
         {
             UIManager.getInstance().open(returnDisplay);
         }
+    }
+
+    @Override
+    public void onGuiClosed()
+    {
+        Keyboard.enableRepeatEvents(false);
     }
 
     static class DimensionButton extends OnOffButton

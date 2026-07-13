@@ -689,8 +689,6 @@ public class WaypointManager extends JmUI
         Fullscreen.state().requireRefresh();
         bottomButtons.setEnabled(true);
 
-        Keyboard.enableRepeatEvents(false);
-
         if (returnDisplay == null)
         {
             UIManager.getInstance().closeAll();
@@ -699,6 +697,12 @@ public class WaypointManager extends JmUI
         {
             UIManager.getInstance().open(returnDisplay);
         }
+    }
+
+    @Override
+    public void onGuiClosed()
+    {
+        Keyboard.enableRepeatEvents(false);
     }
 
     Map<Config.Category, List<SlotMetadata>> getToolbars()
