@@ -158,7 +158,7 @@ public class WaypointManager extends JmUI
 
             if (buttonSortDistance == null)
             {
-                WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(ForgeHelper.INSTANCE.getClient().thePlayer, true);
+                WaypointManagerItem.Sort distanceSort = new WaypointManagerItem.DistanceComparator(true);
                 String distanceLabel = Constants.getString("jm.waypoint.distance");
                 buttonSortDistance = new SortButton(distanceLabel, distanceSort);
                 buttonSortDistance.setTextOnly(fr);
@@ -573,7 +573,7 @@ public class WaypointManager extends JmUI
     protected void updateItems()
     {
         items.clear();
-        Integer currentDim = DimensionsButton.currentWorldProvider == null ? null : ForgeHelper.INSTANCE.getDimension(DimensionsButton.currentWorldProvider);
+        Integer currentDim = buttonDimensions == null ? null : buttonDimensions.getCurrentWorldProvider() == null ? null : ForgeHelper.INSTANCE.getDimension(buttonDimensions.getCurrentWorldProvider());
         FontRenderer fr = getFontRenderer();
         itemWidth = 0;
 

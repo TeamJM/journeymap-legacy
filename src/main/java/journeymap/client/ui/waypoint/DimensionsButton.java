@@ -20,21 +20,18 @@ import java.util.List;
  */
 class DimensionsButton extends Button
 {
-    static boolean needInit = true;
-    static WorldProvider currentWorldProvider;
-    final List<WorldProvider> worldProviders = WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions());
+    private static boolean allDimSelected;
+    private WorldProvider currentWorldProvider;
+    private final List<WorldProvider> worldProviders = WorldData.getDimensionProviders(WaypointStore.instance().getLoadedDimensions());
 
     public DimensionsButton()
     {
         super(0, 0, "");
-
-        if (needInit || currentWorldProvider != null)
+        if (!allDimSelected)
         {
-            currentWorldProvider = ForgeHelper.INSTANCE.getClient().thePlayer.worldObj.provider;
-            needInit = false;
+            this.setCurrentWorldProvider(ForgeHelper.INSTANCE.getClient().thePlayer.worldObj.provider);
         }
         updateLabel();
-
         // Determine width
         fitWidth(ForgeHelper.INSTANCE.getFontRenderer());
     }
@@ -93,13 +90,24 @@ class DimensionsButton extends Button
 
         if (index >= worldProviders.size() || index < 0)
         {
-            currentWorldProvider = null; // "All"
+            this.setCurrentWorldProvider(null); // "All"
         }
         else
         {
-            currentWorldProvider = worldProviders.get(index);
+            this.setCurrentWorldProvider(worldProviders.get(index));
         }
 
         updateLabel();
+    }
+
+    private void setCurrentWorldProvider(WorldProvider provider)
+    {
+        this.currentWorldProvider = provider;
+        allDimSelected = provider == null;
+    }
+
+    WorldProvider getCurrentWorldProvider()
+    {
+        return currentWorldProvider;
     }
 }

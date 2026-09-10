@@ -437,17 +437,17 @@ public class WaypointManagerItem implements ScrollListPane.ISlot
 
     static class DistanceComparator extends Sort
     {
-        EntityPlayer player;
 
-        public DistanceComparator(EntityPlayer player, boolean ascending)
+        public DistanceComparator(boolean ascending)
         {
             super(ascending);
-            this.player = player;
         }
 
         @Override
         public int compare(WaypointManagerItem o1, WaypointManagerItem o2)
         {
+            final EntityPlayer player =  ForgeHelper.INSTANCE.getClient().thePlayer;
+            if (player == null) return 0;
             double dist1 = o1.getDistanceTo(player);
             double dist2 = o2.getDistanceTo(player);
 
