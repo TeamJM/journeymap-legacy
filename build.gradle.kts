@@ -163,6 +163,7 @@ tasks.publishCurseforge {
     mainArtifact.displayName = "${mod_id}-${minecraft_version}-${project.version}"
     mainArtifact.releaseType = curse_release_type
     mainArtifact.changelogType = "html"
+    mainArtifact.addEnvironment("Server", "Client")
     mainArtifact.changelog = project.file("build/doc/changelog.html")
     mainArtifact.withAdditionalFile(fairPlayJar.get().archiveFile.get().asFile)
     mainArtifact.additionalArtifacts.forEach { additionalArtifact ->
