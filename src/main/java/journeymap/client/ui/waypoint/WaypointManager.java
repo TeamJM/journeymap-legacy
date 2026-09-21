@@ -51,6 +51,7 @@ public class WaypointManager extends JmUI
     Boolean canUserTeleport;
     private SortButton buttonSortName, buttonSortDistance;
     private DimensionsButton buttonDimensions;
+    private DimensionPickerPopup dimensionPicker;
     private Button buttonClose, buttonAdd, buttonOptions, buttonRemoveAllWaypoints, buttonConfirmClose, buttonConfirm;
     private OnOffButton buttonToggleAll;
     private ButtonList bottomButtons;
@@ -127,6 +128,7 @@ public class WaypointManager extends JmUI
 
     private void initConfirmGui()
     {
+        closeDimensionPicker();
         initBasicGui(() -> {
             // Bottom buttons
             if (buttonConfirmClose == null)
@@ -273,14 +275,16 @@ public class WaypointManager extends JmUI
             // 1.7
             // itemScrollPane.func_148122_a(width, height, headerHeight, this.height - 30);
 
+            final boolean pickerOpen = isDimensionPickerOpen();
+
             // 1.8
             itemScrollPane.setDimensions(width, height, headerHeight, this.height - 30);
             String[] lastTooltip = itemScrollPane.lastTooltip;
             long lastTooltipTime = itemScrollPane.lastTooltipTime;
             itemScrollPane.lastTooltip = null;
-            itemScrollPane.drawScreen(x, y, par3);
+            itemScrollPane.drawScreen(pickerOpen ? -1 : x, pickerOpen ? -1 : y, par3);
 
-            super.drawScreen(x, y, par3);
+            super.drawScreen(pickerOpen ? -1 : x, pickerOpen ? -1 : y, par3);
 
             // search bar
             if (searchBox != null)
@@ -331,7 +335,7 @@ public class WaypointManager extends JmUI
                 }
             }
 
-            if (itemScrollPane.lastTooltip != null)
+            if (!pickerOpen && itemScrollPane.lastTooltip != null)
             {
                 if (Arrays.equals(itemScrollPane.lastTooltip, lastTooltip))
                 {
@@ -342,6 +346,13 @@ public class WaypointManager extends JmUI
                         drawHoveringText(itemScrollPane.lastTooltip, x, button.getBottomY() + 15);
                     }
                 }
+            }
+
+            if (pickerOpen)
+            {
+                dimensionPicker.setAnchor(buttonDimensions.getX(), buttonDimensions.getY(),
+                        buttonDimensions.getWidth(), headerHeight, this.width);
+                dimensionPicker.draw(x, y, par3);
             }
         }
         catch (Throwable t)
@@ -359,6 +370,12 @@ public class WaypointManager extends JmUI
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseEvent)
     {
+        if (isDimensionPickerOpen())
+        {
+            dimensionPicker.mouseClicked(mouseX, mouseY, mouseEvent);
+            return;
+        }
+
         super.mouseClicked(mouseX, mouseY, mouseEvent);
 
         if (searchBox != null)
@@ -376,6 +393,11 @@ public class WaypointManager extends JmUI
     @Override
     protected void mouseMovedOrUp(int mouseX, int mouseY, int state)
     {
+        if (isDimensionPickerOpen())
+        {
+            return;
+        }
+
         super.mouseMovedOrUp(mouseX, mouseY, state);
 
         itemScrollPane.mouseMovedOrUp(mouseX, mouseY, state);
@@ -384,6 +406,11 @@ public class WaypointManager extends JmUI
     @Override
     protected void mouseClickMove(int mouseX, int mouseY, int lastButtonClicked, long timeSinceMouseClick)
     {
+        if (isDimensionPickerOpen())
+        {
+            return;
+        }
+
         super.mouseClickMove(mouseX, mouseY, lastButtonClicked, timeSinceMouseClick);
         checkPressedButton();
     }
@@ -405,7 +432,14 @@ public class WaypointManager extends JmUI
                 i = MathHelper.clamp_int(i, -1, 1);
             }
 
-            this.itemScrollPane.scrollBy(- this.rowHeight * i);
+            if (isDimensionPickerOpen())
+            {
+                dimensionPicker.scrollBy(- this.rowHeight * i);
+            }
+            else
+            {
+                this.itemScrollPane.scrollBy(- this.rowHeight * i);
+            }
         }
     }
 
@@ -447,9 +481,7 @@ public class WaypointManager extends JmUI
         }
         if (guibutton == buttonDimensions)
         {
-            buttonDimensions.nextValue();
-            updateItems();
-            buttonList.clear();
+            openDimensionPicker();
             return;
         }
         if (guibutton == buttonAdd)
@@ -500,9 +532,48 @@ public class WaypointManager extends JmUI
         }
     }
 
+    protected void openDimensionPicker()
+    {
+        if (buttonDimensions == null)
+        {
+            return;
+        }
+
+        if (dimensionPicker == null)
+        {
+            dimensionPicker = new DimensionPickerPopup(getFontRenderer(), provider -> {
+                buttonDimensions.selectProvider(provider);
+                updateItems();
+                buttonList.clear();
+            });
+        }
+
+        searchBox.setFocused(false);
+        dimensionPicker.open(buttonDimensions.getWorldProviders(), buttonDimensions.getCurrentWorldProvider());
+    }
+
+    protected void closeDimensionPicker()
+    {
+        if (dimensionPicker != null)
+        {
+            dimensionPicker.close();
+        }
+    }
+
+    protected boolean isDimensionPickerOpen()
+    {
+        return dimensionPicker != null && dimensionPicker.isOpen();
+    }
+
     @Override
     protected void keyTyped(char c, int i)
     {
+        if (isDimensionPickerOpen())
+        {
+            dimensionPicker.keyTyped(c, i);
+            return;
+        }
+
         switch (i)
         {
             case Keyboard.KEY_ESCAPE:
