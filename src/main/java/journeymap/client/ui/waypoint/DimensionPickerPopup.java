@@ -59,7 +59,7 @@ class DimensionPickerPopup
     // Layout
     private int x, y, width, height, listX, listWidth, listHeight;
 
-    DimensionPickerPopup(FontRenderer fr, Listener listener)
+    public DimensionPickerPopup(FontRenderer fr, Listener listener)
     {
         this.fr = fr;
         this.listener = listener;
@@ -71,12 +71,12 @@ class DimensionPickerPopup
         this.scrollPane.setShowFrame(false);
     }
 
-    boolean isOpen()
+    public boolean isOpen()
     {
         return open;
     }
 
-    void open(List<WorldProvider> providers, WorldProvider selected)
+    public void open(List<WorldProvider> providers, WorldProvider selected)
     {
         rebuild(providers);
         selectedDimension = selected == null ? null : ForgeHelper.INSTANCE.getDimension(selected);
@@ -87,13 +87,13 @@ class DimensionPickerPopup
         scrollToSelectedPending = true;
     }
 
-    void close()
+    public void close()
     {
         open = false;
         searchField.setFocused(false);
     }
 
-    void setAnchor(int anchorX, int anchorY, int anchorWidth, int topLimit, int screenWidth)
+    public void setAnchor(int anchorX, int anchorY, int anchorWidth, int topLimit, int screenWidth)
     {
         this.anchorX = anchorX;
         this.anchorY = anchorY;
@@ -221,12 +221,12 @@ class DimensionPickerPopup
         scrollPane.scrollBy((firstRow * slotHeight) - scrollPane.getAmountScrolled());
     }
 
-    void scrollBy(int pixels)
+    public void scrollBy(int pixels)
     {
         scrollPane.scrollBy(pixels);
     }
 
-    void draw(int mouseX, int mouseY, float partialTicks)
+    public void draw(int mouseX, int mouseY, float partialTicks)
     {
         if (!open)
         {
@@ -248,7 +248,7 @@ class DimensionPickerPopup
         scrollPane.drawScreen(mouseX, mouseY, partialTicks);
     }
 
-    void mouseClicked(int mouseX, int mouseY, int mouseButton)
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton)
     {
         if (!open)
         {
@@ -280,7 +280,7 @@ class DimensionPickerPopup
         }
     }
 
-    void keyTyped(char c, int i)
+    public void keyTyped(char c, int i)
     {
         if (!open)
         {
@@ -308,7 +308,7 @@ class DimensionPickerPopup
 
     private static class PickerScrollPane extends ScrollPane
     {
-        PickerScrollPane(Minecraft mc, List<? extends Scrollable> items, int itemHeight)
+        private PickerScrollPane(Minecraft mc, List<? extends Scrollable> items, int itemHeight)
         {
             super(mc, 100, 100, items, itemHeight, 0);
         }
@@ -334,15 +334,15 @@ class DimensionPickerPopup
 
     private class EntryButton extends Button
     {
-        final WorldProvider provider;
-        final Integer dimension;
-        final String name;
-        final String idLabel;
-        final int count;
-        final boolean playerDimension;
-        final String searchText;
+        private final WorldProvider provider;
+        private final Integer dimension;
+        private final String name;
+        private final String idLabel;
+        private final int count;
+        private final boolean playerDimension;
+        private final String searchText;
 
-        EntryButton(WorldProvider provider, Integer dimension, String name, int count, boolean playerDimension)
+        private EntryButton(WorldProvider provider, Integer dimension, String name, int count, boolean playerDimension)
         {
             super(0, 0, "");
             this.provider = provider;

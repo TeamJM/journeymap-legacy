@@ -70,18 +70,18 @@ class DimensionsButton extends Button
         allDimSelected = provider == null;
     }
 
-    void selectProvider(WorldProvider provider)
+    public void selectProvider(WorldProvider provider)
     {
         this.setCurrentWorldProvider(provider);
         updateLabel();
     }
 
-    List<WorldProvider> getWorldProviders()
+    public List<WorldProvider> getWorldProviders()
     {
         return worldProviders;
     }
 
-    WorldProvider getCurrentWorldProvider()
+    public WorldProvider getCurrentWorldProvider()
     {
         return currentWorldProvider;
     }
