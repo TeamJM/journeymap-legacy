@@ -87,9 +87,14 @@ public abstract class JmUI extends GuiScreen
 
     public void sizeDisplay(boolean scaled)
     {
-        final int glwidth = scaled ? this.width : mc.displayWidth;
-        final int glheight = scaled ? this.height : mc.displayHeight;
-        DrawUtil.sizeDisplay(glwidth, glheight);
+        if (!scaled)
+        {
+            DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
+            return;
+        }
+
+        ScaledResolution sr = ForgeHelper.INSTANCE.getScaledResolution();
+        DrawUtil.sizeDisplay(sr.getScaledWidth_double(), sr.getScaledHeight_double());
     }
 
     protected boolean isMouseOverButton(int mouseX, int mouseY)
@@ -138,9 +143,9 @@ public abstract class JmUI extends GuiScreen
         {
             logo = TextureCache.instance().getLogo();
         }
-        DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
+        sizeDisplay(false);
         DrawUtil.drawImage(logo, 8, 8, false, 1, 0);
-        DrawUtil.sizeDisplay(width, height);
+        sizeDisplay(true);
     }
 
     protected void drawTitle()
