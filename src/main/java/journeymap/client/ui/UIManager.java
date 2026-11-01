@@ -8,7 +8,7 @@ package journeymap.client.ui;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.hud.MiniMapHud;
+import journeymap.client.hud.MiniMapRenderEvent;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.config.Config;
@@ -25,6 +25,7 @@ import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
@@ -152,9 +153,8 @@ public class UIManager
             if (miniMap.getCurrentMinimapProperties().enabled.get())
             {
                 final GuiScreen currentScreen = minecraft.currentScreen;
-                final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat
-                        || MiniMapHud.isLayoutScreenOpen();
-                if (doDraw && MiniMapHud.shouldDraw())
+                final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat;
+                if (doDraw && !MinecraftForge.EVENT_BUS.post(new MiniMapRenderEvent()))
                 {
                     miniMap.drawMap(partialTicks);
                 }

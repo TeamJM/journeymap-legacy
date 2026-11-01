@@ -12,7 +12,6 @@ import journeymap.client.forge.event.MiniMapOverlayHandler;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
-import journeymap.client.hud.MiniMapHud;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapState;
@@ -225,12 +224,6 @@ public class MiniMap
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
             DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
             displayResized = true;
-
-            // The options screen's preview stays where JourneyMap's own settings put it
-            if (!preview)
-            {
-                MiniMapHud.moveToPosition();
-            }
 
             // Experimental fix for overly-dark screens with some graphics cards
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightmapS, lightmapT);
