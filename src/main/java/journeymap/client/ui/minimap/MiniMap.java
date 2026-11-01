@@ -5,8 +5,8 @@
 
 package journeymap.client.ui.minimap;
 
-import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.api.MiniMapHud;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
@@ -123,9 +123,13 @@ public class MiniMap
         return miniMapProperties;
     }
 
-    DisplayVars getDisplayVars()
+    /**
+     * The minimap and its margins: left, top, right and bottom, in screen pixels.
+     */
+    public int[] getBounds()
     {
-        return dv;
+        return new int[]{dv.textureX - dv.marginX, dv.textureY - dv.marginY,
+                dv.textureX + dv.minimapWidth + dv.marginX, dv.textureY + dv.minimapHeight + dv.marginY};
     }
 
     /**
@@ -221,9 +225,9 @@ public class MiniMap
             displayResized = true;
 
             // The options screen's preview stays where JourneyMap's own settings put it
-            if (Constants.DASHBOARD_LOADED && !preview)
+            if (!preview)
             {
-                DashboardHud.moveToPosition();
+                MiniMapHud.moveToPosition();
             }
 
             // Experimental fix for overly-dark screens with some graphics cards

@@ -5,8 +5,8 @@
 
 package journeymap.client.ui;
 
-import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
+import journeymap.client.api.MiniMapHud;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.log.LogFormatter;
@@ -15,7 +15,6 @@ import journeymap.client.properties.config.Config;
 import journeymap.client.ui.component.JmUI;
 import journeymap.client.ui.dialog.*;
 import journeymap.client.ui.fullscreen.Fullscreen;
-import journeymap.client.ui.minimap.DashboardHud;
 import journeymap.client.ui.minimap.MiniMap;
 import journeymap.client.ui.minimap.MiniMapHotkeysHelp;
 import journeymap.client.ui.waypoint.WaypointEditor;
@@ -154,8 +153,8 @@ public class UIManager
             {
                 final GuiScreen currentScreen = minecraft.currentScreen;
                 final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat
-                        || (Constants.DASHBOARD_LOADED && DashboardHud.isEditorOpen());
-                if (doDraw && (!Constants.DASHBOARD_LOADED || DashboardHud.shouldDraw()))
+                        || MiniMapHud.isLayoutScreenOpen();
+                if (doDraw && MiniMapHud.shouldDraw())
                 {
                     miniMap.drawMap(partialTicks);
                 }
