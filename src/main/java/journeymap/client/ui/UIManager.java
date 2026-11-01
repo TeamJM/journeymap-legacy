@@ -176,7 +176,7 @@ public class UIManager
                             || event.drawWhileScreenOpen;
                     if (doDraw && !event.isCanceled())
                     {
-                        miniMap.drawMap(partialTicks);
+                        miniMap.drawMap(false, partialTicks, event.offsetX, event.offsetY, event.scale);
                     }
                 }
             }

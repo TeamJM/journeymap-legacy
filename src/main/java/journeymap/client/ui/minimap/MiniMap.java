@@ -161,8 +161,19 @@ public class MiniMap
 
     public void drawMap(boolean preview, float partialTicks)
     {
+        drawMap(preview, partialTicks, 0, 0, 1);
+    }
+
+    /**
+     * @param offsetX How far to move the minimap, in screen pixels.
+     * @param offsetY How far to move the minimap, in screen pixels.
+     * @param scale   How much to resize the minimap, around the top left corner of {@link #getBounds()}.
+     */
+    public void drawMap(boolean preview, float partialTicks, float offsetX, float offsetY, float scale)
+    {
         StatTimer timer = drawTimer;
         boolean displayResized = false;
+        boolean transformPushed = false;
 
         RenderHelper.disableStandardItemLighting();
 
@@ -224,6 +235,17 @@ public class MiniMap
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
             DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
             displayResized = true;
+
+            if (offsetX != 0 || offsetY != 0 || scale != 1)
+            {
+                int left = dv.textureX - dv.marginX;
+                int top = dv.textureY - dv.marginTop;
+                GL11.glPushMatrix();
+                transformPushed = true;
+                GL11.glTranslatef(left + offsetX, top + offsetY, 0);
+                GL11.glScalef(scale, scale, 1);
+                GL11.glTranslatef(-left, -top, 0);
+            }
 
             // Experimental fix for overly-dark screens with some graphics cards
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightmapS, lightmapT);
@@ -448,6 +470,11 @@ public class MiniMap
         }
         finally
         {
+            if (transformPushed)
+            {
+                GL11.glPopMatrix();
+            }
+
             // Return resolution to how it is normally scaled, even if drawing failed
             if (displayResized)
             {

@@ -24,6 +24,16 @@ public class MiniMapRenderEvent extends Event
      */
     public boolean drawWhileScreenOpen;
 
+    /**
+     * How far to move the minimap, in screen pixels and not in GUI scaled pixels.
+     */
+    public float offsetX, offsetY;
+
+    /**
+     * How much to resize the minimap, around the top left corner of {@link MiniMapHud#getBounds()}. 1 is normal size.
+     */
+    public float scale = 1;
+
     public MiniMapRenderEvent(GuiScreen screen)
     {
         this.screen = screen;
