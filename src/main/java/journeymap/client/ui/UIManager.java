@@ -9,6 +9,7 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.hud.MiniMapRenderEvent;
+import journeymap.client.log.JMLogger;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.config.Config;
@@ -33,6 +34,7 @@ public class UIManager
 {
     private final Logger logger = Journeymap.getLogger();
     private final MiniMap miniMap;
+    private boolean renderEventFailed;
     Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
 
     private UIManager()
@@ -157,10 +159,22 @@ public class UIManager
                 if (!(currentScreen instanceof JmUI))
                 {
                     final MiniMapRenderEvent event = new MiniMapRenderEvent(currentScreen);
-                    final boolean cancelled = MinecraftForge.EVENT_BUS.post(event);
+                    try
+                    {
+                        if (!renderEventFailed)
+                        {
+                            MinecraftForge.EVENT_BUS.post(event);
+                        }
+                    }
+                    catch (Throwable t)
+                    {
+                        // Forge logs every failure itself, so stop posting or that floods the log every frame
+                        renderEventFailed = true;
+                        JMLogger.logOnce("Error in a MiniMapRenderEvent listener, no longer posting it: " + t, t);
+                    }
                     final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat
                             || event.drawWhileScreenOpen;
-                    if (doDraw && !cancelled)
+                    if (doDraw && !event.isCanceled())
                     {
                         miniMap.drawMap(partialTicks);
                     }
