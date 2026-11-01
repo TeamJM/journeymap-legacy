@@ -1,12 +1,15 @@
 package journeymap.client.hud;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.client.ui.UIManager;
 
 import java.util.function.BooleanSupplier;
 
 /**
- * Lets another mod move, resize or hide the minimap. Without hooks, the minimap draws as usual.
+ * Lets another mod move, resize or hide the minimap. Without hooks, the minimap draws as usual. Client only.
  */
+@SideOnly(Side.CLIENT)
 public final class MiniMapHud
 {
     private static BooleanSupplier layoutScreenOpen = () -> false;
