@@ -153,10 +153,17 @@ public class UIManager
             if (miniMap.getCurrentMinimapProperties().enabled.get())
             {
                 final GuiScreen currentScreen = minecraft.currentScreen;
-                final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat;
-                if (doDraw && !MinecraftForge.EVENT_BUS.post(new MiniMapRenderEvent()))
+                // JourneyMap's own screens stay out of it, like the options which draw their own preview
+                if (!(currentScreen instanceof JmUI))
                 {
-                    miniMap.drawMap(partialTicks);
+                    final MiniMapRenderEvent event = new MiniMapRenderEvent(currentScreen);
+                    final boolean cancelled = MinecraftForge.EVENT_BUS.post(event);
+                    final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat
+                            || event.drawWhileScreenOpen;
+                    if (doDraw && !cancelled)
+                    {
+                        miniMap.drawMap(partialTicks);
+                    }
                 }
             }
         }

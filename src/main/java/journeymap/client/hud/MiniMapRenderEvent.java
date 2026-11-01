@@ -4,13 +4,28 @@ import cpw.mods.fml.common.eventhandler.Cancelable;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.GuiScreen;
 
 /**
  * Posted on the MinecraftForge event bus before the minimap draws on the HUD, not for the preview in JourneyMap's
- * options. Cancel it to hide the minimap for this frame. Client only.
+ * options or while one of JourneyMap's own screens is open. Cancel it to hide the minimap for this frame. Client only.
  */
 @SideOnly(Side.CLIENT)
 @Cancelable
 public class MiniMapRenderEvent extends Event
 {
+    /**
+     * The open screen, or null without one.
+     */
+    public final GuiScreen screen;
+
+    /**
+     * The minimap normally only draws with no screen or the chat open. Set to true to also draw it under this screen.
+     */
+    public boolean drawWhileScreenOpen;
+
+    public MiniMapRenderEvent(GuiScreen screen)
+    {
+        this.screen = screen;
+    }
 }
