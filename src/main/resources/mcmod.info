@@ -12,7 +12,7 @@
     "logoFile": "assets/journeymap/web/img/ico/journeymap144.png",
     "screenshots": [],
     "dependants":[],
-    "dependencies": ["Forge@[${forgeversion},)"],
+    "dependencies": ["Forge@[${forgeversion},)", "dashboard@[1.0.5,)"],
     "requiredMods": ["Forge@[${forgeversion},)"],
     "useDependencyInformation": true
   }]

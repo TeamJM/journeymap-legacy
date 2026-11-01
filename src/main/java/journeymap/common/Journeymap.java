@@ -34,7 +34,7 @@ import java.util.Map;
         version = BuildInfo.JM_VERSION,
         canBeDeactivated = true,
 //        modLanguageAdapter = "net.shadowfacts.forgelin.KotlinAdapter",
-        dependencies = "required-after:Forge@[" + BuildInfo.FORGE_VERSION + ",);after:dashboard@[1.0.5,)")
+        dependencies = "required-after:Forge@[" + BuildInfo.FORGE_VERSION + ",)")
 public class Journeymap
 {
     public static final String MOD_ID = "journeymap";
