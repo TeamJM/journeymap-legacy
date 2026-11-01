@@ -122,6 +122,11 @@ public class MiniMap
         return miniMapProperties;
     }
 
+    DisplayVars getDisplayVars()
+    {
+        return dv;
+    }
+
     /**
      * Called in the render loop.
      */

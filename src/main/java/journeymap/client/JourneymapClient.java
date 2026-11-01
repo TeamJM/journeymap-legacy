@@ -37,6 +37,7 @@ import journeymap.client.task.multi.ITaskManager;
 import journeymap.client.task.multi.TaskController;
 import journeymap.client.ui.UIManager;
 import journeymap.client.ui.fullscreen.Fullscreen;
+import journeymap.client.ui.minimap.DashboardHud;
 import journeymap.client.waypoint.WaypointStore;
 import journeymap.client.webmap.WebMap;
 import journeymap.common.CommonProxy;
@@ -255,6 +256,11 @@ public class JourneymapClient implements CommonProxy
 
             // Log properties
             JMLogger.logProperties();
+
+            if (Constants.DASHBOARD_LOADED)
+            {
+                DashboardHud.register();
+            }
 
             // Logging for thread debugging
             threadLogging = false;

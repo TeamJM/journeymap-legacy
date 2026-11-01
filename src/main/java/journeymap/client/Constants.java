@@ -65,6 +65,8 @@ public class Constants
 
     public static String WEB_DIR = path.join(JOURNEYMAP_DIR, "web", END);
 
+    public static final boolean DASHBOARD_LOADED = Loader.isModLoaded("dashboard");
+
     // Network Channel IDs
 
     /**
