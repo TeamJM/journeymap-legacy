@@ -5,6 +5,7 @@
 
 package journeymap.client.ui.minimap;
 
+import journeymap.client.Constants;
 import journeymap.client.JourneymapClient;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
@@ -218,6 +219,12 @@ public class MiniMap
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
             DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
             displayResized = true;
+
+            // The options screen's preview stays where JourneyMap's own settings put it
+            if (Constants.DASHBOARD_LOADED && !preview)
+            {
+                DashboardHud.moveToPosition();
+            }
 
             // Experimental fix for overly-dark screens with some graphics cards
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightmapS, lightmapT);

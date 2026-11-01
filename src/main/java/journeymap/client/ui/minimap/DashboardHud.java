@@ -6,6 +6,7 @@ import com.gtnewhorizons.dashboard.api.HudRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.client.ui.UIManager;
+import org.lwjgl.opengl.GL11;
 
 /**
  * Lets players move, resize and hide the minimap in Dashboard's HUD editor. The only class using Dashboard, so only
@@ -24,6 +25,31 @@ public final class DashboardHud
     public static void register()
     {
         HudRegistry.register(MINIMAP);
+    }
+
+    public static boolean isEditorOpen()
+    {
+        return HudRegistry.isLayoutScreenOpen();
+    }
+
+    /**
+     * False means the player hid the minimap, so skip drawing it.
+     */
+    public static boolean shouldDraw()
+    {
+        return HudRegistry.shouldRender(MINIMAP);
+    }
+
+    /**
+     * Moves and resizes everything drawn afterwards to where the player put the minimap. Call while drawing in screen
+     * pixels: the move is measured in GUI scaled pixels, so it is scaled up for that and the scale is undone after.
+     */
+    static void moveToPosition()
+    {
+        float scale = HudRegistry.getResolution().getScaleFactor();
+        GL11.glScalef(scale, scale, 1);
+        HudRegistry.translateToPosition(MINIMAP);
+        GL11.glScalef(1 / scale, 1 / scale, 1);
     }
 
     /**
