@@ -6,9 +6,9 @@
 package journeymap.client.ui;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.api.MiniMapHud;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.hud.MiniMapHud;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.config.Config;

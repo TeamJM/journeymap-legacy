@@ -6,13 +6,13 @@
 package journeymap.client.ui.minimap;
 
 import journeymap.client.JourneymapClient;
-import journeymap.client.api.MiniMapHud;
 import journeymap.client.feature.Feature;
 import journeymap.client.feature.FeatureManager;
 import journeymap.client.forge.event.MiniMapOverlayHandler;
 import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.forge.helper.IForgeHelper;
 import journeymap.client.forge.helper.IRenderHelper;
+import journeymap.client.hud.MiniMapHud;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.StatTimer;
 import journeymap.client.model.MapState;

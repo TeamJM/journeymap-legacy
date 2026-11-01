@@ -1,4 +1,4 @@
-package journeymap.client.api;
+package journeymap.client.hud;
 
 import journeymap.client.ui.UIManager;
 
