@@ -130,8 +130,8 @@ public class MiniMap
     {
         // Only drawMap does this otherwise, which does not run while the minimap is hidden
         updateDisplayVars(false);
-        return new int[]{dv.textureX - dv.marginX, dv.textureY - dv.marginY,
-                dv.textureX + dv.minimapWidth + dv.marginX, dv.textureY + dv.minimapHeight + dv.marginY};
+        return new int[]{dv.textureX - dv.marginX, dv.textureY - dv.marginTop,
+                dv.textureX + dv.minimapWidth + dv.marginX, dv.textureY + dv.minimapHeight + dv.marginBottom};
     }
 
     /**

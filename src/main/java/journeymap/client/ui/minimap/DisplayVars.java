@@ -65,6 +65,7 @@ public class DisplayVars
     final LocationFormat.LocationFormatKeys locationFormatKeys;
     final TimeFormat.TimeFormatKeys timeFormatKeys;
     final boolean locationFormatVerbose;
+    final int marginTop, marginBottom;
     int marginX, marginY;
     boolean forceUnicode;
     MapTypeStatus mapTypeStatus;
@@ -176,6 +177,24 @@ public class DisplayVars
             marginY = (int) Math.max(marginY, Math.ceil(compassPointMargin) + compassLabelHeight / 2);
         }
 
+        // Labels only sit on one side of the map, so the space above and below it differs
+        int spaceAbove = marginY;
+        if (!minimapSpec.labelTopInside && showFps)
+        {
+            spaceAbove = Math.max(spaceAbove, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
+        }
+        marginTop = spaceAbove;
+
+        int spaceBelow = marginY;
+        if (!minimapSpec.labelBottomInside && (showLocation || showBiome || showTime))
+        {
+            int labels = showLocation ? 1 : 0;
+            labels += showBiome ? 1 : 0;
+            labels += showTime ? 1 : 0;
+            spaceBelow = Math.max(spaceBelow, minimapSpec.labelBottomMargin + (labels * locationLabelHeight) + compassLabelHeight / 2);
+        }
+        marginBottom = spaceBelow;
+
         DrawUtil.HAlign debugLabelAlign;
         int debugLabelX;
 
@@ -184,13 +203,7 @@ public class DisplayVars
         {
             case BottomRight:
             {
-                if (!minimapSpec.labelBottomInside && (showLocation || showBiome || showTime))
-                {
-                    int labels = showLocation ? 1 : 0;
-                    labels += showBiome ? 1 : 0;
-                    labels += showTime ? 1 : 0;
-                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels * locationLabelHeight) + compassLabelHeight / 2);
-                }
+                marginY = marginBottom;
 
                 textureX = mc.displayWidth - minimapWidth - marginX;
                 textureY = mc.displayHeight - (minimapHeight) - marginY;
@@ -202,10 +215,7 @@ public class DisplayVars
             }
             case TopLeft:
             {
-                if (!minimapSpec.labelTopInside && showFps)
-                {
-                    marginY = Math.max(marginY, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
-                }
+                marginY = marginTop;
 
                 textureX = marginX;
                 textureY = marginY;
@@ -217,14 +227,7 @@ public class DisplayVars
             }
             case BottomLeft:
             {
-                if (!minimapSpec.labelBottomInside && (showLocation || showBiome || showTime))
-                {
-                    int labels = showLocation ? 1 : 0;
-                    labels += showBiome ? 1 : 0;
-                    labels += showTime ? 1 : 0;
-
-                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels * locationLabelHeight) + compassLabelHeight / 2);
-                }
+                marginY = marginBottom;
 
                 textureX = marginX;
                 textureY = mc.displayHeight - (minimapHeight) - marginY;
@@ -236,10 +239,8 @@ public class DisplayVars
             }
             case TopCenter:
             {
-                if (!minimapSpec.labelTopInside && showFps)
-                {
-                    marginY = Math.max(marginY, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
-                }
+                marginY = marginTop;
+
                 textureX = (mc.displayWidth - minimapWidth) / 2;
                 textureY = marginY;
                 translateX = 0;
@@ -261,10 +262,7 @@ public class DisplayVars
             case TopRight:
             default:
             {
-                if (!minimapSpec.labelTopInside && showFps)
-                {
-                    marginY = Math.max(marginY, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
-                }
+                marginY = marginTop;
 
                 textureX = mc.displayWidth - minimapWidth - marginX;
                 textureY = marginY;
