@@ -48,6 +48,7 @@ public class MiniMap
     private static final float lightmapS = (float) (15728880 % 65536) / 1f;
     private static final float lightmapT = (float) (15728880 / 65536) / 1f;
     private static final long labelRefreshRate = 400;
+    private static final float MIN_SCALE = 0.1f;
     private final static GridRenderer gridRenderer = new GridRenderer();
     private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
     private final Logger logger = Journeymap.getLogger();
@@ -235,6 +236,20 @@ public class MiniMap
             // Use 1:1 resolution for minimap regardless of how Minecraft UI is scaled
             DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
             displayResized = true;
+
+            // A broken value would leave the minimap missing or smeared every frame
+            if (!Float.isFinite(offsetX) || !Float.isFinite(offsetY) || !Float.isFinite(scale))
+            {
+                JMLogger.logOnce("Ignoring a minimap offset or scale that is not a number", null);
+                offsetX = 0;
+                offsetY = 0;
+                scale = 1;
+            }
+            else if (scale < MIN_SCALE)
+            {
+                JMLogger.logOnce("Minimap scale is below " + MIN_SCALE + ", using " + MIN_SCALE, null);
+                scale = MIN_SCALE;
+            }
 
             if (offsetX != 0 || offsetY != 0 || scale != 1)
             {
