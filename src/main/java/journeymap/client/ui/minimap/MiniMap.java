@@ -130,8 +130,21 @@ public class MiniMap
     {
         // Only drawMap does this otherwise, which does not run while the minimap is hidden
         updateDisplayVars(false);
-        return new int[]{dv.textureX - dv.marginX, dv.textureY - dv.marginTop,
+        return new int[]{getBoundsLeft(), getBoundsTop(),
                 dv.textureX + dv.minimapWidth + dv.marginX, dv.textureY + dv.minimapHeight + dv.marginBottom};
+    }
+
+    /**
+     * The top left corner of {@link #getBounds()}, also where drawMap resizes around, so the two always match.
+     */
+    private int getBoundsLeft()
+    {
+        return dv.textureX - dv.marginX;
+    }
+
+    private int getBoundsTop()
+    {
+        return dv.textureY - dv.marginTop;
     }
 
     /**
@@ -253,8 +266,8 @@ public class MiniMap
 
             if (offsetX != 0 || offsetY != 0 || scale != 1)
             {
-                int left = dv.textureX - dv.marginX;
-                int top = dv.textureY - dv.marginTop;
+                int left = getBoundsLeft();
+                int top = getBoundsTop();
                 GL11.glPushMatrix();
                 transformPushed = true;
                 GL11.glTranslatef(left + offsetX, top + offsetY, 0);
