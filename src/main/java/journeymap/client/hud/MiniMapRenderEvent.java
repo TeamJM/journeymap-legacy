@@ -34,6 +34,14 @@ public class MiniMapRenderEvent extends Event
      */
     public float scale = 1;
 
+    /**
+     * For Forge's event bus, which creates one to register listeners.
+     */
+    public MiniMapRenderEvent()
+    {
+        this(null);
+    }
+
     public MiniMapRenderEvent(GuiScreen screen)
     {
         this.screen = screen;
