@@ -7,8 +7,8 @@ import journeymap.client.ui.UIManager;
 import net.minecraft.client.Minecraft;
 
 /**
- * What another mod can ask about the minimap, safe to call at any time. To change how it draws, see
- * {@link MiniMapRenderEvent}. Client only.
+ * What another mod can ask about the minimap, safe to call from the start of the game on. Only call it on the client
+ * thread. To change how it draws, see {@link MiniMapRenderEvent}.
  */
 @SideOnly(Side.CLIENT)
 public final class MiniMapHud
@@ -28,6 +28,8 @@ public final class MiniMapHud
 
     /**
      * The minimap and its margins, which hold the compass and the labels, where JourneyMap's own settings put it.
+     * After the window size changed, this first redoes the minimap's layout, which rebuilds its textures and saves its
+     * settings, so avoid calling it more than needed.
      *
      * @return left, top, right and bottom, in screen pixels and not in GUI scaled pixels. All 0 until there is a minimap
      * to ask, like in the main menu.
