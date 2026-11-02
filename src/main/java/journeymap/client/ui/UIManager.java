@@ -301,6 +301,7 @@ public class UIManager
     {
         Fullscreen.state().requireRefresh();
         miniMap.reset();
+        renderEventFailed = false;
     }
 
     public void switchMiniMapPreset()
