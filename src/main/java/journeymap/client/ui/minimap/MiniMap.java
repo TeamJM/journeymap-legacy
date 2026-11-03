@@ -860,6 +860,7 @@ public class MiniMap
 
         DisplayVars oldDv = this.dv;
         this.dv = new DisplayVars(mc, miniMapProperties);
+        boundsLayout = null;
 
         if (oldDv == null || oldDv.shape != this.dv.shape)
         {
