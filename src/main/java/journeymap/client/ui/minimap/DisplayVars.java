@@ -66,7 +66,7 @@ public class DisplayVars
     final TimeFormat.TimeFormatKeys timeFormatKeys;
     final boolean locationFormatVerbose;
     final int marginTop, marginBottom;
-    int marginX, marginY;
+    int marginX;
     boolean forceUnicode;
     MapTypeStatus mapTypeStatus;
     MapPresetStatus mapPresetStatus;
@@ -154,7 +154,8 @@ public class DisplayVars
         drawScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
 
         minimapFrame = new ThemeMinimapFrame(theme, minimapSpec, miniMapProperties, minimapWidth, minimapHeight);
-        marginX = marginY = minimapSpec.margin;
+        marginX = minimapSpec.margin;
+        int marginY = minimapSpec.margin;
 
         int halfWidth = minimapWidth / 2;
         int halfHeight = minimapHeight / 2;
@@ -203,48 +204,40 @@ public class DisplayVars
         {
             case BottomRight:
             {
-                marginY = marginBottom;
-
                 textureX = mc.displayWidth - minimapWidth - marginX;
-                textureY = mc.displayHeight - (minimapHeight) - marginY;
+                textureY = mc.displayHeight - (minimapHeight) - marginBottom;
                 translateX = (mc.displayWidth / 2) - halfWidth - marginX;
-                translateY = (mc.displayHeight / 2) - halfHeight - marginY;
+                translateY = (mc.displayHeight / 2) - halfHeight - marginBottom;
                 debugLabelAlign = DrawUtil.HAlign.Left;
                 debugLabelX = mc.displayWidth - marginX - 20;
                 break;
             }
             case TopLeft:
             {
-                marginY = marginTop;
-
                 textureX = marginX;
-                textureY = marginY;
+                textureY = marginTop;
                 translateX = -(mc.displayWidth / 2) + halfWidth + marginX;
-                translateY = -(mc.displayHeight / 2) + halfHeight + marginY;
+                translateY = -(mc.displayHeight / 2) + halfHeight + marginTop;
                 debugLabelAlign = DrawUtil.HAlign.Right;
                 debugLabelX = marginX;
                 break;
             }
             case BottomLeft:
             {
-                marginY = marginBottom;
-
                 textureX = marginX;
-                textureY = mc.displayHeight - (minimapHeight) - marginY;
+                textureY = mc.displayHeight - (minimapHeight) - marginBottom;
                 translateX = -(mc.displayWidth / 2) + halfWidth + marginX;
-                translateY = (mc.displayHeight / 2) - halfHeight - marginY;
+                translateY = (mc.displayHeight / 2) - halfHeight - marginBottom;
                 debugLabelAlign = DrawUtil.HAlign.Right;
                 debugLabelX = marginX;
                 break;
             }
             case TopCenter:
             {
-                marginY = marginTop;
-
                 textureX = (mc.displayWidth - minimapWidth) / 2;
-                textureY = marginY;
+                textureY = marginTop;
                 translateX = 0;
-                translateY = -(mc.displayHeight / 2) + halfHeight + marginY;
+                translateY = -(mc.displayHeight / 2) + halfHeight + marginTop;
                 debugLabelAlign = DrawUtil.HAlign.Center;
                 debugLabelX = (int) Math.floor(textureX + (minimapWidth / 2));
                 break;
@@ -262,12 +255,10 @@ public class DisplayVars
             case TopRight:
             default:
             {
-                marginY = marginTop;
-
                 textureX = mc.displayWidth - minimapWidth - marginX;
-                textureY = marginY;
+                textureY = marginTop;
                 translateX = (mc.displayWidth / 2) - halfWidth - marginX;
-                translateY = -(mc.displayHeight / 2) + halfHeight + marginY;
+                translateY = -(mc.displayHeight / 2) + halfHeight + marginTop;
                 debugLabelAlign = DrawUtil.HAlign.Left;
                 debugLabelX = mc.displayWidth - marginX - 20;
                 break;

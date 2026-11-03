@@ -31,10 +31,12 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.MathHelper;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.nio.FloatBuffer;
 
 /**
  * Displays the map as a minimap overlay in-game.
@@ -49,6 +51,7 @@ public class MiniMap
     private static final float lightmapT = (float) (15728880 / 65536) / 1f;
     private static final long labelRefreshRate = 400;
     private static final float MIN_SCALE = 0.1f;
+    private static final float MAX_SCALE = 10f;
     private final static GridRenderer gridRenderer = new GridRenderer();
     private final IForgeHelper forgeHelper = ForgeHelper.INSTANCE;
     private final Logger logger = Journeymap.getLogger();
@@ -60,6 +63,7 @@ public class MiniMap
     private StatTimer drawTimer;
     private StatTimer refreshStateTimer;
     private DisplayVars dv;
+    private DisplayVars boundsLayout;
     private long lastLabelRefresh = 0;
     private String fpsLabelText;
     private String locationLabelText;
@@ -72,6 +76,11 @@ public class MiniMap
     private long initTime;
     private long lastRotationTime = 0;
     private double smoothedRotation = Double.NaN;
+
+    /** The offset and scale drawMap applies, see updateRotation. */
+    private boolean moved;
+    private float moveLeft, moveTop, moveOffsetX, moveOffsetY, moveScale;
+    private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
     /**
      * Default constructor
@@ -124,27 +133,54 @@ public class MiniMap
     }
 
     /**
-     * The minimap and its margins: left, top, right and bottom, in screen pixels.
+     * The minimap and its margins: left, top, right and bottom, in screen pixels. Only works out the layout, so it
+     * neither needs a player nor reloads the map or saves its settings, which drawMap does.
      */
     public int[] getBounds()
     {
-        // Only drawMap does this otherwise, which does not run while the minimap is hidden
-        updateDisplayVars(false);
-        return new int[]{getBoundsLeft(), getBoundsTop(),
-                dv.textureX + dv.minimapWidth + dv.marginX, dv.textureY + dv.minimapHeight + dv.marginBottom};
+        DisplayVars layout = getBoundsLayout();
+        return new int[]{getBoundsLeft(layout), getBoundsTop(layout),
+                layout.textureX + layout.minimapWidth + layout.marginX,
+                layout.textureY + layout.minimapHeight + layout.marginBottom};
+    }
+
+    /**
+     * The layout drawMap uses, or a new one when the window or the settings that change the layout changed since.
+     */
+    private DisplayVars getBoundsLayout()
+    {
+        if (isLayoutCurrent(dv))
+        {
+            return dv;
+        }
+        if (!isLayoutCurrent(boundsLayout))
+        {
+            boundsLayout = new DisplayVars(mc, miniMapProperties);
+        }
+        return boundsLayout;
+    }
+
+    private boolean isLayoutCurrent(DisplayVars layout)
+    {
+        return layout != null
+                && mc.displayWidth == layout.displayWidth
+                && mc.displayHeight == layout.displayHeight
+                && layout.shape == miniMapProperties.shape.get()
+                && layout.position == miniMapProperties.position.get()
+                && layout.fontScale == miniMapProperties.fontScale.get();
     }
 
     /**
      * The top left corner of {@link #getBounds()}, also where drawMap resizes around, so the two always match.
      */
-    private int getBoundsLeft()
+    private static int getBoundsLeft(DisplayVars layout)
     {
-        return dv.textureX - dv.marginX;
+        return layout.textureX - layout.marginX;
     }
 
-    private int getBoundsTop()
+    private static int getBoundsTop(DisplayVars layout)
     {
-        return dv.textureY - dv.marginTop;
+        return layout.textureY - layout.marginTop;
     }
 
     /**
@@ -187,7 +223,7 @@ public class MiniMap
     {
         StatTimer timer = drawTimer;
         boolean displayResized = false;
-        boolean transformPushed = false;
+        moved = false;
 
         RenderHelper.disableStandardItemLighting();
 
@@ -263,16 +299,24 @@ public class MiniMap
                 JMLogger.logOnce("Minimap scale is below " + MIN_SCALE + ", using " + MIN_SCALE, null);
                 scale = MIN_SCALE;
             }
+            else if (scale > MAX_SCALE)
+            {
+                JMLogger.logOnce("Minimap scale is above " + MAX_SCALE + ", using " + MAX_SCALE, null);
+                scale = MAX_SCALE;
+            }
 
             if (offsetX != 0 || offsetY != 0 || scale != 1)
             {
-                int left = getBoundsLeft();
-                int top = getBoundsTop();
+                moveLeft = getBoundsLeft(dv);
+                moveTop = getBoundsTop(dv);
+                moveOffsetX = offsetX;
+                moveOffsetY = offsetY;
+                moveScale = scale;
                 GL11.glPushMatrix();
-                transformPushed = true;
-                GL11.glTranslatef(left + offsetX, top + offsetY, 0);
+                moved = true;
+                GL11.glTranslatef(moveLeft + offsetX, moveTop + offsetY, 0);
                 GL11.glScalef(scale, scale, 1);
-                GL11.glTranslatef(-left, -top, 0);
+                GL11.glTranslatef(-moveLeft, -moveTop, 0);
             }
 
             // Experimental fix for overly-dark screens with some graphics cards
@@ -498,9 +542,10 @@ public class MiniMap
         }
         finally
         {
-            if (transformPushed)
+            if (moved)
             {
                 GL11.glPopMatrix();
+                moved = false;
             }
 
             // Return resolution to how it is normally scaled, even if drawing failed
@@ -562,7 +607,31 @@ public class MiniMap
             GL11.glTranslated(-width, -height, 0);
         }
 
+        updateRotation(rotation);
+    }
+
+    /**
+     * GridRenderer remembers the current matrix to turn map pixels into window pixels and back. That must be the
+     * matrix without the offset and scale of drawMap, since what it returns is drawn with them, or they apply twice.
+     * sizeDisplay leaves only a depth shift before them, so undoing them in front of the current matrix is exact.
+     */
+    private void updateRotation(double rotation)
+    {
+        if (!moved)
+        {
+            gridRenderer.updateRotation(rotation);
+            return;
+        }
+        matrixBuffer.clear();
+        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, matrixBuffer);
+        GL11.glPushMatrix();
+        GL11.glLoadIdentity();
+        GL11.glTranslatef(moveLeft, moveTop, 0);
+        GL11.glScalef(1 / moveScale, 1 / moveScale, 1);
+        GL11.glTranslatef(-(moveLeft + moveOffsetX), -(moveTop + moveOffsetY), 0);
+        GL11.glMultMatrix(matrixBuffer);
         gridRenderer.updateRotation(rotation);
+        GL11.glPopMatrix();
     }
 
     private double smoothRotation(double targetRotation)
@@ -626,7 +695,7 @@ public class MiniMap
     private void stopMapRotation(double rotation)
     {
         GL11.glPopMatrix();
-        gridRenderer.updateRotation(rotation);
+        updateRotation(rotation);
     }
 
     private boolean isOnScreen(Point2D.Double objectPixel, Point2D centerPixel, Rectangle2D.Double centerRect)

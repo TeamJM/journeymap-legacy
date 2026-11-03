@@ -33,8 +33,9 @@ import org.apache.logging.log4j.Logger;
 public class UIManager
 {
     private final Logger logger = Journeymap.getLogger();
+    private static final long RENDER_EVENT_RETRY_DELAY = 5000;
     private final MiniMap miniMap;
-    private boolean renderEventFailed;
+    private long renderEventRetryTime;
     Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
 
     private UIManager()
@@ -158,23 +159,32 @@ public class UIManager
                 // JourneyMap's own screens stay out of it, like the options which draw their own preview
                 if (!(currentScreen instanceof JmUI))
                 {
-                    final MiniMapRenderEvent event = new MiniMapRenderEvent(currentScreen);
-                    try
+                    MiniMapRenderEvent event = null;
+                    if (System.currentTimeMillis() >= renderEventRetryTime)
                     {
-                        if (!renderEventFailed)
+                        event = new MiniMapRenderEvent(currentScreen);
+                        try
                         {
                             MinecraftForge.EVENT_BUS.post(event);
                         }
-                    }
-                    catch (Throwable t)
-                    {
-                        // Forge logs every failure itself, so stop posting or that floods the log every frame
-                        renderEventFailed = true;
-                        JMLogger.logOnce("Error in a MiniMapRenderEvent listener, no longer posting it: " + t, t);
+                        catch (Throwable t)
+                        {
+                            // Forge logs every failure itself, so wait before posting again or that floods the log
+                            renderEventRetryTime = System.currentTimeMillis() + RENDER_EVENT_RETRY_DELAY;
+                            JMLogger.logOnce("Error in a MiniMapRenderEvent listener, trying again in a few seconds: " + t, t);
+                            event = null;
+                        }
                     }
                     final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat
-                            || event.drawWhileScreenOpen;
-                    if (doDraw && !event.isCanceled())
+                            || (event != null && event.drawWhileScreenOpen);
+                    if (event == null)
+                    {
+                        if (doDraw)
+                        {
+                            miniMap.drawMap(false, partialTicks);
+                        }
+                    }
+                    else if (doDraw && !event.isCanceled())
                     {
                         miniMap.drawMap(false, partialTicks, event.offsetX, event.offsetY, event.scale);
                     }
@@ -301,7 +311,7 @@ public class UIManager
     {
         Fullscreen.state().requireRefresh();
         miniMap.reset();
-        renderEventFailed = false;
+        renderEventRetryTime = 0;
     }
 
     public void switchMiniMapPreset()

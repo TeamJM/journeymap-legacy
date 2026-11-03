@@ -3,8 +3,8 @@ package journeymap.client.hud;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import journeymap.client.JourneymapClient;
+import journeymap.client.forge.helper.ForgeHelper;
 import journeymap.client.ui.UIManager;
-import net.minecraft.client.Minecraft;
 
 /**
  * What another mod can ask about the minimap, safe to call from the start of the game on. Only call it on the client
@@ -18,18 +18,22 @@ public final class MiniMapHud
     }
 
     /**
-     * Whether the player has the minimap turned on in JourneyMap. False until there is a minimap to ask, like in the
-     * main menu.
+     * Whether JourneyMap draws the minimap on the HUD: the player has it turned on, and mapping runs or is turned off
+     * in the settings. False until there is a minimap to ask, like in the main menu. Open screens and a cancelled
+     * {@link MiniMapRenderEvent} are not part of it, since those can change every frame.
      */
     public static boolean isEnabled()
     {
-        return isMiniMapReady() && UIManager.getInstance().isMiniMapEnabled();
+        if (!isMiniMapReady() || !UIManager.getInstance().isMiniMapEnabled())
+        {
+            return false;
+        }
+        return JourneymapClient.getInstance().isMapping() || !JourneymapClient.getCoreProperties().mappingEnabled.get();
     }
 
     /**
      * The minimap and its margins, which hold the compass and the labels, where JourneyMap's own settings put it.
-     * After the window size changed, this first redoes the minimap's layout, which rebuilds its textures and saves its
-     * settings, so avoid calling it more than needed.
+     * This only works out the layout, so it does not reload the map or save settings.
      *
      * @return left, top, right and bottom, in screen pixels and not in GUI scaled pixels. All 0 until there is a minimap
      * to ask, like in the main menu.
@@ -44,6 +48,7 @@ public final class MiniMapHud
      */
     private static boolean isMiniMapReady()
     {
-        return Minecraft.getMinecraft().thePlayer != null && JourneymapClient.getInstance().isInitialized();
+        JourneymapClient client = JourneymapClient.getInstance();
+        return client != null && client.isInitialized() && ForgeHelper.INSTANCE.getClient().thePlayer != null;
     }
 }
