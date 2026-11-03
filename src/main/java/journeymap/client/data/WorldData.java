@@ -113,14 +113,23 @@ public class WorldData extends CacheLoader<Class, WorldData>
     {
         try
         {
-            return ForgeHelper.INSTANCE.getRealmsServerName().replace(':', '_');
+            String realmsServerName = ForgeHelper.INSTANCE.getRealmsServerName();
+            if (realmsServerName != null)
+            {
+                return realmsServerName.replace(':', '_');
+            }
         }
         catch (Throwable t)
         {
             Journeymap.getLogger().error("Couldn't get service name: {}", LogFormatter.toString(t));
             // Fallback
-            return getLegacyServerName().replace(':', '_');
+            String legacyServerName = getLegacyServerName();
+            if (legacyServerName != null)
+            {
+                return legacyServerName.replace(':', '_');
+            }
         }
+        return null;
     }
 
     public static String getLegacyServerName()
