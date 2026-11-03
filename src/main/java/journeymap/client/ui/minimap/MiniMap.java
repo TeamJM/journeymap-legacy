@@ -78,7 +78,7 @@ public class MiniMap
     private double smoothedRotation = Double.NaN;
 
     /** The offset and scale drawMap applies, see updateRotation. */
-    private boolean moved;
+    private boolean hudMoved;
     private float moveLeft, moveTop, moveOffsetX, moveOffsetY, moveScale;
     private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
@@ -162,11 +162,16 @@ public class MiniMap
 
     private boolean isLayoutCurrent(DisplayVars layout)
     {
+        return isLayoutCurrent(layout, miniMapProperties.shape.get(), miniMapProperties.position.get());
+    }
+
+    private boolean isLayoutCurrent(DisplayVars layout, Shape shape, Position position)
+    {
         return layout != null
                 && mc.displayWidth == layout.displayWidth
                 && mc.displayHeight == layout.displayHeight
-                && layout.shape == miniMapProperties.shape.get()
-                && layout.position == miniMapProperties.position.get()
+                && layout.requestedShape == shape
+                && layout.position == position
                 && layout.fontScale == miniMapProperties.fontScale.get();
     }
 
@@ -223,7 +228,7 @@ public class MiniMap
     {
         StatTimer timer = drawTimer;
         boolean displayResized = false;
-        moved = false;
+        hudMoved = false;
 
         RenderHelper.disableStandardItemLighting();
 
@@ -313,7 +318,7 @@ public class MiniMap
                 moveOffsetY = offsetY;
                 moveScale = scale;
                 GL11.glPushMatrix();
-                moved = true;
+                hudMoved = true;
                 GL11.glTranslatef(moveLeft + offsetX, moveTop + offsetY, 0);
                 GL11.glScalef(scale, scale, 1);
                 GL11.glTranslatef(-moveLeft, -moveTop, 0);
@@ -542,10 +547,10 @@ public class MiniMap
         }
         finally
         {
-            if (moved)
+            if (hudMoved)
             {
                 GL11.glPopMatrix();
-                moved = false;
+                hudMoved = false;
             }
 
             // Return resolution to how it is normally scaled, even if drawing failed
@@ -617,7 +622,7 @@ public class MiniMap
      */
     private void updateRotation(double rotation)
     {
-        if (!moved)
+        if (!hudMoved)
         {
             gridRenderer.updateRotation(rotation);
             return;
@@ -830,19 +835,13 @@ public class MiniMap
     {
         if (dv != null)
         {
-            updateDisplayVars(dv.shape, dv.position, force);
+            updateDisplayVars(dv.requestedShape, dv.position, force);
         }
     }
 
     public void updateDisplayVars(Shape shape, Position position, boolean force)
     {
-        if (dv != null
-                && !force
-                && mc.displayHeight == dv.displayHeight
-                && mc.displayWidth == dv.displayWidth
-                && this.dv.shape == shape
-                && this.dv.position == position
-                && this.dv.fontScale == miniMapProperties.fontScale.get())
+        if (!force && isLayoutCurrent(dv, shape, position))
         {
             return;
         }

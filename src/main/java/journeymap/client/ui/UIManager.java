@@ -34,8 +34,10 @@ public class UIManager
 {
     private final Logger logger = Journeymap.getLogger();
     private static final long RENDER_EVENT_RETRY_DELAY = 5000;
+    private static final long RENDER_EVENT_MAX_RETRY_DELAY = 5 * 60 * 1000;
     private final MiniMap miniMap;
     private long renderEventRetryTime;
+    private long renderEventRetryDelay = RENDER_EVENT_RETRY_DELAY;
     Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
 
     private UIManager()
@@ -166,27 +168,25 @@ public class UIManager
                         try
                         {
                             MinecraftForge.EVENT_BUS.post(event);
+                            renderEventRetryDelay = RENDER_EVENT_RETRY_DELAY;
                         }
                         catch (Throwable t)
                         {
-                            // Forge logs every failure itself, so wait before posting again or that floods the log
-                            renderEventRetryTime = System.currentTimeMillis() + RENDER_EVENT_RETRY_DELAY;
-                            JMLogger.logOnce("Error in a MiniMapRenderEvent listener, trying again in a few seconds: " + t, t);
+                            // Forge logs every failure itself, so wait longer after each one in a row or that floods the log
+                            renderEventRetryTime = System.currentTimeMillis() + renderEventRetryDelay;
+                            renderEventRetryDelay = Math.min(renderEventRetryDelay * 2, RENDER_EVENT_MAX_RETRY_DELAY);
+                            JMLogger.logOnce("Error in a MiniMapRenderEvent listener, trying again later: " + t.getClass().getName(), t);
                             event = null;
                         }
                     }
                     final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat
                             || (event != null && event.drawWhileScreenOpen);
-                    if (event == null)
+                    if (doDraw && (event == null || !event.isCanceled()))
                     {
-                        if (doDraw)
-                        {
-                            miniMap.drawMap(false, partialTicks);
-                        }
-                    }
-                    else if (doDraw && !event.isCanceled())
-                    {
-                        miniMap.drawMap(false, partialTicks, event.offsetX, event.offsetY, event.scale);
+                        miniMap.drawMap(false, partialTicks,
+                                event == null ? 0 : event.offsetX,
+                                event == null ? 0 : event.offsetY,
+                                event == null ? 1 : event.scale);
                     }
                 }
             }
@@ -312,6 +312,7 @@ public class UIManager
         Fullscreen.state().requireRefresh();
         miniMap.reset();
         renderEventRetryTime = 0;
+        renderEventRetryDelay = RENDER_EVENT_RETRY_DELAY;
     }
 
     public void switchMiniMapPreset()

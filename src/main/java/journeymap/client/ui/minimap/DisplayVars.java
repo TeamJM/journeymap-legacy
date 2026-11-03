@@ -36,6 +36,8 @@ public class DisplayVars
 {
     final Position position;
     final Shape shape;
+    /** The shape in the settings, which differs from shape when the theme has no spec for it. */
+    final Shape requestedShape;
     final Orientation orientation;
     final double fontScale;
     final float drawScale;
@@ -88,6 +90,7 @@ public class DisplayVars
         this.showCompass = miniMapProperties.showCompass.get();
         this.showReticle = miniMapProperties.showReticle.get();
         this.position = miniMapProperties.position.get();
+        this.requestedShape = miniMapProperties.shape.get();
         this.orientation = miniMapProperties.orientation.get();
         this.displayWidth = mc.displayWidth;
         this.displayHeight = mc.displayHeight;

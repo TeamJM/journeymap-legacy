@@ -24,11 +24,7 @@ public final class MiniMapHud
      */
     public static boolean isEnabled()
     {
-        if (!isMiniMapReady() || !UIManager.getInstance().isMiniMapEnabled())
-        {
-            return false;
-        }
-        return JourneymapClient.getInstance().isMapping() || !JourneymapClient.getCoreProperties().mappingEnabled.get();
+        return isMiniMapReady() && UIManager.getInstance().isMiniMapEnabled();
     }
 
     /**
@@ -36,7 +32,7 @@ public final class MiniMapHud
      * This only works out the layout, so it does not reload the map or save settings.
      *
      * @return left, top, right and bottom, in screen pixels and not in GUI scaled pixels. All 0 until there is a minimap
-     * to ask, like in the main menu.
+     * to ask, like in the main menu or while joining a world.
      */
     public static int[] getBounds()
     {
@@ -44,11 +40,13 @@ public final class MiniMapHud
     }
 
     /**
-     * Using UIManager before this is true would break it for the whole session.
+     * The same point from which JourneyMap itself draws the minimap. Using UIManager earlier would set it up for the
+     * wrong world.
      */
     private static boolean isMiniMapReady()
     {
         JourneymapClient client = JourneymapClient.getInstance();
-        return client != null && client.isInitialized() && ForgeHelper.INSTANCE.getClient().thePlayer != null;
+        return client != null && client.isInitialized() && ForgeHelper.INSTANCE.getClient().thePlayer != null
+                && client.shouldDrawMiniMap();
     }
 }
