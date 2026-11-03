@@ -113,7 +113,7 @@ public class MiniMapOverlayHandler implements EventHandlerManager.EventHandler
                 {
                     jm = JourneymapClient.getInstance();
                 }
-                if (jm.isMapping() || !JourneymapClient.getCoreProperties().mappingEnabled.get())
+                if (jm.shouldDrawMiniMap())
                 {
                     mc.mcProfiler.startSection("journeymap");
 

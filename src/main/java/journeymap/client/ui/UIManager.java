@@ -8,6 +8,8 @@ package journeymap.client.ui;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.helper.ForgeHelper;
+import journeymap.client.hud.MiniMapRenderEvent;
+import journeymap.client.log.JMLogger;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
 import journeymap.client.properties.config.Config;
@@ -24,13 +26,18 @@ import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 public class UIManager
 {
     private final Logger logger = Journeymap.getLogger();
+    private static final long RENDER_EVENT_RETRY_DELAY = 5000;
+    private static final long RENDER_EVENT_MAX_RETRY_DELAY = 5 * 60 * 1000;
     private final MiniMap miniMap;
+    private long renderEventRetryTime;
+    private long renderEventRetryDelay = RENDER_EVENT_RETRY_DELAY;
     Minecraft minecraft = ForgeHelper.INSTANCE.getClient();
 
     private UIManager()
@@ -151,10 +158,36 @@ public class UIManager
             if (miniMap.getCurrentMinimapProperties().enabled.get())
             {
                 final GuiScreen currentScreen = minecraft.currentScreen;
-                final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat;
-                if (doDraw)
+                // JourneyMap's own screens stay out of it, like the options which draw their own preview
+                if (!(currentScreen instanceof JmUI))
                 {
-                    miniMap.drawMap(partialTicks);
+                    MiniMapRenderEvent event = null;
+                    if (System.currentTimeMillis() >= renderEventRetryTime)
+                    {
+                        event = new MiniMapRenderEvent(currentScreen);
+                        try
+                        {
+                            MinecraftForge.EVENT_BUS.post(event);
+                            renderEventRetryDelay = RENDER_EVENT_RETRY_DELAY;
+                        }
+                        catch (Throwable t)
+                        {
+                            // Forge logs every failure itself, so wait longer after each one in a row or that floods the log
+                            renderEventRetryTime = System.currentTimeMillis() + renderEventRetryDelay;
+                            renderEventRetryDelay = Math.min(renderEventRetryDelay * 2, RENDER_EVENT_MAX_RETRY_DELAY);
+                            JMLogger.logOnce("Error in a MiniMapRenderEvent listener, trying again later: " + t.getClass().getName(), t);
+                            event = null;
+                        }
+                    }
+                    final boolean doDraw = currentScreen == null || currentScreen instanceof GuiChat
+                            || (event != null && event.drawWhileScreenOpen);
+                    if (doDraw && (event == null || !event.isCanceled()))
+                    {
+                        miniMap.drawMap(false, partialTicks,
+                                event == null ? 0 : event.offsetX,
+                                event == null ? 0 : event.offsetY,
+                                event == null ? 1 : event.scale);
+                    }
                 }
             }
         }
@@ -278,6 +311,8 @@ public class UIManager
     {
         Fullscreen.state().requireRefresh();
         miniMap.reset();
+        renderEventRetryTime = 0;
+        renderEventRetryDelay = RENDER_EVENT_RETRY_DELAY;
     }
 
     public void switchMiniMapPreset()

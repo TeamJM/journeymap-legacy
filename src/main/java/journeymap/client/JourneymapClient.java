@@ -374,6 +374,14 @@ public class JourneymapClient implements CommonProxy
     }
 
     /**
+     * Whether the minimap is drawn on the HUD: while mapping, or always when mapping is turned off.
+     */
+    public boolean shouldDrawMiniMap()
+    {
+        return isMapping() || !getCoreProperties().mappingEnabled.get();
+    }
+
+    /**
      * Whether thread logging is enabled.
      *
      * @return

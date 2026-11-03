@@ -36,6 +36,8 @@ public class DisplayVars
 {
     final Position position;
     final Shape shape;
+    /** The shape in the settings, which differs from shape when the theme has no spec for it. */
+    final Shape requestedShape;
     final Orientation orientation;
     final double fontScale;
     final float drawScale;
@@ -65,7 +67,8 @@ public class DisplayVars
     final LocationFormat.LocationFormatKeys locationFormatKeys;
     final TimeFormat.TimeFormatKeys timeFormatKeys;
     final boolean locationFormatVerbose;
-    int marginX, marginY;
+    final int marginTop, marginBottom;
+    int marginX;
     boolean forceUnicode;
     MapTypeStatus mapTypeStatus;
     MapPresetStatus mapPresetStatus;
@@ -87,6 +90,7 @@ public class DisplayVars
         this.showCompass = miniMapProperties.showCompass.get();
         this.showReticle = miniMapProperties.showReticle.get();
         this.position = miniMapProperties.position.get();
+        this.requestedShape = miniMapProperties.shape.get();
         this.orientation = miniMapProperties.orientation.get();
         this.displayWidth = mc.displayWidth;
         this.displayHeight = mc.displayHeight;
@@ -153,7 +157,8 @@ public class DisplayVars
         drawScale = (miniMapProperties.textureSmall.get() ? .75f : 1f);
 
         minimapFrame = new ThemeMinimapFrame(theme, minimapSpec, miniMapProperties, minimapWidth, minimapHeight);
-        marginX = marginY = minimapSpec.margin;
+        marginX = minimapSpec.margin;
+        int marginY = minimapSpec.margin;
 
         int halfWidth = minimapWidth / 2;
         int halfHeight = minimapHeight / 2;
@@ -176,6 +181,24 @@ public class DisplayVars
             marginY = (int) Math.max(marginY, Math.ceil(compassPointMargin) + compassLabelHeight / 2);
         }
 
+        // Labels only sit on one side of the map, so the space above and below it differs
+        int spaceAbove = marginY;
+        if (!minimapSpec.labelTopInside && showFps)
+        {
+            spaceAbove = Math.max(spaceAbove, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
+        }
+        marginTop = spaceAbove;
+
+        int spaceBelow = marginY;
+        if (!minimapSpec.labelBottomInside && (showLocation || showBiome || showTime))
+        {
+            int labels = showLocation ? 1 : 0;
+            labels += showBiome ? 1 : 0;
+            labels += showTime ? 1 : 0;
+            spaceBelow = Math.max(spaceBelow, minimapSpec.labelBottomMargin + (labels * locationLabelHeight) + compassLabelHeight / 2);
+        }
+        marginBottom = spaceBelow;
+
         DrawUtil.HAlign debugLabelAlign;
         int debugLabelX;
 
@@ -184,66 +207,40 @@ public class DisplayVars
         {
             case BottomRight:
             {
-                if (!minimapSpec.labelBottomInside && (showLocation || showBiome || showTime))
-                {
-                    int labels = showLocation ? 1 : 0;
-                    labels += showBiome ? 1 : 0;
-                    labels += showTime ? 1 : 0;
-                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels * locationLabelHeight) + compassLabelHeight / 2);
-                }
-
                 textureX = mc.displayWidth - minimapWidth - marginX;
-                textureY = mc.displayHeight - (minimapHeight) - marginY;
+                textureY = mc.displayHeight - (minimapHeight) - marginBottom;
                 translateX = (mc.displayWidth / 2) - halfWidth - marginX;
-                translateY = (mc.displayHeight / 2) - halfHeight - marginY;
+                translateY = (mc.displayHeight / 2) - halfHeight - marginBottom;
                 debugLabelAlign = DrawUtil.HAlign.Left;
                 debugLabelX = mc.displayWidth - marginX - 20;
                 break;
             }
             case TopLeft:
             {
-                if (!minimapSpec.labelTopInside && showFps)
-                {
-                    marginY = Math.max(marginY, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
-                }
-
                 textureX = marginX;
-                textureY = marginY;
+                textureY = marginTop;
                 translateX = -(mc.displayWidth / 2) + halfWidth + marginX;
-                translateY = -(mc.displayHeight / 2) + halfHeight + marginY;
+                translateY = -(mc.displayHeight / 2) + halfHeight + marginTop;
                 debugLabelAlign = DrawUtil.HAlign.Right;
                 debugLabelX = marginX;
                 break;
             }
             case BottomLeft:
             {
-                if (!minimapSpec.labelBottomInside && (showLocation || showBiome || showTime))
-                {
-                    int labels = showLocation ? 1 : 0;
-                    labels += showBiome ? 1 : 0;
-                    labels += showTime ? 1 : 0;
-
-                    marginY = Math.max(marginY, minimapSpec.labelBottomMargin + (labels * locationLabelHeight) + compassLabelHeight / 2);
-                }
-
                 textureX = marginX;
-                textureY = mc.displayHeight - (minimapHeight) - marginY;
+                textureY = mc.displayHeight - (minimapHeight) - marginBottom;
                 translateX = -(mc.displayWidth / 2) + halfWidth + marginX;
-                translateY = (mc.displayHeight / 2) - halfHeight - marginY;
+                translateY = (mc.displayHeight / 2) - halfHeight - marginBottom;
                 debugLabelAlign = DrawUtil.HAlign.Right;
                 debugLabelX = marginX;
                 break;
             }
             case TopCenter:
             {
-                if (!minimapSpec.labelTopInside && showFps)
-                {
-                    marginY = Math.max(marginY, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
-                }
                 textureX = (mc.displayWidth - minimapWidth) / 2;
-                textureY = marginY;
+                textureY = marginTop;
                 translateX = 0;
-                translateY = -(mc.displayHeight / 2) + halfHeight + marginY;
+                translateY = -(mc.displayHeight / 2) + halfHeight + marginTop;
                 debugLabelAlign = DrawUtil.HAlign.Center;
                 debugLabelX = (int) Math.floor(textureX + (minimapWidth / 2));
                 break;
@@ -261,15 +258,10 @@ public class DisplayVars
             case TopRight:
             default:
             {
-                if (!minimapSpec.labelTopInside && showFps)
-                {
-                    marginY = Math.max(marginY, Math.max(compassLabelHeight / 2, minimapSpec.labelTopMargin) + fpsLabelHeight);
-                }
-
                 textureX = mc.displayWidth - minimapWidth - marginX;
-                textureY = marginY;
+                textureY = marginTop;
                 translateX = (mc.displayWidth / 2) - halfWidth - marginX;
-                translateY = -(mc.displayHeight / 2) + halfHeight + marginY;
+                translateY = -(mc.displayHeight / 2) + halfHeight + marginTop;
                 debugLabelAlign = DrawUtil.HAlign.Left;
                 debugLabelX = mc.displayWidth - marginX - 20;
                 break;
