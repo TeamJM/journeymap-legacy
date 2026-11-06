@@ -64,49 +64,24 @@ class DimensionsButton extends Button
     }
 
 
-    public void nextValue()
-    {
-        int index;
-
-        if (currentWorldProvider == null)
-        {
-            index = 0;
-        }
-        else
-        {
-            index = -1;
-
-            int currentDimension = ForgeHelper.INSTANCE.getDimension(currentWorldProvider);
-
-            for (WorldProvider worldProvider : worldProviders)
-            {
-                if (currentDimension == ForgeHelper.INSTANCE.getDimension(worldProvider))
-                {
-                    index = worldProviders.indexOf(worldProvider) + 1;
-                    break;
-                }
-            }
-        }
-
-        if (index >= worldProviders.size() || index < 0)
-        {
-            this.setCurrentWorldProvider(null); // "All"
-        }
-        else
-        {
-            this.setCurrentWorldProvider(worldProviders.get(index));
-        }
-
-        updateLabel();
-    }
-
     private void setCurrentWorldProvider(WorldProvider provider)
     {
         this.currentWorldProvider = provider;
         allDimSelected = provider == null;
     }
 
-    WorldProvider getCurrentWorldProvider()
+    public void selectProvider(WorldProvider provider)
+    {
+        this.setCurrentWorldProvider(provider);
+        updateLabel();
+    }
+
+    public List<WorldProvider> getWorldProviders()
+    {
+        return worldProviders;
+    }
+
+    public WorldProvider getCurrentWorldProvider()
     {
         return currentWorldProvider;
     }
