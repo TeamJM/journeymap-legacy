@@ -1113,18 +1113,6 @@ public class Fullscreen extends JmUI
     }
 
     @Override
-    protected void drawLogo()
-    {
-        if (logo.isDefunct())
-        {
-            logo = TextureCache.instance().getLogo();
-        }
-        DrawUtil.sizeDisplay(mc.displayWidth, mc.displayHeight);
-        DrawUtil.drawImage(logo, 8, 8, false, 1, 0);
-        DrawUtil.sizeDisplay(width, height);
-    }
-
-    @Override
     public final boolean doesGuiPauseGame()
     {
         return false;
