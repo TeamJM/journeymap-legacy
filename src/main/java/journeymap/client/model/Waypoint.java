@@ -29,7 +29,7 @@ import java.util.*;
  */
 public class Waypoint implements Serializable
 {
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
     public static final Gson GSON = new GsonBuilder().setVersion(VERSION).create();
 
     protected static final String ICON_NORMAL = "waypoint-normal.png";
@@ -77,6 +77,12 @@ public class Waypoint implements Serializable
     @Since(1)
     protected TreeSet<Integer> dimensions;
 
+    /**
+     * Epoch millis, 0 for waypoints saved before this field existed.
+     */
+    @Since(2)
+    protected long creationTime;
+
     protected transient boolean readOnly;
     protected transient boolean dirty;
     protected transient Minecraft mc = ForgeHelper.INSTANCE.getClient();
@@ -94,6 +100,7 @@ public class Waypoint implements Serializable
         this.x = original.x;
         this.y = original.y;
         this.z = original.z;
+        this.creationTime = original.creationTime;
     }
 
     public Waypoint(String name, int posX, int posY, int posZ, Color color, Type type, Integer currentDimension)
@@ -127,6 +134,7 @@ public class Waypoint implements Serializable
         this.enable = enable;
         this.type = type;
         this.origin = origin;
+        this.creationTime = System.currentTimeMillis();
 
         switch (type)
         {
@@ -150,10 +158,10 @@ public class Waypoint implements Serializable
 
     public static Waypoint at(int posX, int posY, int posZ, Type type, int dimension)
     {
+        Date now = new Date();
         String name;
         if (type == Type.Death)
         {
-            Date now = new Date();
             name = String.format("%s %s %s", Constants.getString("jm.waypoint.deathpoint"),
                     DateFormat.getTimeInstance().format(now),
                     DateFormat.getDateInstance(DateFormat.SHORT).format(now));
@@ -163,6 +171,7 @@ public class Waypoint implements Serializable
             name = createName(posX, posZ);
         }
         Waypoint waypoint = new Waypoint(name, posX, posY, posZ, Color.white, type, dimension);
+        waypoint.creationTime = now.getTime();
         waypoint.setRandomColor();
         return waypoint;
     }
@@ -423,6 +432,11 @@ public class Waypoint implements Serializable
     public void setReadOnly(boolean readOnly)
     {
         this.readOnly = readOnly;
+    }
+
+    public long getCreationTime()
+    {
+        return creationTime;
     }
 
     @Override
