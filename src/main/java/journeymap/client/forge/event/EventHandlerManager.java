@@ -5,8 +5,9 @@
 
 package journeymap.client.forge.event;
 
-import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.eventhandler.EventBus;
+import cpw.mods.fml.common.versioning.VersionParser;
 import journeymap.client.cartography.ColorManager;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.network.WorldInfoHandler;
@@ -23,7 +24,7 @@ import java.util.HashMap;
 public class EventHandlerManager
 {
     static WorldInfoHandler worldInfoHandler;
-    private static HashMap<Class<? extends EventHandler>, EventHandler> handlers = new HashMap<Class<? extends EventHandler>, EventHandler>();
+    private static final HashMap<Class<? extends EventHandler>, EventHandler> handlers = new HashMap<>();
 
     public static void registerGeneralHandlers()
     {
@@ -33,8 +34,33 @@ public class EventHandlerManager
         register(new ChunkUpdateHandler());
         register(new WaypointBeaconHandler());
         register(new TextureAtlasHandler());
+        if (isOpenBlocksGraveApiAvailable())
+        {
+            registerOpenBlockHandler();
+        }
         worldInfoHandler = new WorldInfoHandler();
         ColorManager.instance();
+    }
+
+    private static boolean isOpenBlocksGraveApiAvailable()
+    {
+        if (Loader.isModLoaded("OpenBlocks"))
+        {
+            for (ModContainer api : ModAPIManager.INSTANCE.getAPIList())
+            {
+                if ("OpenBlocks|API".equals(api.getModId()))
+                {
+                    return VersionParser.parseRange("[1.2,)").containsVersion(api.getProcessedVersion());
+                }
+            }
+        }
+        return false;
+    }
+
+    @Optional.Method(modid = "OpenBlocks")
+    private static void registerOpenBlockHandler()
+    {
+        register(new GraveRetrievedHandler());
     }
 
     public static void registerGuiHandlers()
