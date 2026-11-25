@@ -22,11 +22,13 @@ import java.util.UUID;
 @SideOnly(Side.CLIENT)
 public class GraveRetrievedHandler implements EventHandlerManager.EventHandler
 {
-    // OpenBlocks timestamps the grave on the server whereas, Journeymap creates the waypoint when
-    // the client player isDead, which is set 20 ticks later, see EntityLivingDeath#onDeathUpdate.
+    // OpenBlocks timestamps the grave on the server whereas Journeymap creates the waypoint when
+    // the client player isDead, which is set 20 ticks later, see EntityLivingBase#onDeathUpdate.
     // So both the timestamp and location may differ.
     private static final long MAX_DEATH_TIME_DIFFERENCE_MS = 3000;
-    private static final int MAX_GRAVE_DISTANCE = 8;
+    // Y is ignored because OpenBlocks clamps the grave height (e.g. void deaths). Horizontally it searches
+    // graveSpawnRange / 2 blocks around the death position, ~7 blocks with the default config.
+    private static final int MAX_GRAVE_HORIZONTAL_DISTANCE = 16;
 
     @Override
     public EnumSet<EventHandlerManager.BusType> getBus()
@@ -44,14 +46,13 @@ public class GraveRetrievedHandler implements EventHandlerManager.EventHandler
             final int dimension = event.entityPlayer.worldObj.provider.dimensionId;
             final long deathTime = event.deathTime;
             final int x = event.x;
-            final int y = event.y;
             final int z = event.z;
             // addScheduledTask
-            Minecraft.getMinecraft().func_152344_a(() -> removeMatchingDeathpoint(ownerID, dimension, deathTime, x, y, z));
+            Minecraft.getMinecraft().func_152344_a(() -> removeMatchingDeathpoint(ownerID, dimension, deathTime, x, z));
         }
     }
 
-    private void removeMatchingDeathpoint(UUID ownerID, int dimension, long deathTime, int x, int y, int z)
+    private void removeMatchingDeathpoint(UUID ownerID, int dimension, long deathTime, int x, int z)
     {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         WaypointProperties properties = JourneymapClient.getWaypointProperties();
@@ -73,14 +74,13 @@ public class GraveRetrievedHandler implements EventHandlerManager.EventHandler
                 continue;
             }
             int dx = waypoint.getX() - x;
-            int dy = waypoint.getY() - y;
             int dz = waypoint.getZ() - z;
-            if (dx * dx + dy * dy + dz * dz > MAX_GRAVE_DISTANCE * MAX_GRAVE_DISTANCE)
+            if (dx * dx + dz * dz > MAX_GRAVE_HORIZONTAL_DISTANCE * MAX_GRAVE_HORIZONTAL_DISTANCE)
             {
                 continue;
             }
-            // waypoint is created 20 ticks later
-            long timeDifference = Math.abs((waypoint.getCreationTime() - 20 * 50) - deathTime);
+            final int JOURNEYMAP_DEATHPOINT_CREATION_DELAY = 20 * 50;
+            long timeDifference = Math.abs((waypoint.getCreationTime() - JOURNEYMAP_DEATHPOINT_CREATION_DELAY) - deathTime);
             if (timeDifference <= closestTimeDifference)
             {
                 closest = waypoint;

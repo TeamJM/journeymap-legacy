@@ -5,10 +5,7 @@
 
 package journeymap.client.forge.event;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.ModAPIManager;
-import cpw.mods.fml.common.ModContainer;
-import cpw.mods.fml.common.Optional;
+import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.eventhandler.EventBus;
 import cpw.mods.fml.common.versioning.VersionParser;
 import journeymap.client.cartography.ColorManager;
@@ -47,11 +44,14 @@ public class EventHandlerManager
 
     private static boolean isOpenBlocksGraveApiAvailable()
     {
-        for (ModContainer api : ModAPIManager.INSTANCE.getAPIList())
+        if (Loader.isModLoaded("OpenBlocks"))
         {
-            if ("OpenBlocks|API".equals(api.getModId()))
+            for (ModContainer api : ModAPIManager.INSTANCE.getAPIList())
             {
-                return VersionParser.parseRange("[1.2,)").containsVersion(api.getProcessedVersion());
+                if ("OpenBlocks|API".equals(api.getModId()))
+                {
+                    return VersionParser.parseRange("[1.2,)").containsVersion(api.getProcessedVersion());
+                }
             }
         }
         return false;
