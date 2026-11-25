@@ -13,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import openblocks.api.GraveRetrievedEvent;
 
 import java.util.EnumSet;
+import java.util.UUID;
 
 /**
  * Removes the local player's deathpoint once their OpenBlocks grave has been emptied.
@@ -37,30 +38,28 @@ public class GraveRetrievedHandler implements EventHandlerManager.EventHandler
     @SubscribeEvent
     public void onGraveRetrieved(GraveRetrievedEvent event)
     {
-        final String ownerName = event.ownerName;
-        final int dimension = event.entityPlayer.worldObj.provider.dimensionId;
-        final long deathTime = event.deathTime;
-        final int x = event.x;
-        final int y = event.y;
-        final int z = event.z;
-        // addScheduledTask
-        Minecraft.getMinecraft().func_152344_a(() -> removeMatchingDeathpoint(ownerName, dimension, deathTime, x, y, z));
+        if (event.ownerId != null && event.deathTime != GraveRetrievedEvent.UNKNOWN_DEATH_TIME)
+        {
+            final UUID ownerID = event.ownerId;
+            final int dimension = event.entityPlayer.worldObj.provider.dimensionId;
+            final long deathTime = event.deathTime;
+            final int x = event.x;
+            final int y = event.y;
+            final int z = event.z;
+            // addScheduledTask
+            Minecraft.getMinecraft().func_152344_a(() -> removeMatchingDeathpoint(ownerID, dimension, deathTime, x, y, z));
+        }
     }
 
-    private void removeMatchingDeathpoint(String ownerName, int dimension, long deathTime, int x, int y, int z)
+    private void removeMatchingDeathpoint(UUID ownerID, int dimension, long deathTime, int x, int y, int z)
     {
-        // OpenBlocks uses -1 for graves without a known death time
-        if (deathTime < 0)
-        {
-            return;
-        }
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         WaypointProperties properties = JourneymapClient.getWaypointProperties();
         if (player == null || !properties.managerEnabled.get() || !properties.deleteDeathpointOnGraveRetrieved.get())
         {
             return;
         }
-        if (!player.getGameProfile().getName().equals(ownerName))
+        if (!player.getGameProfile().getId().equals(ownerID))
         {
             return;
         }
