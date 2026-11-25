@@ -1,4 +1,4 @@
-package journeymap.client.hud;
+package journeymap.api.minimap;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

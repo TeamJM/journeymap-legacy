@@ -5,10 +5,10 @@
 
 package journeymap.client.ui;
 
+import journeymap.api.minimap.MiniMapRenderEvent;
 import journeymap.client.JourneymapClient;
 import journeymap.client.data.WaypointsData;
 import journeymap.client.forge.helper.ForgeHelper;
-import journeymap.client.hud.MiniMapRenderEvent;
 import journeymap.client.log.JMLogger;
 import journeymap.client.log.LogFormatter;
 import journeymap.client.model.Waypoint;
